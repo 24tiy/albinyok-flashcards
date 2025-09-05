@@ -22,7 +22,7 @@ const translations = {
     noCSVs:"CSV в репозитории не найдены",
     ghApiErr:"Ошибка доступа к GitHub: ",
     selectPlaceholder:"…ищем CSV в репозитории…",
-    urlPlaceholder:"https://raw.githubusercontent.com/24tiy/albinyok-flashcards/main/Questions_et_r_ponses.csv",
+    urlPlaceholder:"https://...csv, .tsv, google sheet etc",
     reveal:"Показать ответ",
     hide:"Скрыть ответ",
     know:"✅ Знаю",
@@ -73,7 +73,7 @@ const translations = {
     noCSVs:"No CSV files found",
     ghApiErr:"GitHub error: ",
     selectPlaceholder:"…searching for CSVs…",
-    urlPlaceholder:"https://raw.githubusercontent.com/24tiy/albinyok-flashcards/main/Questions_et_r_ponses.csv",
+    urlPlaceholder:"https://...csv, .tsv, google sheet etc",
     reveal:"Show answer",
     hide:"Hide answer",
     know:"✅ Know",
@@ -124,7 +124,7 @@ const translations = {
     noCSVs:"Aucun CSV trouvé",
     ghApiErr:"Erreur GitHub : ",
     selectPlaceholder:"…recherche des CSV…",
-    urlPlaceholder:"https://raw.githubusercontent.com/24tiy/albinyok-flashcards/main/Questions_et_r_ponses.csv",
+    urlPlaceholder:"https://...csv, .tsv, google sheet etc",
     reveal:"Afficher réponse",
     hide:"Cacher réponse",
     know:"✅ Je sais",
@@ -171,27 +171,26 @@ function updateLang() {
   $("#templateBtn").textContent = t("template");
   $("#demoBtn").textContent = t("demo");
   $("#loadUrlBtn").textContent = t("urlBtn");
-  $("#loadPickedBtn").textContent = t("repoBtn");
-  $("#changeGHBtn").textContent = t("ghBarBtn");
-  $("#testBtn").textContent = "🧑‍🎓 " + t("test");
   $("#trainHardBtn").childNodes[0].nodeValue = "💪 " + t("train_hard");
   $("#toggleEditBtn").childNodes[0].nodeValue = "📝 " + t("edit");
-  $("#ghOwner").setAttribute("aria-label", t("owner"));
-  $("#ghRepo").setAttribute("aria-label", t("repo"));
-  $("#ghBranch").setAttribute("aria-label", t("branch"));
+  $("#ghOwner")?.setAttribute("aria-label", t("owner"));
+  $("#ghRepo")?.setAttribute("aria-label", t("repo"));
+  $("#ghBranch")?.setAttribute("aria-label", t("branch"));
   $("#urlInput").placeholder = t("urlPlaceholder");
   let pick=$("#csvPicker");
   if(pick && pick.options.length && pick.options[0].value===""){
     pick.options[0].textContent = t("selectPlaceholder");
   }
   $("#deckName").textContent = `${t('deck')}: —`;
+  $("#testBtn").textContent = "🧑‍🎓 " + t("test");
   $("#testStatus").innerHTML = testLocked ? `<b>${t("test_enabled")}</b> — ${t("test_status")}` : "";
   $("#testStatus").style.display = testLocked ? "" : "none";
   $("#testModeCheck").checked = !!testLocked;
   updateControlsBar();
 }
+
 $("#langSelect").addEventListener("change",function(e){
-  curLang=this.value; updateLang(); updateControlsBar(); updateUI();
+  curLang=this.value; updateLang(); updateUI();
 });
 $("#themeToggle").onclick = () => {
   theme = (theme==="light")?"dark":"light";
@@ -305,12 +304,6 @@ $("#testModeCheck").onchange=function(){
   awaitingTestAnswer = false;
   updateLang(); updateUI();
 };
-document.addEventListener("DOMContentLoaded",function(){
-  updateLang();
-  if(restore()) return;
-  $("#testModeCheck").checked = testLocked;
-  updateLang();
-});
 function modalTipBind(id, textKey) {
   let btn = $(id);
   btn && (btn.onmouseenter = btn.onclick = function (e) {
@@ -327,54 +320,8 @@ function modalTipBind(id, textKey) {
 modalTipBind("#testHelp", "testmode_tip");
 modalTipBind("#hardHelp", "hard_tip");
 modalTipBind("#editHelp", "editor_tip");
+// --- Таблицы: загрузка по файлу и ссылке
 
-// ---- карточки, загрузка, редактор
-
-function persist(){
-  localStorage.setItem(localKey,JSON.stringify({deck,idx,shown,deckName,lang:curLang,theme:theme,editMode}));
-}
-function restore(){
-  try{
-    let raw=localStorage.getItem(localKey);
-    if(!raw) return false;
-    let p=JSON.parse(raw);
-    if(p && p.deck && p.deck.length){
-      deck=p.deck; idx=Math.min(Math.max(0,p.idx|0),deck.length-1); shown=!!p.shown; deckName=p.deckName||'—';
-      if(p.lang) { curLang=p.lang; $("#langSelect").value=curLang; }
-      if(p.theme){ theme=p.theme; document.body.dataset.theme=theme; $("#themeToggle").textContent=(theme==="dark"?"🌞":"🌙");}
-      if(p.editMode!==undefined) editMode=!!p.editMode;
-      updateLang(); showWorkspace(); updateUI(); return true;
-    }
-  }catch(e){}
-  return false;
-}
-function showWorkspace(){ $("#uploader").classList.add("hidden"); $("#workspace").style.display="block"; }
-function showUploader(){ $("#uploader").classList.remove("hidden"); $("#workspace").style.display="none"; }
-$("#templateBtn").onclick = () => {
-  let csv='question,answer\n"Столица Франции?","Париж"\n"2+2?","4"\n"Главный цвет неба днём","Синий"\n';
-  let blob=new Blob([csv],{type:"text/csv;charset=utf-8;"}),url=URL.createObjectURL(blob),a=document.createElement("a");
-  a.href=url; a.download="flashcards_template.csv"; a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000);
-};
-$("#demoBtn").onclick = () => {
-  let demo='question,answer\n"Столица Франции?","Париж"\n"What is the capital of France?","Paris"\n"Quelle est la capitale de la France?","Paris"\n"2+2?","4"\n"Язык Python — это...","Язык программирования"\n"Python is a...","Programming language"\n"Python est un...","Langage de programmation"';
-  loadCSVText(demo,"Demo");
-};
-function loadCSVText(text,name){
-  try{
-    let parsed = Papa.parse(text.trim(), {skipEmptyLines:true});
-    if(parsed.errors && parsed.errors.length) throw new Error(parsed.errors[0].message);
-    let d=toDeck(parsed.data);
-    if(!d.length) throw new Error(t("csvNotPairs"));
-    mainDeck = JSON.parse(JSON.stringify(d));
-    deck = d; idx=0; shown=false; deckName=name||'';
-    persist(); showWorkspace(); testLocked=false; awaitingTestAnswer=false; updateUI();
-    $("#editorBar").style.display = "none";
-  }catch(e){
-    let err=$("#error");
-    if(err){ err.textContent=t("errorPref") + (e.message||e); err.classList.remove("hidden"); }
-    showUploader();
-  }
-}
 $("#file").addEventListener("change",function(e){
   let f=(e.target&&e.target.files&&e.target.files[0])?e.target.files[0]:null; if(!f) return;
   let r=new FileReader();
@@ -390,68 +337,81 @@ $("#reupload").addEventListener("change",function(e){
   r.readAsText(f);
 });
 $("#loadUrlBtn").onclick=function(){
-  let inp=$("#urlInput"),url=(inp&&inp.value)?inp.value.trim():"";
-  if(!url) return alert("Вставь ссылку на CSV");
-  fetch(url,{cache:"no-store"}).then(res=>{
-    if(!res.ok) throw new Error(`${t("fetchFail")} (${res.status})`);
-    if(+res.headers.get("content-length")>500000) throw new Error(t("fileTooBig"));
-    return res.text();
-  }).then(txt=>{
-    let name=decodeURIComponent(url.split("/").pop()||"Remote CSV");
-    loadCSVText(txt,name);
-  }).catch(e=>alert(e.message||e));
-};
-$("#loadPickedBtn").onclick=function(){
-  let pick=$("#csvPicker");
-  if(!pick||!pick.value) return;
-  let owner=pick.getAttribute("data-owner"),repo=pick.getAttribute("data-repo"),branch=pick.getAttribute("data-branch")||"main";
-  let url=`https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${pick.value}`;
-  fetch(url,{cache:"no-store"}).then(res=>{
-    if(!res.ok) throw new Error(`${t("fetchFail")} (${res.status})`);
-    if(+res.headers.get("content-length")>500000) throw new Error(t("fileTooBig"));
-    return res.text();
-  }).then(txt=>{
-    let name=decodeURIComponent(url.split("/").pop()||"Remote CSV");
-    loadCSVText(txt,name);
-  }).catch(e=>alert(e.message||e));
-};
-$("#changeGHBtn").onclick=function(){
-  let owner=$("#ghOwner")?$("#ghOwner").value.trim():"",repo=$("#ghRepo")?$("#ghRepo").value.trim():"",branch=$("#ghBranch")?$("#ghBranch").value.trim():"";
-  populatePicker(owner,repo,branch);
-  let pick=$("#csvPicker"); if(pick){pick.innerHTML = `<option>${t("selectPlaceholder")}</option>`;}
-  $("#error").classList.add("hidden");
-  setTimeout(()=>alert(t("ghChanged")),200);
-};
-function populatePicker(owner,repo,branch){
-  owner=owner||($("#ghOwner")?$("#ghOwner").value.trim():"");
-  repo=repo||($("#ghRepo")?$("#ghRepo").value.trim():"");
-  branch=branch||($("#ghBranch")?$("#ghBranch").value.trim():"");
-  let pick=$("#csvPicker"), btn=$("#loadPickedBtn");
-  if(!pick) return;
-  pick.innerHTML = `<option>${t("selectPlaceholder")}</option>`; btn.disabled = true;
-  if(!(owner&&repo&&branch)) return;
-  let url=`https://api.github.com/repos/${owner}/${repo}/git/trees/${encodeURIComponent(branch)}?recursive=1`;
-  fetch(url,{headers:{"Accept":"application/vnd.github+json"}})
+  let err = $("#error"), man = $("#downloadManual");
+  err.classList.add("hidden"); man.classList.add("hidden"); err.textContent = man.textContent = "";
+  let inp=$("#urlInput"), url=(inp&&inp.value)?inp.value.trim():"";
+  if (!url) { err.textContent="Вставьте ссылку!"; err.classList.remove("hidden"); return; }
+  // Google Sheets - auto to CSV
+  if(url.includes("docs.google.com/spreadsheets/") && !/export\?format=csv/.test(url))
+    url = url.replace(/\/edit.*$/, '') + '/export?format=csv';
+  fetch(url,{cache:"no-store"})
     .then(res=>{
-      if(!res.ok) throw new Error(`${t("ghApiErr")}${res.status}`);
-      return res.json();
+      if(!res.ok) throw new Error(`Не удалось скачать: ${res.status} ${res.statusText}`);
+      if(+res.headers.get("content-length")>9000000) throw new Error("Слишком большой файл");
+      return res.text();
     })
-    .then(data=>{
-      let tree=(data&&data.tree)?data.tree:[], files=[];
-      for(let it of tree){ if(it.type==="blob" && /\.csv$/i.test(it.path)) files.push({path:it.path, name:it.path.split("/").pop()}); }
-      if(!files.length){pick.innerHTML = `<option>${t("noCSVs")}</option>`; btn.disabled = true;return;}
-      files.sort((a,b)=>a.path.localeCompare(b.path));
-      let html=""; for(let item of files){ html+=`<option value="${item.path}">${item.path}</option>`;}
-      pick.innerHTML=html;
-      pick.setAttribute("data-owner",owner);
-      pick.setAttribute("data-repo",repo);
-      pick.setAttribute("data-branch",branch);
-      btn.disabled=false;
-    })["catch"](e=>{
-      pick.innerHTML = `<option>${t("ghInvalid")} (${e.message||e})</option>`;
-      btn.disabled=true;
+    .then(txt=>{
+      if(txt.trim().length<50 || /<(html|body)[ >]/i.test(txt)) throw new Error("Не похоже на таблицу/CSV: скорее всего, файл защищён или отсутствует публично.");
+      let name = decodeURIComponent(url.split("/").pop()||"Remote Table");
+      loadCSVText(txt, name);
+    })
+    .catch(e=>{
+      man.textContent = "Не удалось скачать таблицу. Проверь, что она публична и это CSV/таблица. Или скачай файл к себе, а затем загрузи вручную. Ошибка: " + (e.message||e);
+      man.classList.remove("hidden");
     });
+};
+// --- Editor, Train Hard, Shuffle и прочее из предыдущих вариантов, ничего добавлять не нужно
+function persist(){ localStorage.setItem(localKey,JSON.stringify({deck,idx,shown,deckName,lang:curLang,theme:theme,editMode})); }
+function restore(){ try{ let raw=localStorage.getItem(localKey); if(!raw) return false; let p=JSON.parse(raw);
+if(p && p.deck && p.deck.length){ deck=p.deck; idx=Math.min(Math.max(0,p.idx|0),deck.length-1); shown=!!p.shown; deckName=p.deckName||'—';
+if(p.lang) { curLang=p.lang; $("#langSelect").value=curLang; }
+if(p.theme){ theme=p.theme; document.body.dataset.theme=theme; $("#themeToggle").textContent=(theme==="dark"?"🌞":"🌙");}
+if(p.editMode!==undefined) editMode=!!p.editMode; updateLang(); showWorkspace(); updateUI(); return true;}}catch(e){} return false;}
+function showWorkspace(){ $("#uploader").classList.add("hidden"); $("#workspace").style.display="block"; }
+function showUploader(){ $("#uploader").classList.remove("hidden"); $("#workspace").style.display="none"; }
+$("#templateBtn").onclick = () => {
+  let csv='question,answer\n"Столица Франции?","Париж"\n"2+2?","4"\n"Главный цвет неба днём","Синий"\n';
+  let blob=new Blob([csv],{type:"text/csv;charset=utf-8;"}),url=URL.createObjectURL(blob),a=document.createElement("a");
+  a.href=url; a.download="flashcards_template.csv"; a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000);
+};
+$("#demoBtn").onclick = () => {
+  let demo='question,answer\n"Столица Франции?","Париж"\n"What is the capital of France?","Paris"\n"Quelle est la capitale de la France?","Paris"\n"2+2?","4"\n"Язык Python — это...","Язык программирования"\n"Python is a...","Programming language"\n"Python est un...","Langage de programmation"';
+  loadCSVText(demo,"Demo");
+};
+function loadCSVText(text,name){
+  try{
+    let parsed = Papa.parse(text.trim(), {skipEmptyLines:true});
+    if(parsed.errors && parsed.errors.length) throw new Error(t("csvNotPairs"));
+    let d=toDeck(parsed.data);
+    if(!d.length) throw new Error(t("csvNotPairs"));
+    mainDeck = JSON.parse(JSON.stringify(d));
+    deck = d; idx=0; shown=false; deckName=name||'';
+    persist(); showWorkspace(); testLocked=false; awaitingTestAnswer=false; updateUI();
+    $("#editorBar").style.display = "none";
+  }catch(e){
+    let err=$("#error");
+    if(err){ err.textContent=t("errorPref") + (e.message||e); err.classList.remove("hidden"); }
+    showUploader();
+  }
 }
+$("#shuffleBtn").onclick = () => {deck=shuffle(deck);idx=0;shown=false;updateUI();persist();};
+$("#resetBtn").onclick = () => {
+  for(let i=0;i<deck.length;i++){deck[i].ok=false;deck[i].bad=false;}
+  idx=0;shown=false;updateUI();persist();
+};
+$("#exportBtn").onclick = ()=>{
+  let out=deck.map((x,i)=>({i,q:x.q,a:x.a,ok:x.ok,bad:x.bad}));
+  let blob=new Blob([JSON.stringify(out,null,2)],{type:"application/json"});
+  let url=URL.createObjectURL(blob),a=document.createElement("a");
+  a.href=url; a.download="deck-progress.json";
+  a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000);
+};
+$("#clearBtn").onclick = () => {
+  if(confirm("Удалить весь прогресс?")){ 
+    localStorage.removeItem(localKey);
+    location.reload();
+  }
+};
 $("#toggleEditBtn").onclick = function() {
   editMode = !editMode;
   persist();
@@ -511,24 +471,6 @@ $("#trainHardBtn").onclick = ()=>{
   deckName=t("train_hard");
   persist(); showWorkspace(); updateUI();
 };
-$("#shuffleBtn").onclick = () => {deck=shuffle(deck);idx=0;shown=false;updateUI();persist();};
-$("#resetBtn").onclick = () => {
-  for(let i=0;i<deck.length;i++){deck[i].ok=false;deck[i].bad=false;}
-  idx=0;shown=false;updateUI();persist();
-};
-$("#exportBtn").onclick = ()=>{
-  let out=deck.map((x,i)=>({i,q:x.q,a:x.a,ok:x.ok,bad:x.bad}));
-  let blob=new Blob([JSON.stringify(out,null,2)],{type:"application/json"});
-  let url=URL.createObjectURL(blob),a=document.createElement("a");
-  a.href=url; a.download="deck-progress.json";
-  a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000);
-};
-$("#clearBtn").onclick = () => {
-  if(confirm("Удалить весь прогресс?")){ 
-    localStorage.removeItem(localKey);
-    location.reload();
-  }
-};
 function showHotkeys(){ $("#hotkeysTip").textContent = t("hotkeys"); }
 function bootstrap(){
   updateLang();
@@ -537,3 +479,4 @@ function bootstrap(){
   $("#testModeCheck").checked = testLocked;
 }
 document.addEventListener("DOMContentLoaded",bootstrap);
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ let j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
