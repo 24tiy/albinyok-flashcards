@@ -32,7 +32,7 @@ const translations = {
     empty:"Загрузите CSV или выберите файл из репозитория",
     progress:"Экспорт прогресса",
     clear:"Очистить всё",
-    hotkeys:"Tap \"Знаю\"/\"Не знаю\", далее →",
+    hotkeys:"Только Знаю/Не знаю → Дальше",
     errorPref:"Ошибка: ",
     ghInvalid:"Нет файлов .csv или ошибка доступа к GitHub.",
     ghChanged:"Репозиторий обновлён. Попробуйте снова.",
@@ -48,16 +48,109 @@ const translations = {
     train_hard:"Тренировать сложные",
     save_success:"Карточки сохранены!",
     train_all_done:"Все сложные карточки выучены! МОЛОДЕЦ!",
-    testmode_tip:"В тесте навигация только с помощью кнопки 'Дальше'. Выбери 'Знаю' или 'Не знаю' и переходи к следующему вопросу.",
-    editor_tip:"В редакторе можно изменять или удалять карточки и сохранять изменения."
+    testmode_tip:"В тесте только 'Знаю'/ 'Не знаю' + Дальше.",
+    editor_tip:"В редакторе можно изменять или удалять карточки."
+  },
+  en: {
+    siteTitle:"Albinyok Flashcards",
+    siteSub:'CSV flashcards app — remember better everywhere!',
+    fileOrLink:"Data source?",
+    fileBtn:"CSV File",
+    template:"CSV Template",
+    demo:"Demo Set",
+    urlBtn:"By Link",
+    repoBtn:"Load from GitHub",
+    ghBarBtn:"Change Repository",
+    owner:"Owner",
+    repo:"Repository",
+    branch:"Branch",
+    noCSVs:"No CSV files found",
+    ghApiErr:"GitHub error: ",
+    selectPlaceholder:"…searching for CSVs…",
+    urlPlaceholder:"https://raw.githubusercontent.com/24tiy/albinyok-flashcards/main/Questions_et_r_ponses.csv",
+    reveal:"Show answer",
+    hide:"Hide answer",
+    know:"✅ Know",
+    dont:"❌ Don’t know",
+    shuffle:"Shuffle",
+    reset:"Reset progress",
+    deck:"Source",
+    empty:"Upload or select a CSV",
+    progress:"Export progress",
+    clear:"Clear all",
+    hotkeys:"Only Know/Don't know → Next",
+    errorPref:"Error: ",
+    ghInvalid:"No CSV files or GitHub error.",
+    ghChanged:"Repository updated. Retry.",
+    fetchFail:"Load error",
+    fileTooBig:"File too big!",
+    csvNotPairs:"No question/answer pairs found",
+    help:"Help",
+    editor_hint:"Edit cards below and save! 1 row = 1 card.",
+    add_card:"Add card",
+    save_cards:"Save changes",
+    del:"Delete",
+    edit:"Edit",
+    train_hard:"Train hard cards",
+    save_success:"Saved!",
+    train_all_done:"All hard cards done! NICE!",
+    testmode_tip:"Test mode: only Know/Don't know and Next.",
+    editor_tip:"You can add, edit and delete cards."
+  },
+  fr: {
+    siteTitle:"Albinyok Flashcards",
+    siteSub:"Appli pour réviser vos cartes CSV — mobile et PC.",
+    fileOrLink:"Source des données ?",
+    fileBtn:"Fichier CSV",
+    template:"Modèle CSV",
+    demo:"Jeu démo",
+    urlBtn:"Par lien",
+    repoBtn:"Charger GitHub",
+    ghBarBtn:"Changer dépôt",
+    owner:"Utilisateur",
+    repo:"Dépôt",
+    branch:"Branche",
+    noCSVs:"Aucun CSV trouvé",
+    ghApiErr:"Erreur GitHub : ",
+    selectPlaceholder:"…recherche des CSV…",
+    urlPlaceholder:"https://raw.githubusercontent.com/24tiy/albinyok-flashcards/main/Questions_et_r_ponses.csv",
+    reveal:"Afficher réponse",
+    hide:"Cacher réponse",
+    know:"✅ Je sais",
+    dont:"❌ Je ne sais pas",
+    shuffle:"Mélanger",
+    reset:"Réinitialiser",
+    deck:"Source",
+    empty:"Chargez ou choisissez un CSV",
+    progress:"Exporter progrès",
+    clear:"Tout nettoyer",
+    hotkeys:"Seulement Je sais/Je ne sais pas → Suivant",
+    errorPref:"Erreur : ",
+    ghInvalid:"Pas de CSV ou erreur GitHub.",
+    ghChanged:"Dépôt mis à jour. Essayez encore.",
+    fetchFail:"Erreur téléchargement",
+    fileTooBig:"Fichier trop volumineux !",
+    csvNotPairs:"Aucune question/réponse trouvée",
+    help:"Aide",
+    editor_hint:"Éditez, puis sauvegardez. 1 ligne = 1 carte.",
+    add_card:"Ajouter carte",
+    save_cards:"Enregistrer",
+    del:"Supprimer",
+    edit:"Éditer",
+    train_hard:"Difficile",
+    save_success:"Cartes enregistrées!",
+    train_all_done:"Toutes les difficiles apprises !",
+    testmode_tip:"Mode test : seulement Je sais/Je ne sais pas, puis Suivant.",
+    editor_tip:"Modifiez ou supprimez les cartes."
   }
 };
 function $(sel){ return document.querySelector(sel);}
-function t(k){return translations[curLang][k]||k;}
+function t(k){return translations[curLang][k]||k; }
+
 function updateLang() {
   document.documentElement.lang = curLang;
   $("#siteTitle").textContent = t("siteTitle");
-  $("#siteSub").textContent = t("siteSub");
+  $(".sub").firstChild.textContent = t("siteSub");
   $("#fileOrLink").textContent = t("fileOrLink");
   $("#fileBtnTxt").textContent = t("fileBtn");
   $("#templateBtn").textContent = t("template");
@@ -65,6 +158,7 @@ function updateLang() {
   $("#loadUrlBtn").textContent = t("urlBtn");
   $("#loadPickedBtn").textContent = t("repoBtn");
   $("#changeGHBtn").textContent = t("ghBarBtn");
+  $("#testBtn").textContent = "Тест";
   $("#ghOwner").setAttribute("aria-label", t("owner"));
   $("#ghRepo").setAttribute("aria-label", t("repo"));
   $("#ghBranch").setAttribute("aria-label", t("branch"));
@@ -77,7 +171,9 @@ function updateLang() {
   $("#helpLink").textContent = t("help");
   updateControlsBar();
 }
-$("#langSelect").addEventListener("change",function(e){curLang=this.value;updateLang();updateControlsBar();});
+$("#langSelect").addEventListener("change",function(e){
+  curLang=this.value; updateLang(); updateControlsBar(); updateUI();
+});
 $("#themeToggle").onclick = () => {
   theme = (theme==="light")?"dark":"light";
   document.body.dataset.theme = theme; 
@@ -110,6 +206,7 @@ function toDeck(rows){
     out.push({q:filtered[i][0], a:filtered[i][1], ok:false, bad:false});
   return out;
 }
+
 function updateControlsBar() {
   let el=$("#controlsBar");
   if (!el) return;
@@ -117,13 +214,14 @@ function updateControlsBar() {
   if (!testLocked) {
     el.appendChild(createCtrl("ctrl showhide","", shown ? t("hide") : t("reveal"),()=>toggleShowHide()));
   }
-  el.appendChild(createCtrl("ctrl ok","", "✅ Знаю", onKnowClick));
-  el.appendChild(createCtrl("ctrl bad","", "❌ Не знаю", onDontKnowClick));
+  el.appendChild(createCtrl("ctrl ok","", t("know"),()=>onKnowClick()));
+  el.appendChild(createCtrl("ctrl bad","", t("dont"),()=>onDontKnowClick()));
   if (testLocked) {
     let next = document.createElement("button");
     next.className = "next-btn-main";
     next.textContent = "Дальше";
     next.onclick = () => { nextTestStep(); };
+    next.disabled = true;
     el.appendChild(next);
   }
 }
@@ -133,6 +231,7 @@ function createCtrl(className, title, text, handler) {
   btn.onclick = handler;
   return btn;
 }
+
 function updateUI(){
   let q=$("#q"), a=$("#a"), c=$("#counter"), s=$("#score"), n=$("#deckName"), bar=$("#progressBar");
   if(!deck.length){
@@ -163,26 +262,28 @@ function toggleShowHide() {
 function onKnowClick(){
   if(testLocked){
     deck[idx].ok=true; deck[idx].bad=false;
-    $("#controlsBar .ctrl.ok").setAttribute('disabled',true);
-    $("#controlsBar .ctrl.bad").setAttribute('disabled',true);
+    [...document.querySelectorAll("#controlsBar .ctrl")].map(b=>b.disabled=true);
     document.querySelector(".next-btn-main").disabled=false;
+    persist();
   }
 }
 function onDontKnowClick(){
   if(testLocked){
     deck[idx].bad=true; deck[idx].ok=false;
-    $("#controlsBar .ctrl.ok").setAttribute('disabled',true);
-    $("#controlsBar .ctrl.bad").setAttribute('disabled',true);
+    [...document.querySelectorAll("#controlsBar .ctrl")].map(b=>b.disabled=true);
     document.querySelector(".next-btn-main").disabled=false;
+    persist();
   }
 }
 function nextTestStep(){
   shown = false;
   idx = (idx+1)%deck.length;
-  $("#controlsBar .ctrl.ok").removeAttribute('disabled');
-  $("#controlsBar .ctrl.bad").removeAttribute('disabled');
-  document.querySelector(".next-btn-main").disabled=true;
   updateUI();
+  // разблокировать
+  setTimeout(() => {
+    [...document.querySelectorAll("#controlsBar .ctrl")].map(b=>b.disabled=false);
+    document.querySelector(".next-btn-main").disabled=true;
+  }, 50);
   persist();
 }
 function persist(){
@@ -222,7 +323,7 @@ function loadCSVText(text,name){
     if(!d.length) throw new Error(t("csvNotPairs"));
     mainDeck = JSON.parse(JSON.stringify(d));
     deck = d; idx=0; shown=false; deckName=name||'';
-    persist(); showWorkspace(); updateUI();
+    persist(); showWorkspace(); testLocked=false; updateUI();
     $("#editorBar").style.display = "none";
   }catch(e){
     let err=$("#error");
@@ -364,7 +465,33 @@ $("#trainHardBtn").onclick = ()=>{
   deck = hard.map(x=>({...x}));
   idx=0; shown=false;
   deckName=t("train_hard");
+  testLocked = false;
   persist(); showWorkspace(); updateUI();
+};
+$("#shuffleBtn").onclick = () => {deck=shuffle(deck);idx=0;shown=false;updateUI();persist();};
+$("#testBtn").onclick = () => {
+  if(!deck.length) return;
+  shown = false; idx = 0; testLocked = true;
+  showWorkspace();
+  updateUI();
+};
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ let j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+$("#resetBtn").onclick = () => {
+  for(let i=0;i<deck.length;i++){deck[i].ok=false;deck[i].bad=false;}
+  idx=0;shown=false;updateUI();persist();
+};
+$("#exportBtn").onclick = ()=>{
+  let out=deck.map((x,i)=>({i,q:x.q,a:x.a,ok:x.ok,bad:x.bad}));
+  let blob=new Blob([JSON.stringify(out,null,2)],{type:"application/json"});
+  let url=URL.createObjectURL(blob),a=document.createElement("a");
+  a.href=url; a.download="deck-progress.json";
+  a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000);
+};
+$("#clearBtn").onclick = () => {
+  if(confirm("Удалить весь прогресс?")){ 
+    localStorage.removeItem(localKey);
+    location.reload();
+  }
 };
 function showHotkeys(){ $("#hotkeysTip").textContent = t("hotkeys"); }
 function bootstrap(){
@@ -379,7 +506,6 @@ function bootstrap(){
 }
 document.addEventListener("DOMContentLoaded",bootstrap);
 
-// ------------ Модальные подсказки "?"
 function modalTipBind(helpBtnId, text) {
   let btn = $(helpBtnId); if(!btn) return;
   btn.onmouseenter = btn.onclick = function(e){
