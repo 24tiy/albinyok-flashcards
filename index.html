@@ -3,130 +3,143 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CSV Flashcards</title>
-  <meta name="description" content="Современное приложение для повторения и редактирования карточек из CSV на любом устройстве.">
+  <title>Albinyok Flashcards</title>
+  <meta name="description" content="Современное приложение для повторения и редактирования карточек из CSV/Albinyok на любом устройстве.">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg:#f7f9fc;
-      --bg-alt:#f1f4fa;
-      --card:#fff;
-      --text:#212c45;
-      --muted:#98a3b8;
-      --accent:#715AFF;
-      --accent-2:#53D1FD;
-      --btn:#715AFF;
-      --btn-hover:#533BE6;
-      --ok:#22bb88;
-      --bad:#f03d61;
+      --bg:#f7f9fc; --bg-alt:#f1f4fa; --card:#fff; --text:#212c45; --muted:#98a3b8;
+      --accent:#715AFF; --accent-2:#53D1FD; --btn:#715AFF; --btn-hover:#533BE6;
+      --ok:#22bb88; --bad:#f03d61;
       --shadow:0 14px 38px rgba(43,51,104,.16), 0 3px 8px rgba(43,51,104,.08);
       --radius:18px;
     }
     [data-theme="dark"] {
-      --bg:#11121b;
-      --bg-alt:#191b28;
-      --card:#121320;
-      --text:#f7f7fa;
-      --muted:#98a3b890;
-      --accent:#99A8FF;
-      --accent-2:#38A2DC;
-      --btn:#533BE6;
-      --btn-hover:#715AFF;
+      --bg:#11121b; --bg-alt:#191b28; --card:#121320; --text:#f7f7fa; --muted:#98a3b890;
+      --accent:#99A8FF; --accent-2:#38A2DC; --btn:#533BE6; --btn-hover:#715AFF;
       --shadow:0 14px 38px rgba(12,18,42,.3),0 3px 8px rgba(13,18,41,.08);
     }
     html, body {height:100%;}
     body {
-        margin:0;
-        font-family: 'Inter', ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Noto Sans,Arial;
-        background:var(--bg);
-        color:var(--text);
-        line-height:1.52;
-        min-height:100vh;
-        transition:background .5s,color .5s;
+      margin:0;
+      font-family:'Inter',ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Noto Sans,Arial;
+      background:var(--bg); color:var(--text); min-height:100vh;
+      transition:background .5s,color .5s; line-height:1.45;
+      font-size:15.7px;
     }
-    .container {
-        max-width:700px;
-        margin:48px auto 32px;
-        padding:0;
-        background: transparent;
-        border-radius:var(--radius);
-    }
-    header {
-      display: flex; align-items: flex-start; gap:22px; margin-bottom:11px;
-      flex-wrap:wrap;
-    }
-    .logo{
-      width:54px; height:54px; border-radius:16px;
-      background:linear-gradient(135deg,var(--accent),var(--accent-2));
-      box-shadow:var(--shadow); display:grid; place-items:center;
-      color:white; font-weight:800; font-size:27px; margin-top:4px;
-    }
-    h1 { font-size:calc(1.7rem + 2vw); margin:0; font-weight:800; letter-spacing:-.5px;}
-    .sub{ color:var(--muted); font-size:19px; margin-top:2px;}
-    .lang-select{margin-left:auto;display:flex;gap:11px;}
-    .lang-flags{border:none;background:var(--bg-alt);padding:10px 13px;font-size:14px;appearance:none;border-radius:11px;font-weight:600;}
-    .theme-toggle{border:none;background:var(--bg-alt);font-size:20px;border-radius:12px;padding:6.5px 11px;cursor:pointer;transition:background .2s;}
+    h1 {font-size:2.0rem;margin:0 0 2px 0;font-weight:900;letter-spacing:-.5px;}
+    .container {max-width:750px; margin:35px auto 32px; padding:0; background: transparent; border-radius:var(--radius);}
+    header {display:flex;align-items:flex-start;gap:16px;margin-bottom:11px;flex-wrap:wrap;}
+    .logo {width:54px;height:54px;border-radius:16px;background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:var(--shadow);display:grid;place-items:center;color:#fff;font-weight:900;font-size:25px;margin-top:4px;}
+    .sub {color:var(--muted);font-size:15px;margin-top:2px;}
+    .lang-select{margin-left:auto;display:flex;gap:8px;}
+    .lang-flags{border:none;background:var(--bg-alt);padding:8px 11px;font-size:13.5px;appearance:none;border-radius:11px;font-weight:600;}
+    .theme-toggle{border:none;background:var(--bg-alt);font-size:19px;border-radius:12px;padding:5px 11px;cursor:pointer;transition:background .2s;}
     .theme-toggle:active{background:var(--accent-2);}
     .uploader {
-        margin:31px 0 20px; padding:23px 26px 19px 26px;
-        border-radius:var(--radius);background:var(--bg-alt);box-shadow:var(--shadow);border:none;
-        display:flex;flex-direction:column;gap:15px;
+      margin:23px 0 16px; padding:20px 18px 17px 18px;
+      border-radius:28px;background:var(--bg-alt);box-shadow:var(--shadow);border:none;
+      display:flex;flex-direction:column;gap:10px;
     }
-
-    .uploader h2{font-weight:700;font-size:20px;}
-    .row, .gh-bar{display:flex;gap:15px;flex-wrap:wrap;align-items:center;}
-    label.file{display:inline-flex;align-items:center;gap:9px;background:var(--card);font-weight:600;border:1.4px solid #e2e6ef;padding:14px 20px; border-radius:11px;cursor:pointer;box-shadow:var(--shadow);}
+    .uploader h2{font-weight:800;font-size:1.10rem;}
+    .row, .gh-bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+    label.file{display:inline-flex;align-items:center;gap:11px;background:var(--card);font-weight:600;border:1.5px solid #e2e6ef;padding:10px 15px; border-radius:13px;cursor:pointer;box-shadow:var(--shadow);}
     input[type=file]{display:none;}
     input[type=url],input[type=text],select{
-      font-size:16px;padding:12px 11px;border-radius:var(--radius);border:1.5px solid #e2e6ef;background:var(--card);color:var(--text);
-      box-shadow:0 1.5px 6px rgba(70,80,120,.03);
+      font-size:14px;padding:8px 9px;border-radius:var(--radius);border:1.2px solid #e2e6ef;background:var(--card);color:var(--text);
+      box-shadow:0 2px 9px rgba(70,80,120,.015);
     }
     input[type=url]:focus,input[type=text]:focus,select:focus{border:1.5px solid var(--accent);}
-    .btn{appearance:none;border:none;background:var(--btn);color:#fff;border-radius:12px;padding:13.5px 22px;font-weight:700;cursor:pointer;box-shadow:var(--shadow);transition:background .16s;}
-    .btn.secondary{background:var(--accent-2);color:#212c45;}
-    .btn.ghost{background:transparent;color:var(--accent);border:1.7px solid var(--accent);}
-    .btn:active,.btn.active{filter:brightness(0.86);}
-    .settings-bar{display:flex;gap:18px;align-items:center;justify-content:center;margin:14px 0 16px 0;}
-    .settings-bar label{font-size:15.5px;font-weight:500;}
-    .settings-bar button.btn{font-size:15.5px;}
-    .workspace{display:none;margin-top:28px;}
-    .topbar{display:flex;gap:14px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:17px;margin-top:7px;}
-    .chip{background:var(--card);border:1.4px solid #e2e6ef;padding:8px 13px;border-radius:999px;box-shadow:var(--shadow);font-size:15px;}
+    /* Фиолетовые стеклянные кнопки */
+    .btn-glass-violet {
+      background: rgba(125,100,255, 0.13);
+      color: #5239ca;
+      border: 2.1px solid #9277f5;
+      border-radius: 18px;
+      font-weight:700;font-size:1.07rem;
+      padding: 12px 24px;
+      box-shadow: 0 7px 26px 0 rgba(126,91,255,.13), 0 2px 7px 0 rgba(126,91,255,.09);
+      backdrop-filter: blur(9px);
+      margin:0 6px 8px 0;
+      transition:.18s;
+      display:inline-block;
+    }
+    .btn-glass-violet.selected,
+    .btn-glass-violet:active,
+    .btn-glass-violet.primary {background: #8d6dff;color:#fff;border-color: #8769e6;}
+    .btn-glass-violet.outline {background: transparent;color: #7857de;border-style:dashed;}
+    .btn-glass-violet.small {font-size:.97rem;padding:7px 13px;margin:7px 7px 7px 0;}
+    .settings-bar{display:flex;gap:12px;align-items:center;justify-content:center;margin:13px 0 17px 0;}
+    .switchbtn{display:inline-block;margin-right:9px;vertical-align:middle;}
+    /* Современные кнопки внизу */
+    .btn-new {
+      background: rgba(82,195,255,0.18);
+      color: #233542;
+      border-radius: 18px;
+      border: 2.1px solid #43c6f6;
+      font-weight: 800;
+      font-size: 1.07rem;
+      backdrop-filter: blur(9px);
+      box-shadow: 0 6px 36px 0 rgba(64,170,255,0.11), 0 2px 8px 0 rgba(90,180,255,0.08);
+      padding: 13.5px 25px;
+      transition:.19s;
+      margin:0 6px 0 0;
+      letter-spacing:.01em;
+      display:inline-block;
+    }
+    .btn-new.selected,
+    .btn-new:active,
+    .btn-new.primary {background: #52d1fd;color: #16304d;border-color: #14bfff;}
+    .workspace{display:none;margin-top:24px;}
+    .topbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:14px;margin-top:7px;}
+    .chip{background:var(--card);border:1.2px solid #e2e6ef;padding:7px 12px;border-radius:999px;box-shadow:var(--shadow);font-size:14.5px;}
     .progress{margin-top:9px;height:10px;background:#e2e3ed;border-radius:999px;overflow:hidden;}
     .progress>div{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));width:0%;transition:width .44s;}
-    .card{position:relative;background:var(--card);border-radius:28px;box-shadow:var(--shadow);padding:38px 23px 35px;display:flex;flex-direction:column;align-items:stretch;justify-content:center;text-align:center;min-height:160px;}
-    .q{font-size:clamp(22px,3vw,29px);font-weight:800;margin-bottom:30px;letter-spacing:-.5px;}
-    .a{font-size:clamp(19px,2vw,23px);color:var(--muted);font-weight:600;}
-    .controls{display:flex;flex-wrap:wrap;gap:15px;align-items:center;justify-content:center;margin-top:24px;}
-    .ctrl{display:inline-flex;align-items:center;gap:8px;padding:11.5px 20px;border-radius:12px;border:1.6px solid #d2d2df;background:var(--card);cursor:pointer;box-shadow:var(--shadow);font-weight:700;transition:filter .15s;}
+    .card{position:relative;background:var(--card);border-radius:24px;box-shadow:var(--shadow);padding:24px 11px 27px;display:flex;flex-direction:column;align-items:stretch;justify-content:center;text-align:center;min-height:140px;}
+    .q{font-size:clamp(18px,2vw,23px);font-weight:800;margin-bottom:22px;}
+    .a{font-size:clamp(15px,2vw,18px);color:var(--muted);font-weight:600;}
+    .controls{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:center;margin-top:17px;}
+    .ctrl{display:inline-flex;align-items:center;gap:7px;padding:8px 15px;border-radius:12px;border:1.1px solid #d2d2df;background:var(--card);cursor:pointer;box-shadow:var(--shadow);font-weight:700;transition:filter .15s;font-size:1.00rem;}
     .ctrl.ok{color:var(--ok);}
     .ctrl.bad{color:var(--bad);}
     .ctrl.hard{color:#e5a700;}
     .ctrl.again{color:#b11212;}
     .ctrl.active{filter:brightness(0.66);}
-    .tiny{font-size:14px;color:var(--muted);}
+    .tiny{font-size:12.5px;color:var(--muted);}
     .kbd{font-family:ui-monospace,Consolas,Menlo,monospace;background:var(--bg-alt);padding:2px 7px;border-radius:7px;}
     .hidden{display:none !important;}
-    .error{padding:15px 16px;border-radius:14px;background:rgba(255,0,0,.09);border:1.5px solid #e49c9c;margin-top:11px;color:#b11212;}
-    .exportbar{display:flex;gap:16px;margin-top:28px;justify-content:center;flex-wrap:wrap;}
-    .edit-bar{margin:20px 0;text-align:center;}
-    .edit-btn{margin:1px 9px;}
-    @media (max-width:900px){
-      .container{max-width:99vw;}
+    .error{padding:11px 14px;border-radius:14px;background:rgba(255,0,0,.09);border:1.2px solid #e49c9c;margin-top:11px;color:#b11212;}
+    .exportbar{display:flex;gap:8px;margin-top:23px;justify-content:center;flex-wrap:wrap;padding-bottom:11px;}
+    .edit-bar{margin:14px 0;text-align:center;}
+    .edit-btn{margin:1px 8px;}
+    .placeholder-btn {
+      display:inline-flex;align-items:center;justify-content:center;
+      width:54px;height:54px;
+      font-size:1.15rem;
+      border-radius:16px;
+      border:2.4px dashed #52d1fd;
+      color:#43a1e6;
+      background:rgba(82,195,255,0.10);
+      margin:0 6px 12px 0;
+      box-shadow: 0 2px 28px 0 rgba(64,170,255,0.09);
+      transition:.16s;
     }
+    .placeholder-btn strong{font-size:1.02em;}
+    @media (max-width:900px){.container{max-width:99vw;}}
     @media (max-width:600px){
-      .container{padding:5vw 0 10vw; margin: 0;}
-      .card{padding:16px 3vw 17px;}
-      header h1{font-size:23px;}
-      .row,.controls,.settings-bar,.exportbar{flex-direction:column;gap:11px;}
-      .uploader{padding:7px 2vw 11px;}
+      .container{padding:0;margin:0;}
+      .card{padding:7px 2vw 11px;}
+      header h1{font-size:21px;}
+      .row,.controls,.settings-bar,.exportbar{flex-direction:column;gap:10px;}
+      .uploader{padding:7px 2vw 8px;}
       .exportbar,.settings-bar{align-items:stretch;}
     }
     @media (max-width:400px){
-      .card{font-size:15px;}
-      header{gap:4px;}
-      .sub{font-size:13px;}
-      .btn,.ctrl,label.file{font-size:13px;}
+      .card{font-size:14px;}
+      header{gap:3px;}
+      .sub{font-size:11px;}
+      .btn,.ctrl,label.file,.btn-new,.btn-glass-violet{font-size:11px;}
+      .settings-bar label.switchbtn{font-size:12px;}
     }
     ::-webkit-scrollbar{background:var(--bg-alt);}
     ::-webkit-scrollbar-thumb{background:var(--bg);border-radius:999px;}
@@ -137,7 +150,7 @@
     <header>
       <div class="logo">Q↔A</div>
       <div>
-        <h1 id="siteTitle">CSV Flashcards</h1>
+        <h1 id="siteTitle">Albinyok Flashcards</h1>
         <div class="sub" id="siteSub"></div>
       </div>
       <div class="lang-select">
@@ -157,23 +170,32 @@
         </label>
         <input type="file" id="file" accept=".csv,text/csv" />
         <input type="url" id="urlInput" style="width:220px;margin-left:7px;" />
-        <button class="btn" id="loadUrlBtn" type="button"></button>
+        <button class="btn-glass-violet" id="loadUrlBtn" type="button">По ссылке</button>
         <select id="csvPicker" style="margin-left:7px;"><option value=""></option></select>
-        <button class="btn" id="loadPickedBtn" type="button" disabled></button>
+        <button class="btn-glass-violet" id="loadPickedBtn" type="button" disabled>Загрузить с GitHub</button>
+        <button class="btn-glass-violet" id="changeGHBtn" type="button">Сменить репозиторий</button>
       </div>
       <div class="gh-bar">
-        <input id="ghOwner" value="24tiy" maxlength="32" aria-label="GitHub User/Org"/>
-        <input id="ghRepo" value="albinyok-flashcards" maxlength="40" aria-label="GitHub Repo"/>
-        <input id="ghBranch" value="main" maxlength="24" aria-label="Branch"/>
-        <button class="btn ghost" id="changeGHBtn" type="button"></button>
+        <!-- можно добавить что-то еще -->
       </div>
       <div id="error" class="error hidden" role="alert"></div>
     </section>
 
     <div class="settings-bar switch">
-      <label><input type="checkbox" id="toggleRating">🔄 Рейтинг ответа (легко/сложно/повторить)</label>
-      <label><input type="checkbox" id="toggleEdit">📝 Редактор карточек</label>
-      <button class="btn" id="trainHardBtn" type="button">Тренировать сложные</button>
+      <label class="switchbtn">
+        <input type="checkbox" id="toggleRating" style="vertical-align:middle;">
+        <span class="btn-glass-violet small">🔄 Рейтинг ответа</span>
+      </label>
+      <label class="switchbtn">
+        <input type="checkbox" id="toggleEdit" style="vertical-align:middle;">
+        <span class="btn-glass-violet small">📝 Редактор карточек</span>
+      </label>
+      <button class="btn-glass-violet" id="trainHardBtn" type="button">Тренировать сложные</button>
+    </div>
+
+    <div style="display:flex;justify-content:center;align-items:center;margin: 12px 0 11px 0;gap:19px;">
+      <div class="placeholder-btn"><strong>Свободно</strong></div>
+      <div class="placeholder-btn"><strong>Добавить действие</strong></div>
     </div>
 
     <section class="workspace" id="workspace" aria-live="polite">
@@ -184,9 +206,9 @@
           <span class="chip" id="score">✓ 0 • ✗ 0</span>
         </div>
         <div>
-          <button class="btn ghost" id="shuffleBtn" title="S"></button>
-          <button class="btn ghost" id="resetBtn" title="R"></button>
-          <label class="file" for="reupload">↻ CSV</label>
+          <button class="btn-glass-violet small" id="shuffleBtn" title="S">Перемешать</button>
+          <button class="btn-glass-violet small" id="resetBtn" title="R">Сбросить прогресс</button>
+          <label class="file" for="reupload">Сменить документ</label>
           <input type="file" id="reupload" accept=".csv,text/csv" />
         </div>
       </div>
@@ -196,17 +218,17 @@
         <div class="a" id="a"></div>
       </div>
       <div class="controls" id="controlsBar" aria-label="Управление">
-        <!-- buttons JS-inserted -->
+        <!-- Кнопки генерируются JS -->
       </div>
       <div class="tiny" style="text-align:center;margin-top:8px" id="hotkeysTip"></div>
     </section>
     <section class="edit-bar" id="editorBar" style="display:none"></section>
     <div class="exportbar">
-      <button class="btn" id="exportBtn"></button>
-      <button class="btn ghost" id="clearBtn"></button>
-      <button class="btn secondary" id="templateBtn" type="button"></button>
-      <button class="btn ghost" id="demoBtn" type="button"></button>
-      <a id="helpLink" href="README.md" target="_blank" class="btn ghost"></a>
+      <button class="btn-new" id="templateBtn" type="button">Шаблон CSV</button>
+      <button class="btn-new" id="demoBtn" type="button">Демо-набор</button>
+      <a id="helpLink" href="README.md" target="_blank" class="btn-new">Помощь</a>
+      <button class="btn-new" id="exportBtn">Экспорт прогресса</button>
+      <button class="btn-new" id="clearBtn">Очистить всё</button>
     </div>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
