@@ -27,6 +27,9 @@
     header {display:flex;align-items:flex-start;gap:16px;margin-bottom:11px;flex-wrap:wrap;}
     .logo {width:54px;height:54px;border-radius:16px;background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:var(--shadow);display:grid;place-items:center;color:#fff;font-weight:900;font-size:25px;margin-top:4px;}
     .sub {color:var(--muted);font-size:15px;margin-top:2px;}
+    .sub-secondary {
+      color:var(--muted);font-size:14px;margin-top:5px;line-height:1.7;display:block;
+    }
     .lang-select{margin-left:auto;display:flex;gap:8px;}
     .lang-flags{border:none;background:var(--bg-alt);padding:8px 11px;font-size:13.5px;appearance:none;border-radius:11px;font-weight:600;}
     .theme-toggle{border:none;background:var(--bg-alt);font-size:19px;border-radius:12px;padding:5px 11px;cursor:pointer;transition:background .2s;}
@@ -51,7 +54,8 @@
     .btn-glass-violet.selected,.btn-glass-violet:active,.btn-glass-violet.primary {background: #8d6dff;color:#fff;border-color: #8769e6;}
     .btn-glass-violet.outline {background:transparent;color:#7857de;border-style:dashed;}
     .btn-glass-violet.small {font-size:.97rem;padding:7px 13px;margin:7px 7px 7px 0;}
-    .settings-bar{display:flex;gap:12px;align-items:center;justify-content:center;margin:13px 0 17px 0;}
+    .settings-bar{display:flex;gap:14px;align-items:center;justify-content:center;margin:13px 0 17px 0;}
+    .settings-bar.rowbar{flex-direction:row;}
     .switchbtn{display:inline-block;margin-right:9px;vertical-align:middle;}
     .btn-new {background:rgba(82,195,255,0.18);color:#233542;border-radius:18px;border:2.1px solid #43c6f6;
       font-weight:800;font-size:1.07rem;backdrop-filter:blur(9px);
@@ -68,6 +72,8 @@
     .a{font-size:clamp(15px,2vw,18px);color:var(--muted);font-weight:600;}
     .controls{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:center;margin-top:17px;}
     .ctrl{display:inline-flex;align-items:center;gap:7px;padding:8px 15px;border-radius:12px;border:1.1px solid #d2d2df;background:var(--card);cursor:pointer;box-shadow:var(--shadow);font-weight:700;transition:filter .15s;font-size:1.00rem;}
+    .ctrl .icon-ok {font-size:1.25em;color:#22bb88;margin-right:5px;}
+    .ctrl .icon-bad {font-size:1.23em;color:#f03d61;margin-right:4px;}
     .ctrl.ok{color:var(--ok);}
     .ctrl.bad{color:var(--bad);}
     .ctrl.hard{color:#e5a700;}
@@ -80,6 +86,11 @@
     .exportbar{display:flex;gap:8px;margin-top:23px;justify-content:center;flex-wrap:wrap;padding-bottom:11px;}
     .edit-bar{margin:14px 0;text-align:center;}
     .edit-btn{margin:1px 8px;}
+    .feedback-link{margin-top:8px;text-align:center;font-size:15px;}
+    .feedback-link a{
+      color:#51a5e6;text-decoration:none;font-weight:700;transition:.18s;font-size:17px;
+    }
+    .feedback-link a:hover{color:#715aff;text-decoration:underline;}
     @media (max-width:900px){.container{max-width:99vw;}}
     @media (max-width:600px){
       .container{padding:0;margin:0;}
@@ -106,7 +117,10 @@
       <div class="logo">Q↔A</div>
       <div>
         <h1 id="siteTitle">Albinyok Flashcards</h1>
-        <div class="sub" id="siteSub"></div>
+        <div class="sub">
+          Приложение для повтора карточек из CSV — учи на телефоне и на ПК.
+          <span class="sub-secondary">Ваш прогресс сохраняется локально.</span>
+        </div>
       </div>
       <div class="lang-select">
         <select id="langSelect" class="lang-flags" aria-label="Language">
@@ -137,15 +151,8 @@
       </div>
       <div id="error" class="error hidden" role="alert"></div>
     </section>
-    <div class="settings-bar switch">
-      <label class="switchbtn">
-        <input type="checkbox" id="toggleRating" style="vertical-align:middle;">
-        <span class="btn-glass-violet small">🔄 Рейтинг ответа</span>
-      </label>
-      <label class="switchbtn">
-        <input type="checkbox" id="toggleEdit" style="vertical-align:middle;">
-        <span class="btn-glass-violet small">📝 Редактор карточек</span>
-      </label>
+    <div class="settings-bar rowbar">
+      <button class="btn-glass-violet" id="toggleEditBtn" type="button" style="min-width:160px;">📝 Редактор карточек</button>
       <button class="btn-glass-violet" id="trainHardBtn" type="button">Тренировать сложные</button>
     </div>
     <section class="workspace" id="workspace" aria-live="polite">
@@ -153,7 +160,7 @@
         <div>
           <span class="chip" id="deckName"></span>
           <span class="chip" id="counter">0 / 0</span>
-          <span class="chip" id="score">✓ 0 • ✗ 0</span>
+          <span class="chip" id="score">✅ 0 • ❌ 0</span>
         </div>
         <div>
           <button class="btn-glass-violet small" id="shuffleBtn" title="S">Перемешать</button>
@@ -177,6 +184,9 @@
       <a id="helpLink" href="README.md" target="_blank" class="btn-new">Помощь</a>
       <button class="btn-new" id="exportBtn">Экспорт прогресса</button>
       <button class="btn-new" id="clearBtn">Очистить всё</button>
+    </div>
+    <div class="feedback-link">
+      <span>Обратная связь: <a href="https://t.me/sasha24tiy" target="_blank">@sasha24tiy</a></span>
     </div>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
