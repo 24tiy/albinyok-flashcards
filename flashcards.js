@@ -1,15 +1,13 @@
 let curLang = "ru";
 let theme = "light";
-let ratingMode = false;
 let editMode = false;
-let hardCards = [];
 let mainDeck = [];
 let deck=[], idx=0, shown=false, deckName='—';
 let localKey = 'albinyok-flashcards-v1';
 const translations = {
   ru: {
     siteTitle:"Albinyok Flashcards",
-    siteSub:'Приложение для повтора карточек из CSV — учи на телефоне и на ПК. Ваш прогресс сохраняется локально.',
+    siteSub:'Приложение для повтора карточек из CSV — учи на телефоне и на ПК.',
     fileOrLink:"Откуда берём информацию?",
     fileBtn:"Файл CSV",
     template:"Шаблон CSV",
@@ -28,15 +26,15 @@ const translations = {
     hide:"Скрыть ответ",
     prev:"← Назад",
     next:"Вперёд →",
-    know:"✓ Знаю",
-    dont:"✗ Не знаю",
+    know:"✅ Знаю",
+    dont:"❌ Не знаю",
     shuffle:"Перемешать",
     reset:"Сбросить прогресс",
     deck:"Источник вопросов",
     empty:"Загрузите CSV или выберите файл из репозитория",
     progress:"Экспорт прогресса",
     clear:"Очистить всё",
-    hotkeys:"Space/Enter — ответ · ←/→ — навигация · J/K — не знаю/знаю (или Сложно/Легко) · S — перемешать",
+    hotkeys:"Space/Enter — ответ · ←/→ — навигация · J/K — не знаю/знаю · S — перемешать",
     errorPref:"Ошибка: ",
     ghInvalid:"Нет файлов .csv или ошибка доступа к GitHub.",
     ghChanged:"Репозиторий обновлён. Попробуйте снова.",
@@ -44,9 +42,6 @@ const translations = {
     fileTooBig:"Файл слишком большой!",
     csvNotPairs:"Не найдено пар 'вопрос/ответ'",
     help:"Помощь",
-    rate_easy:"Легко",
-    rate_hard:"Сложно",
-    rate_again:"Повторить",
     editor_hint:"Редактируйте карточки ниже, затем сохраните! Каждая строка — одна карточка.",
     add_card:"Добавить карточку",
     save_cards:"Сохранить изменения",
@@ -58,110 +53,6 @@ const translations = {
     edit_mode:"Режим редактирования",
     save_success:"Карточки сохранены!",
     train_all_done:"Все сложные карточки выучены! МОЛОДЕЦ!"
-  },
-  en: {
-    siteTitle:"Albinyok Flashcards",
-    siteSub:'App for using and repeating CSV flashcards — use anywhere, progress is saved locally.',
-    fileOrLink:"Where does info come from?",
-    fileBtn:"CSV File",
-    template:"Template CSV",
-    demo:"Demo Set",
-    urlBtn:"From Link",
-    repoBtn:"Load from GitHub",
-    ghBarBtn:"Change Repo",
-    owner:"User",
-    repo:"Repo",
-    branch:"Branch",
-    noCSVs:"No CSV files found in repo",
-    ghApiErr:"GitHub API error: ",
-    selectPlaceholder:"…searching for CSVs…",
-    urlPlaceholder:"https://raw.githubusercontent.com/24tiy/albinyok-flashcards/main/Questions_et_r_ponses.csv",
-    reveal:"Show answer",
-    hide:"Hide answer",
-    prev:"← Back",
-    next:"Next →",
-    know:"✓ Know",
-    dont:"✗ Don’t know",
-    shuffle:"Shuffle",
-    reset:"Reset progress",
-    deck:"Source",
-    empty:"Upload or select a CSV",
-    progress:"Export progress",
-    clear:"Clear all",
-    hotkeys:"Space/Enter — answer · ←/→ — navigation · J/K — hard/easy · S — shuffle",
-    errorPref:"Error: ",
-    ghInvalid:"No CSV files or GitHub access error.",
-    ghChanged:"Repo updated. Try again.",
-    fetchFail:"Download error",
-    fileTooBig:"File too large!",
-    csvNotPairs:"No question/answer pairs found",
-    help:"Help",
-    rate_easy:"Easy",
-    rate_hard:"Hard",
-    rate_again:"Again",
-    editor_hint:"Edit your cards below, then save! Each line = 1 card.",
-    add_card:"Add Card",
-    save_cards:"Save Cards",
-    del:"Delete",
-    edit:"Edit",
-    train_hard:"Train hard cards",
-    theme_light:"Light theme",
-    theme_dark:"Dark theme",
-    edit_mode:"Edit mode",
-    save_success:"Cards saved!",
-    train_all_done:"All hard cards learned! NICE!"
-  },
-  fr: {
-    siteTitle:"Albinyok Flashcards",
-    siteSub:'Appli pour réviser vos cartes CSV — partout, progrès sauvegardé localement.',
-    fileOrLink:"D’où viennent les données ?",
-    fileBtn:"Fichier CSV",
-    template:"Modèle CSV",
-    demo:"Jeu démo",
-    urlBtn:"Par lien",
-    repoBtn:"Charger GitHub",
-    ghBarBtn:"Changer dépôt",
-    owner:"Utilisateur",
-    repo:"Dépôt",
-    branch:"Branche",
-    noCSVs:"Aucun CSV trouvé",
-    ghApiErr:"Erreur API GitHub : ",
-    selectPlaceholder:"…recherche des CSV…",
-    urlPlaceholder:"https://raw.githubusercontent.com/24tiy/albinyok-flashcards/main/Questions_et_r_ponses.csv",
-    reveal:"Afficher réponse",
-    hide:"Cacher réponse",
-    prev:"← Précédent",
-    next:"Suivant →",
-    know:"✓ Je sais",
-    dont:"✗ Je ne sais pas",
-    shuffle:"Mélanger",
-    reset:"Réinitialiser",
-    deck:"Source",
-    empty:"Chargez ou choisissez un CSV",
-    progress:"Exporter progrès",
-    clear:"Tout nettoyer",
-    hotkeys:"Space/Enter — réponse · ←/→ — navigation · J/K — difficile/facile · S — mélanger",
-    errorPref:"Erreur : ",
-    ghInvalid:"Pas de CSV ou erreur GitHub.",
-    ghChanged:"Dépôt mis à jour. Essayez encore.",
-    fetchFail:"Erreur téléchargement",
-    fileTooBig:"Fichier trop volumineux !",
-    csvNotPairs:"Aucune question/réponse trouvée",
-    help:"Aide",
-    rate_easy:"Facile",
-    rate_hard:"Difficile",
-    rate_again:"Encore",
-    editor_hint:"Éditez vos cartes ci-dessous puis sauvegardez. 1 ligne = 1 carte.",
-    add_card:"Ajouter une carte",
-    save_cards:"Enregistrer",
-    del:"Supprimer",
-    edit:"Éditer",
-    train_hard:"S’entraîner sur les difficiles",
-    theme_light:"Thème clair",
-    theme_dark:"Thème sombre",
-    edit_mode:"Mode édition",
-    save_success:"Cartes enregistrées !",
-    train_all_done:"Toutes les cartes difficiles sont apprises ! SUPER !"
   }
 };
 function $(sel){ return document.querySelector(sel);}
@@ -218,25 +109,18 @@ function toDeck(rows){
   if(!filtered.length) return [];
   let skip=sniffHeader(filtered[0]) ? 1:0, out=[];
   for(let i=skip;i<filtered.length;i++)
-    out.push({q:filtered[i][0], a:filtered[i][1], ok:false, bad:false,rating:0});
+    out.push({q:filtered[i][0], a:filtered[i][1], ok:false, bad:false});
   return out;
 }
 function updateControlsBar() {
-  let isRating = ratingMode;
   let el=$("#controlsBar");
   if (!el) return;
   el.innerHTML = "";
-  if(isRating){
-    el.appendChild(createCtrl("ctrl ok","K",t("rate_easy"),()=>rateCard(2)));
-    el.appendChild(createCtrl("ctrl hard","J",t("rate_hard"),()=>rateCard(1)));
-    el.appendChild(createCtrl("ctrl again","A",t("rate_again"),()=>rateCard(0)));
-  } else {
-    el.appendChild(createCtrl("ctrl","←",t("prev"),()=>prevCard()));
-    el.appendChild(createCtrl("ctrl","Space",t("reveal"),()=>revealCard()));
-    el.appendChild(createCtrl("ctrl","→",t("next"),()=>nextCard()));
-    el.appendChild(createCtrl("ctrl ok","K",t("know"),()=>markOk()));
-    el.appendChild(createCtrl("ctrl bad","J",t("dont"),()=>markBad()));
-  }
+  el.appendChild(createCtrl("ctrl","←",t("prev"),()=>prevCard()));
+  el.appendChild(createCtrl("ctrl","Space",t("reveal"),()=>revealCard()));
+  el.appendChild(createCtrl("ctrl","→",t("next"),()=>nextCard()));
+  el.appendChild(createCtrl("ctrl ok","K","✅ Знаю",()=>markOk()));
+  el.appendChild(createCtrl("ctrl bad","J","❌ Не знаю",()=>markBad()));
 }
 function createCtrl(className, title, text, handler) {
   let btn=document.createElement("button");
@@ -249,7 +133,7 @@ function updateUI(){
   if(!deck.length){
     q.textContent = t("empty"); a.textContent = ""; a.style.display = "none";
     if (c) c.textContent = "0 / 0";
-    if (s) s.textContent = "✓ 0 • ✗ 0";
+    if (s) s.textContent = "✅ 0 • ❌ 0";
     if (n) n.textContent = `${t('deck')}: —`;
     if (bar) bar.style.width = "0%";
     return;
@@ -261,7 +145,7 @@ function updateUI(){
   if (!shown) a.style.visibility = "hidden"; else a.style.visibility = "visible";
   if (c) c.textContent = `${idx+1} / ${deck.length}`;
   let ok=deck.filter(x=>x.ok).length, bad=deck.filter(x=>x.bad).length;
-  if (s) s.textContent = `✓ ${ok} • ✗ ${bad}`;
+  if (s) s.textContent = `✅ ${ok} • ❌ ${bad}`;
   if (n) n.textContent = `${t('deck')}: ${deckName}`;
   updateControlsBar();
 }
@@ -270,16 +154,8 @@ function prevCard(){if(deck.length){idx=(idx-1+deck.length)%deck.length;shown=fa
 function nextCard(){if(deck.length){idx=(idx+1)%deck.length;shown=false;updateUI();persist();}}
 function markOk(){if(deck.length){deck[idx].ok=true;deck[idx].bad=false;nextCard();persist();}}
 function markBad(){if(deck.length){deck[idx].bad=true;deck[idx].ok=false;nextCard();persist();}}
-function rateCard(val){
-  if(!deck.length) return;
-  deck[idx].rating = val;
-  if(val===2){deck[idx].ok=true;deck[idx].bad=false;}
-  if(val===1){deck[idx].ok=false;deck[idx].bad=true;}
-  if(val===0){deck[idx].ok=false;deck[idx].bad=true;}
-  nextCard(); persist();
-}
 function persist(){
-  localStorage.setItem(localKey,JSON.stringify({deck,idx,shown,deckName,lang:curLang,theme:theme,ratingMode,editMode}));
+  localStorage.setItem(localKey,JSON.stringify({deck,idx,shown,deckName,lang:curLang,theme:theme,editMode}));
 }
 function restore(){
   try{
@@ -287,10 +163,9 @@ function restore(){
     if(!raw) return false;
     let p=JSON.parse(raw);
     if(p && p.deck && p.deck.length){
-      deck=p.deck; idx=Math.min(Math.max(0,p.idx|0),deck.length-1); shown=!!p.shown; deckName=p.deckName||'—'; 
+      deck=p.deck; idx=Math.min(Math.max(0,p.idx|0),deck.length-1); shown=!!p.shown; deckName=p.deckName||'—';
       if(p.lang) { curLang=p.lang; $("#langSelect").value=curLang; }
       if(p.theme){ theme=p.theme; document.body.dataset.theme=theme; $("#themeToggle").textContent=(theme==="dark"?"🌞":"🌙");}
-      if(p.ratingMode!==undefined) ratingMode=!!p.ratingMode;
       if(p.editMode!==undefined) editMode=!!p.editMode;
       updateLang(); showWorkspace(); updateUI(); return true;
     }
@@ -372,7 +247,9 @@ $("#changeGHBtn").onclick=function(){
   setTimeout(()=>alert(t("ghChanged")),200);
 };
 function populatePicker(owner,repo,branch){
-  owner=owner||($("#ghOwner")?$("#ghOwner").value.trim():""); repo=repo||($("#ghRepo")?$("#ghRepo").value.trim():"");branch=branch||($("#ghBranch")?$("#ghBranch").value.trim():"");
+  owner=owner||($("#ghOwner")?$("#ghOwner").value.trim():"");
+  repo=repo||($("#ghRepo")?$("#ghRepo").value.trim():"");
+  branch=branch||($("#ghBranch")?$("#ghBranch").value.trim():"");
   let pick=$("#csvPicker"), btn=$("#loadPickedBtn");
   if(!pick) return;
   pick.innerHTML = `<option>${t("selectPlaceholder")}</option>`; btn.disabled = true;
@@ -399,8 +276,8 @@ function populatePicker(owner,repo,branch){
       btn.disabled=true;
     });
 }
-$("#toggleEdit").onchange = function() {
-  editMode = this.checked;
+$("#toggleEditBtn").onclick = function() {
+  editMode = !editMode;
   persist();
   if(editMode) launchEditor();
   else { $("#editorBar").style.display="none"; }
@@ -458,7 +335,6 @@ $("#trainHardBtn").onclick = ()=>{
   deckName=t("train_hard");
   persist(); showWorkspace(); updateUI();
 };
-$("#toggleRating").onchange = function(){ ratingMode = this.checked; persist(); updateControlsBar(); updateUI(); };
 window.addEventListener("keydown",function(e){
   let tag=(document.activeElement&&document.activeElement.tagName)||"";
   if(["INPUT","TEXTAREA","SELECT"].includes(tag)) return;
@@ -466,9 +342,8 @@ window.addEventListener("keydown",function(e){
   else if(e.key==="ArrowRight"){ nextCard();}
   else if(e.key==="ArrowLeft"){ prevCard();}
   else if((e.key||"").toLowerCase()==="s"){ deck=shuffle(deck); idx=0; shown=false; updateUI(); persist(); }
-  else if((e.key||"").toLowerCase()==="k"){ if(ratingMode) rateCard(2); else markOk();}
-  else if((e.key||"").toLowerCase()==="j"){ if(ratingMode) rateCard(1); else markBad();}
-  else if((e.key||"").toLowerCase()==="a" && ratingMode){ rateCard(0);}
+  else if((e.key||"").toLowerCase()==="k"){ markOk();}
+  else if((e.key||"").toLowerCase()==="j"){ markBad();}
 });
 function shuffle(a){ 
   for(let i=a.length-1;i>0;i--){ 
@@ -489,7 +364,7 @@ $("#resetBtn") && ($("#resetBtn").onclick = () => {
 $("#markOkBtn") && ($("#markOkBtn").onclick = markOk);
 $("#markBadBtn") && ($("#markBadBtn").onclick = markBad);
 $("#exportBtn").onclick = ()=>{
-  let out=deck.map((x,i)=>({i,q:x.q,a:x.a,ok:x.ok,bad:x.bad,rating:x.rating}));
+  let out=deck.map((x,i)=>({i,q:x.q,a:x.a,ok:x.ok,bad:x.bad}));
   let blob=new Blob([JSON.stringify(out,null,2)],{type:"application/json"});
   let url=URL.createObjectURL(blob),a=document.createElement("a");
   a.href=url; a.download="deck-progress.json";
