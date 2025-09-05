@@ -2,8 +2,8 @@ let curLang = "ru";
 let theme = "light";
 let editMode = false;
 let mainDeck = [];
-let deck=[], idx=0, shown=false, deckName='—';
-let localKey = 'albinyok-flashcards-v1';
+let deck=[], idx=0, shown=false, deckName='—', testLocked=false, localKey = 'albinyok-flashcards-v1';
+
 const translations = {
   ru: {
     siteTitle:"Albinyok Flashcards",
@@ -24,8 +24,6 @@ const translations = {
     urlPlaceholder:"https://raw.githubusercontent.com/24tiy/albinyok-flashcards/main/Questions_et_r_ponses.csv",
     reveal:"Показать ответ",
     hide:"Скрыть ответ",
-    prev:"← Назад",
-    next:"Вперёд →",
     know:"✅ Знаю",
     dont:"❌ Не знаю",
     shuffle:"Перемешать",
@@ -34,7 +32,7 @@ const translations = {
     empty:"Загрузите CSV или выберите файл из репозитория",
     progress:"Экспорт прогресса",
     clear:"Очистить всё",
-    hotkeys:"Space/Enter — ответ · ←/→ — навигация · J/K — не знаю/знаю · S — перемешать",
+    hotkeys:"Tap \"Знаю\"/\"Не знаю\", далее →",
     errorPref:"Ошибка: ",
     ghInvalid:"Нет файлов .csv или ошибка доступа к GitHub.",
     ghChanged:"Репозиторий обновлён. Попробуйте снова.",
@@ -48,11 +46,10 @@ const translations = {
     del:"Удалить",
     edit:"Править",
     train_hard:"Тренировать сложные",
-    theme_light:"Светлая тема",
-    theme_dark:"Тёмная тема",
-    edit_mode:"Режим редактирования",
     save_success:"Карточки сохранены!",
-    train_all_done:"Все сложные карточки выучены! МОЛОДЕЦ!"
+    train_all_done:"Все сложные карточки выучены! МОЛОДЕЦ!",
+    testmode_tip:"В тесте навигация только с помощью кнопки 'Дальше'. Выбери 'Знаю' или 'Не знаю' и переходи к следующему вопросу.",
+    editor_tip:"В редакторе можно изменять или удалять карточки и сохранять изменения."
   }
 };
 function $(sel){ return document.querySelector(sel);}
@@ -93,6 +90,7 @@ function initTheme(){
   $("#themeToggle").textContent = theme==="dark" ? "🌞" : "🌙";
 }
 initTheme();
+
 function sniffHeader(a){
   if(!a || a.length<2) return false;
   let ha=(a[0]||'').toLowerCase(), hb=(a[1]||'').toLowerCase();
@@ -116,11 +114,18 @@ function updateControlsBar() {
   let el=$("#controlsBar");
   if (!el) return;
   el.innerHTML = "";
-  el.appendChild(createCtrl("ctrl","←",t("prev"),()=>prevCard()));
-  el.appendChild(createCtrl("ctrl","Space",t("reveal"),()=>revealCard()));
-  el.appendChild(createCtrl("ctrl","→",t("next"),()=>nextCard()));
-  el.appendChild(createCtrl("ctrl ok","K","✅ Знаю",()=>markOk()));
-  el.appendChild(createCtrl("ctrl bad","J","❌ Не знаю",()=>markBad()));
+  if (!testLocked) {
+    el.appendChild(createCtrl("ctrl showhide","", shown ? t("hide") : t("reveal"),()=>toggleShowHide()));
+  }
+  el.appendChild(createCtrl("ctrl ok","", "✅ Знаю", onKnowClick));
+  el.appendChild(createCtrl("ctrl bad","", "❌ Не знаю", onDontKnowClick));
+  if (testLocked) {
+    let next = document.createElement("button");
+    next.className = "next-btn-main";
+    next.textContent = "Дальше";
+    next.onclick = () => { nextTestStep(); };
+    el.appendChild(next);
+  }
 }
 function createCtrl(className, title, text, handler) {
   let btn=document.createElement("button");
@@ -131,7 +136,8 @@ function createCtrl(className, title, text, handler) {
 function updateUI(){
   let q=$("#q"), a=$("#a"), c=$("#counter"), s=$("#score"), n=$("#deckName"), bar=$("#progressBar");
   if(!deck.length){
-    q.textContent = t("empty"); a.textContent = ""; a.style.display = "none";
+    q.textContent = t("empty");
+    a.textContent = ""; a.style.display = "none";
     if (c) c.textContent = "0 / 0";
     if (s) s.textContent = "✅ 0 • ❌ 0";
     if (n) n.textContent = `${t('deck')}: —`;
@@ -141,19 +147,44 @@ function updateUI(){
   let card=deck[idx];
   q.textContent = card.q || `(${t('deck')})`;
   a.textContent = card.a || `(—)`;
-  a.style.display = "block";
-  if (!shown) a.style.visibility = "hidden"; else a.style.visibility = "visible";
+  if (!shown) { a.style.display = "none"; }
+  else { a.style.display = "block"; }
   if (c) c.textContent = `${idx+1} / ${deck.length}`;
   let ok=deck.filter(x=>x.ok).length, bad=deck.filter(x=>x.bad).length;
   if (s) s.textContent = `✅ ${ok} • ❌ ${bad}`;
   if (n) n.textContent = `${t('deck')}: ${deckName}`;
   updateControlsBar();
 }
-function revealCard(){shown=!shown;updateUI();persist();}
-function prevCard(){if(deck.length){idx=(idx-1+deck.length)%deck.length;shown=false;updateUI();persist();}}
-function nextCard(){if(deck.length){idx=(idx+1)%deck.length;shown=false;updateUI();persist();}}
-function markOk(){if(deck.length){deck[idx].ok=true;deck[idx].bad=false;nextCard();persist();}}
-function markBad(){if(deck.length){deck[idx].bad=true;deck[idx].ok=false;nextCard();persist();}}
+function toggleShowHide() {
+  shown = !shown;
+  updateUI();
+  persist();
+}
+function onKnowClick(){
+  if(testLocked){
+    deck[idx].ok=true; deck[idx].bad=false;
+    $("#controlsBar .ctrl.ok").setAttribute('disabled',true);
+    $("#controlsBar .ctrl.bad").setAttribute('disabled',true);
+    document.querySelector(".next-btn-main").disabled=false;
+  }
+}
+function onDontKnowClick(){
+  if(testLocked){
+    deck[idx].bad=true; deck[idx].ok=false;
+    $("#controlsBar .ctrl.ok").setAttribute('disabled',true);
+    $("#controlsBar .ctrl.bad").setAttribute('disabled',true);
+    document.querySelector(".next-btn-main").disabled=false;
+  }
+}
+function nextTestStep(){
+  shown = false;
+  idx = (idx+1)%deck.length;
+  $("#controlsBar .ctrl.ok").removeAttribute('disabled');
+  $("#controlsBar .ctrl.bad").removeAttribute('disabled');
+  document.querySelector(".next-btn-main").disabled=true;
+  updateUI();
+  persist();
+}
 function persist(){
   localStorage.setItem(localKey,JSON.stringify({deck,idx,shown,deckName,lang:curLang,theme:theme,editMode}));
 }
@@ -281,7 +312,7 @@ $("#toggleEditBtn").onclick = function() {
   persist();
   if(editMode) launchEditor();
   else { $("#editorBar").style.display="none"; }
-}
+};
 function launchEditor() {
   let bar = $("#editorBar");
   bar.innerHTML = `<div style="font-size:13px;margin-bottom:10px">${t("editor_hint")}</div>`;
@@ -322,7 +353,7 @@ function launchEditor() {
     deck = newDeck; idx=0; shown=false;
     persist(); showWorkspace(); updateUI();
     bar.innerHTML=`<div style="color:var(--ok);margin:8px 0;">${t("save_success")}</div>`;
-    setTimeout(()=>bar.style.display="none",1400);
+    setTimeout(()=>bar.style.display="none",1200);
   }
   bar.appendChild(addBtn); bar.appendChild(saveBtn);
   bar.style.display="block";
@@ -334,47 +365,6 @@ $("#trainHardBtn").onclick = ()=>{
   idx=0; shown=false;
   deckName=t("train_hard");
   persist(); showWorkspace(); updateUI();
-};
-window.addEventListener("keydown",function(e){
-  let tag=(document.activeElement&&document.activeElement.tagName)||"";
-  if(["INPUT","TEXTAREA","SELECT"].includes(tag)) return;
-  if(e.key===" "||e.key==="Enter"){ e.preventDefault(); revealCard();}
-  else if(e.key==="ArrowRight"){ nextCard();}
-  else if(e.key==="ArrowLeft"){ prevCard();}
-  else if((e.key||"").toLowerCase()==="s"){ deck=shuffle(deck); idx=0; shown=false; updateUI(); persist(); }
-  else if((e.key||"").toLowerCase()==="k"){ markOk();}
-  else if((e.key||"").toLowerCase()==="j"){ markBad();}
-});
-function shuffle(a){ 
-  for(let i=a.length-1;i>0;i--){ 
-    let j=Math.floor(Math.random()*(i+1)); 
-    [a[i],a[j]]=[a[j],a[i]];
-  } 
-  return a;
-}
-$("#card").onclick = () => {revealCard();};
-$("#prevBtn") && ($("#prevBtn").onclick = prevCard);
-$("#nextBtn") && ($("#nextBtn").onclick = nextCard);
-$("#revealBtn") && ($("#revealBtn").onclick = revealCard);
-$("#shuffleBtn") && ($("#shuffleBtn").onclick = () => {deck=shuffle(deck);idx=0;shown=false;updateUI();persist();});
-$("#resetBtn") && ($("#resetBtn").onclick = () => {
-  for(let i=0;i<deck.length;i++){deck[i].ok=false;deck[i].bad=false;}
-  idx=0;shown=false;updateUI();persist();
-});
-$("#markOkBtn") && ($("#markOkBtn").onclick = markOk);
-$("#markBadBtn") && ($("#markBadBtn").onclick = markBad);
-$("#exportBtn").onclick = ()=>{
-  let out=deck.map((x,i)=>({i,q:x.q,a:x.a,ok:x.ok,bad:x.bad}));
-  let blob=new Blob([JSON.stringify(out,null,2)],{type:"application/json"});
-  let url=URL.createObjectURL(blob),a=document.createElement("a");
-  a.href=url; a.download="deck-progress.json";
-  a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000);
-};
-$("#clearBtn").onclick = () => {
-  if(confirm("Удалить весь прогресс?")){ 
-    localStorage.removeItem(localKey);
-    location.reload();
-  }
 };
 function showHotkeys(){ $("#hotkeysTip").textContent = t("hotkeys"); }
 function bootstrap(){
@@ -388,3 +378,21 @@ function bootstrap(){
   showHotkeys();
 }
 document.addEventListener("DOMContentLoaded",bootstrap);
+
+// ------------ Модальные подсказки "?"
+function modalTipBind(helpBtnId, text) {
+  let btn = $(helpBtnId); if(!btn) return;
+  btn.onmouseenter = btn.onclick = function(e){
+    let mt = $("#modalTip");
+    mt.textContent = text;
+    mt.style.display = "block";
+    let rect = btn.getBoundingClientRect();
+    mt.style.left = (rect.left + window.scrollX - 80) + "px";
+    mt.style.top = (rect.bottom + window.scrollY + 2) + "px";
+  };
+  btn.onmouseleave = function(){
+    $("#modalTip").style.display = "none";
+  };
+}
+modalTipBind("#editHelp", t('editor_tip'));
+modalTipBind("#hardHelp", t('testmode_tip'));
