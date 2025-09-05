@@ -507,14 +507,24 @@ window.addEventListener("keydown",function(e){
   else if((e.key||"").toLowerCase()==="a" && ratingMode){ rateCard(0);}
 });
 
-function shuffle(a){ for(let i=a.length-1;i>0;i--){ let j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; }
+function shuffle(a){ 
+  for(let i=a.length-1;i>0;i--){ 
+    let j=Math.floor(Math.random()*(i+1)); 
+    [a[i],a[j]]=[a[j],a[i]];
+  } 
+  return a;
+}
 
-$("#card").onclick = () => {revealCard();}
+$("#card").onclick = () => {revealCard();};
+
 $("#prevBtn") && ($("#prevBtn").onclick = prevCard);
 $("#nextBtn") && ($("#nextBtn").onclick = nextCard);
 $("#revealBtn") && ($("#revealBtn").onclick = revealCard);
-$("#shuffleBtn") && ($("#shuffleBtn").onclick = ()=>{deck=shuffle(deck);idx=0;shown=false;updateUI();persist();};
-$("#resetBtn") && ($("#resetBtn").onclick = ()=>{for(let i=0;i<deck.length;i++){deck[i].ok=false;deck[i].bad=false;}idx=0;shown=false;updateUI();persist();};
+$("#shuffleBtn") && ($("#shuffleBtn").onclick = () => {deck=shuffle(deck);idx=0;shown=false;updateUI();persist();});
+$("#resetBtn") && ($("#resetBtn").onclick = () => {
+  for(let i=0;i<deck.length;i++){deck[i].ok=false;deck[i].bad=false;}
+  idx=0;shown=false;updateUI();persist();
+});
 $("#markOkBtn") && ($("#markOkBtn").onclick = markOk);
 $("#markBadBtn") && ($("#markBadBtn").onclick = markBad);
 
@@ -525,7 +535,13 @@ $("#exportBtn").onclick = ()=>{
   a.href=url; a.download="deck-progress.json";
   a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000);
 };
-$("#clearBtn").onclick = ()=>{ if(confirm("Удалить весь прогресс?")){ localStorage.removeItem(localKey); location.reload(); }};
+
+$("#clearBtn").onclick = () => {
+  if(confirm("Удалить весь прогресс?")){ 
+    localStorage.removeItem(localKey);
+    location.reload();
+  }
+};
 
 function showHotkeys(){ $("#hotkeysTip").textContent = t("hotkeys"); }
 
@@ -533,7 +549,9 @@ function bootstrap(){
   updateLang();
   if(restore()) return;
   var params=new URLSearchParams(window.location.search);
-  let owner=params.get("owner")||$("#ghOwner").value,repo=params.get("repo")||$("#ghRepo").value,branch=params.get("branch")||$("#ghBranch").value;
+  let owner=params.get("owner")||$("#ghOwner").value,
+      repo=params.get("repo")||$("#ghRepo").value,
+      branch=params.get("branch")||$("#ghBranch").value;
   populatePicker(owner,repo,branch);
   showHotkeys();
 }
