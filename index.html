@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>CSV Flashcards (albinyok-flashcards)</title>
-  <meta name="description" content="Многоязычные флеш‑карты из CSV: вопросы и ответы, мобильная и офлайн поддержка.">
+  <meta name="description" content="Карточки для изучения информации из CSV — трёхъязычное, мобильное и простое приложение для повторения." />
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <style>
     :root{ --bg:#f4f6fb; --bg-alt:#e6e9f2; --card:#fff; --text:#16204b; --muted:#6c7892; --accent:#865dff; --accent-2:#3fbaff; --ok:#13b77f; --bad:#f44c5c; --shadow:0 6px 24px rgba(40,40,60,0.10);}
@@ -39,9 +39,7 @@
     .sub a{color:var(--accent);}
     .lang-select{
       margin-left:auto;position:relative;}
-    .lang-selector{display:flex;gap:5px;align-items:center;}
     .lang-flags{border:1.5px solid #ececec;border-radius:11px;background:var(--bg-alt);padding:5px 11px;font-size:15px;appearance:none;}
-    .flag{font-size:16px;width:21px;}
     .uploader{margin:16px 0 10px;padding:15px 10px 15px 18px;border:2px dashed #ccc;border-radius:18px;background:var(--bg-alt);}
     .uploader.drag{border-color:var(--accent);}
     .row{display:flex;flex-wrap:wrap;align-items:center;gap:12px;}
@@ -61,7 +59,7 @@
     .chip{background:var(--card);border:1px solid #eee;padding:6px 10px 5px;border-radius:999px;box-shadow:var(--shadow);font-size:13px}
     .progress{margin-top:6px;height:8px;background:#e2e3ed;border-radius:999px;overflow:hidden;}
     .progress>div{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));width:0%;}
-    .card{position:relative;background:var(--card);border-radius:26px;box-shadow:var(--shadow);padding:20px 10px 25px;display:flex;flex-direction:column;align-items:stretch;justify-content:center;text-align:center;}
+    .card{position:relative;background:var(--card);border-radius:26px;box-shadow:var(--shadow);padding:20px 10px 24px;display:flex;flex-direction:column;align-items:stretch;justify-content:center;text-align:center;}
     .q{font-size:clamp(18px,2.4vw,21px);font-weight:700;margin-bottom:22px;}
     .a{font-size:clamp(16px,2vw,19px);color:var(--muted);}
     .controls{display:flex;flex-wrap:wrap;gap:9px;align-items:center;justify-content:center;margin-top:14px;}
@@ -74,15 +72,14 @@
     .kbd{font-family:ui-monospace,Consolas,Menlo,monospace;background:#e6e9f2;padding:2px 6px;border-radius:6px;}
     .hidden{display:none !important;}
     .error{padding:12px 14px;border-radius:12px;background:rgba(255,0,0,.09);border:1px solid #e49c9c;margin-top:10px;color:#b11212;}
-    .exportbar{display:flex;gap:8px;margin-top:11px;}
-    .tools-bar{display:flex;gap:11px;margin-top:28px;align-items:center;}
+    .exportbar{display:flex;gap:10px;margin-top:18px;justify-content:center;flex-wrap:wrap;}
     @media (max-width:600px){
-      .container{padding:11px 2vw 22px;margin:8px;}
-      .card{padding:11px 2vw 17px;}
+      .container{padding:11px 2vw 20px;margin:8px;}
+      .card{padding:10px 1.3vw 13px;}
       header h1{font-size:19px;}
-      .row,.controls,.tools-bar{flex-direction:column;gap:6px;}
-      .uploader{padding:7px 2vw 12px;}
-      .tools-bar{align-items:stretch;}
+      .row,.controls,.exportbar{flex-direction:column;gap:7px;}
+      .uploader{padding:7px 2vw 11px;}
+      .exportbar{align-items:stretch;}
     }
     @media (max-width:400px){
       .card{font-size:16px;}
@@ -128,11 +125,7 @@
       </div>
       <div id="error" class="error hidden" role="alert"></div>
     </section>
-    <div class="tools-bar">
-      <button class="btn secondary" id="templateBtn" type="button"></button>
-      <button class="btn ghost" id="demoBtn" type="button"></button>
-      <a id="helpLink" href="README.md" target="_blank" class="btn ghost">?</a>
-    </div>
+
     <section class="workspace" id="workspace" aria-live="polite">
       <div class="topbar">
         <div>
@@ -149,7 +142,7 @@
       </div>
       <div class="progress" aria-hidden="true"><div id="progressBar"></div></div>
       <div class="card" id="card">
-        <div class="q" id="q">—</div>
+        <div class="q" id="q"></div>
         <div class="a" id="a"></div>
       </div>
       <div class="controls" aria-label="Управление">
@@ -160,11 +153,14 @@
         <button class="ctrl bad" id="markBadBtn" title="J"></button>
       </div>
       <div class="tiny" style="text-align:center;margin-top:8px" id="hotkeysTip"></div>
-      <div class="exportbar">
-        <button class="btn" id="exportBtn"></button>
-        <button class="btn ghost" id="clearBtn"></button>
-      </div>
     </section>
+    <div class="exportbar">
+      <button class="btn" id="exportBtn"></button>
+      <button class="btn ghost" id="clearBtn"></button>
+      <button class="btn secondary" id="templateBtn" type="button"></button>
+      <button class="btn ghost" id="demoBtn" type="button"></button>
+      <a id="helpLink" href="README.md" target="_blank" class="btn ghost"></a>
+    </div>
   </div>
 <script>
 // ----------- Переводы ----------
@@ -322,7 +318,6 @@ function updateLang(){
   $("#hotkeysTip").textContent = t("hotkeys");
   $("#helpLink").textContent = t("help");
 }
-
 function $(s){return document.querySelector(s);}
 function sniffHeader(a){
   if(!a || a.length<2) return false;
@@ -357,7 +352,7 @@ function updateUI(){
   let card=deck[idx];
   q.textContent = card.q || `(${t('deck')})`;
   a.textContent = card.a || `(—)`;
-  a.style.display = "block"; // ответ всегда виден, а скрывается по reveal
+  a.style.display = "block";
   if (!shown) a.style.visibility = "hidden"; else a.style.visibility = "visible";
   if (c) c.textContent = `${idx+1} / ${deck.length}`;
   let ok=deck.filter(x=>x.ok).length, bad=deck.filter(x=>x.bad).length;
@@ -453,8 +448,8 @@ function addHandlers(){
     a.href=url; a.download="flashcards_template.csv"; a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000);
   });
   $("#demoBtn")?.addEventListener("click",()=>{
-    let demo='question,answer\n"HTTP статус 200","OK — успешный запрос"\n"Git команда для клонирования","git clone <url>"\n"Колонка A в CSV","Вопрос"\n"Колонка B в CSV","Ответ"\n';
-    loadCSVText(demo,"Демо");
+    let demo='question,answer\n"Столица Франции?","Париж"\n"What is the capital of France?","Paris"\n"Quelle est la capitale de la France?","Paris"\n"2+2?","4"\n"Язык Python — это...","Язык программирования"\n"Python is a...","Programming language"\n"Python est un...","Langage de programmation"\n';
+    loadCSVText(demo,"Demo");
   });
   $("#loadUrlBtn")?.addEventListener("click",()=>{
     let inp=$("#urlInput"),url=(inp&&inp.value)?inp.value.trim():"";
