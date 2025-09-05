@@ -1,8 +1,9 @@
 let curLang = "ru";
 let theme = "light";
 let editMode = false;
+let testLocked = false;
 let mainDeck = [];
-let deck=[], idx=0, shown=false, deckName='—', testLocked=false, localKey = 'albinyok-flashcards-v1';
+let deck=[], idx=0, shown=false, deckName='—', localKey = 'albinyok-flashcards-v1';
 
 const translations = {
   ru: {
@@ -48,8 +49,9 @@ const translations = {
     train_hard:"Тренировать сложные",
     save_success:"Карточки сохранены!",
     train_all_done:"Все сложные карточки выучены! МОЛОДЕЦ!",
-    testmode_tip:"В тесте только 'Знаю'/ 'Не знаю' + Дальше.",
-    editor_tip:"В редакторе можно изменять или удалять карточки."
+    testmode_tip:"Режим теста: только кнопки 'Знаю' и 'Не знаю'. Появляется 'Дальше' → переход к следующему вопросу. Выйти можно повторно кликнув на 🧑‍🎓 Тест выше.",
+    hard_tip:"Показать только сложные карточки, которые были помечены 'Не знаю'.",
+    editor_tip:"В редакторе можно добавлять, изменять и удалять любые карточки, не забывайте сохранять."
   },
   en: {
     siteTitle:"Albinyok Flashcards",
@@ -71,7 +73,7 @@ const translations = {
     reveal:"Show answer",
     hide:"Hide answer",
     know:"✅ Know",
-    dont:"❌ Don’t know",
+    dont:"❌ Don't know",
     shuffle:"Shuffle",
     reset:"Reset progress",
     deck:"Source",
@@ -94,8 +96,9 @@ const translations = {
     train_hard:"Train hard cards",
     save_success:"Saved!",
     train_all_done:"All hard cards done! NICE!",
-    testmode_tip:"Test mode: only Know/Don't know and Next.",
-    editor_tip:"You can add, edit and delete cards."
+    testmode_tip:"Test mode: only Know/Don't know, then Next. Turn off test by clicking 🧑‍🎓 Test again.",
+    hard_tip:"Show only cards marked as Don't know.",
+    editor_tip:"You can add, edit and delete cards. Don't forget to save."
   },
   fr: {
     siteTitle:"Albinyok Flashcards",
@@ -140,12 +143,13 @@ const translations = {
     train_hard:"Difficile",
     save_success:"Cartes enregistrées!",
     train_all_done:"Toutes les difficiles apprises !",
-    testmode_tip:"Mode test : seulement Je sais/Je ne sais pas, puis Suivant.",
-    editor_tip:"Modifiez ou supprimez les cartes."
+    testmode_tip:"Mode test : seulement Je sais/Je ne sais pas, puis Suivant. Quitter : cliquez 🧑‍🎓 Test.",
+    hard_tip:"Afficher seulement les difficiles marquées.",
+    editor_tip:"Modifiez ou supprimez des cartes puis sauvegardez."
   }
 };
 function $(sel){ return document.querySelector(sel);}
-function t(k){return translations[curLang][k]||k; }
+function t(k){return translations[curLang][k]||k;}
 
 function updateLang() {
   document.documentElement.lang = curLang;
@@ -158,7 +162,9 @@ function updateLang() {
   $("#loadUrlBtn").textContent = t("urlBtn");
   $("#loadPickedBtn").textContent = t("repoBtn");
   $("#changeGHBtn").textContent = t("ghBarBtn");
-  $("#testBtn").textContent = "Тест";
+  $("#testBtn").childNodes[0].nodeValue = "🧑‍🎓 " + (testLocked ? t("hide") : "Тест");
+  $("#trainHardBtn").childNodes[0].nodeValue = "💪 " + t("train_hard");
+  $("#toggleEditBtn").childNodes[0].nodeValue = "📝 " + t("edit");
   $("#ghOwner").setAttribute("aria-label", t("owner"));
   $("#ghRepo").setAttribute("aria-label", t("repo"));
   $("#ghBranch").setAttribute("aria-label", t("branch"));
@@ -206,7 +212,6 @@ function toDeck(rows){
     out.push({q:filtered[i][0], a:filtered[i][1], ok:false, bad:false});
   return out;
 }
-
 function updateControlsBar() {
   let el=$("#controlsBar");
   if (!el) return;
@@ -219,7 +224,7 @@ function updateControlsBar() {
   if (testLocked) {
     let next = document.createElement("button");
     next.className = "next-btn-main";
-    next.textContent = "Дальше";
+    next.textContent = t("next") || "Дальше";
     next.onclick = () => { nextTestStep(); };
     next.disabled = true;
     el.appendChild(next);
@@ -231,7 +236,6 @@ function createCtrl(className, title, text, handler) {
   btn.onclick = handler;
   return btn;
 }
-
 function updateUI(){
   let q=$("#q"), a=$("#a"), c=$("#counter"), s=$("#score"), n=$("#deckName"), bar=$("#progressBar");
   if(!deck.length){
@@ -279,7 +283,6 @@ function nextTestStep(){
   shown = false;
   idx = (idx+1)%deck.length;
   updateUI();
-  // разблокировать
   setTimeout(() => {
     [...document.querySelectorAll("#controlsBar .ctrl")].map(b=>b.disabled=false);
     document.querySelector(".next-btn-main").disabled=true;
@@ -470,10 +473,12 @@ $("#trainHardBtn").onclick = ()=>{
 };
 $("#shuffleBtn").onclick = () => {deck=shuffle(deck);idx=0;shown=false;updateUI();persist();};
 $("#testBtn").onclick = () => {
-  if(!deck.length) return;
-  shown = false; idx = 0; testLocked = true;
+  testLocked = !testLocked;
+  shown = false;
+  idx = 0;
   showWorkspace();
   updateUI();
+  updateLang();
 };
 function shuffle(a){ for(let i=a.length-1;i>0;i--){ let j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 $("#resetBtn").onclick = () => {
@@ -506,19 +511,19 @@ function bootstrap(){
 }
 document.addEventListener("DOMContentLoaded",bootstrap);
 
-function modalTipBind(helpBtnId, text) {
-  let btn = $(helpBtnId); if(!btn) return;
-  btn.onmouseenter = btn.onclick = function(e){
+function modalTipBind(id, textKey) {
+  let btn = $(id);
+  btn && (btn.onmouseenter = btn.onclick = function (e) {
     let mt = $("#modalTip");
-    mt.textContent = text;
+    mt.textContent = t(textKey);
     mt.style.display = "block";
     let rect = btn.getBoundingClientRect();
     mt.style.left = (rect.left + window.scrollX - 80) + "px";
     mt.style.top = (rect.bottom + window.scrollY + 2) + "px";
-  };
-  btn.onmouseleave = function(){
+  }, btn.onmouseleave = function () {
     $("#modalTip").style.display = "none";
-  };
+  });
 }
-modalTipBind("#editHelp", t('editor_tip'));
-modalTipBind("#hardHelp", t('testmode_tip'));
+modalTipBind("#testHelp", "testmode_tip");
+modalTipBind("#hardHelp", "hard_tip");
+modalTipBind("#editHelp", "editor_tip");
