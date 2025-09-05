@@ -93,6 +93,8 @@ input[type=url]:focus,input[type=text]:focus,select:focus{border:1.5px solid var
 .help-centered{text-align:center;padding-top:2px;}
 .btn-help{background:none;border:none;display:inline;padding:0 2px;vertical-align:middle;font-size:17px;cursor:pointer;color:#8c95ff;}
 .btn-help:active, .btn-help:focus{color:#478fff;}
+.testSwitch { display:inline-flex; align-items:center; gap:6px;}
+#testModeCheck {transform:scale(1.18); accent-color: #715aff; margin:0 6px 0 0; vertical-align:middle;}
 @media (max-width:900px){.container{max-width:99vw;}}
 @media (max-width:600px){
   .container{padding:0 2vw;margin:0;}
@@ -156,12 +158,17 @@ input[type=url]:focus,input[type=text]:focus,select:focus{border:1.5px solid var
       <button class="btn-glass-violet" id="toggleEditBtn" type="button">📝 Редактор карточек
         <button class="btn-help" id="editHelp" tabindex="0" aria-label="О редакторе">?</button>
       </button>
-      <button class="btn-glass-violet" id="testBtn" type="button">🧑‍🎓 Тест
+      <label class="testSwitch">
+        <input type="checkbox" id="testModeCheck">
+        <span class="btn-glass-violet" id="testBtn">🧑‍🎓 Тест</span>
         <button class="btn-help" id="testHelp" tabindex="0" aria-label="О тесте">?</button>
-      </button>
+      </label>
       <button class="btn-glass-violet" id="trainHardBtn" type="button">💪 Тренировать сложные
         <button class="btn-help" id="hardHelp" tabindex="0" aria-label="О трудных карточках">?</button>
       </button>
+    </div>
+    <div class="test-status" id="testStatus" style="text-align:center;margin:3px 0 2px;font-size:15px;color:#8258e1;display:none;">
+      <b>Режим теста включён</b> — только "Знаю/Не знаю", далее <b>Дальше</b>
     </div>
     <section class="workspace" id="workspace" aria-live="polite">
       <div class="topbar">
