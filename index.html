@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CSV Flashcards (Q/A)</title>
+  <meta name="description" content="Простое приложение флеш‑карт: колонка A — вопрос, колонка B — ответ. Загрузи CSV и учи в браузере. Работает на GitHub Pages." />
+  <style>
+    :root{
+      --bg: hsl(220 20% 98%);
+      --bg-alt: hsl(220 30% 96%);
+      --card: #fff;
+      --text: hsl(222 47% 18%);
+      --muted: hsl(222 22% 40%);
+      --accent: hsl(258 90% 66%);
+      --accent-2: hsl(200 90% 60%);
+      --ok: hsl(150 70% 40%);
+      --bad: hsl(0 80% 55%);
+      --shadow: 0 10px 30px rgba(20, 20, 40, .08);
+      --radius-xl: 16px;
+      --radius-2xl: 20px;
+    }
+    @media (prefers-color-scheme: dark){
+      :root{
+        --bg: hsl(222 20% 9%);
+        --bg-alt: hsl(222 18% 13%);
+        --card: hsl(222 15% 12%);
+        --text: hsl(0 0% 98%);
+        --muted: hsl(220 10% 70%);
+        --shadow: 0 10px 30px rgba(0,0,0,.35);
+      }
+    }
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background:
+        radial-gradient(1200px 600px at 10% -20%, var(--bg-alt), transparent 60%),
+        radial-gradient(1200px 600px at 110% 10%, var(--bg-alt), transparent 60%),
+        var(--bg);
+      color:var(--text);
+      line-height:1.45;
+    }
+    .container{max-width:980px;margin:0 auto;padding:28px 20px 64px}
+    header{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+    .logo{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:var(--shadow);display:grid;place-items:center;color:white;font-weight:800}
+    h1{font-size:clamp(22px,4vw,30px);margin:0}
+    .sub{color:var(--muted);font-size:14px}
+
+    /* Uploader */
+    .uploader{margin:22px 0;padding:22px;border:2px dashed rgba(0,0,0,.12);border-radius:var(--radius-2xl);background:rgba(0,0,0,.03)}
+    @media (prefers-color-scheme: dark){
+      .uploader{border-color:rgba(255,255,255,.18);background:rgba(255,255,255,.03)}
+    }
+    .uploader.drag{border-color:var(--accent);background:rgba(139,92,246,.08)}
+    .uploader .row{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+    .uploader h2{margin:0 0 8px;font-size:18px}
+    .uploader p{margin:0 0 12px;color:var(--muted)}
+    .btn{appearance:none;border:none;background:var(--accent);color:#fff;border-radius:12px;padding:10px 14px;font-weight:700;cursor:pointer;box-shadow:var(--shadow);transition:.2s transform,.2s filter}
+    .btn:hover{transform:translateY(-1px);filter:brightness(1.03)}
+    .btn.secondary{background:var(--accent-2)}
+    .btn.ghost{background:transparent;color:var(--accent);border:1.5px solid var(--accent)}
+    .btn:disabled{opacity:.6;cursor:not-allowed}
+    input[type=file]{display:none}
+    label.file{display:inline-flex;gap:10px;align-items:center;background:var(--card);border:1.5px solid rgba(0,0,0,.08);padding:10px 14px;border-radius:12px;cursor:pointer;box-shadow:var(--shadow)}
+    @media (prefers-color-scheme: dark){
+      label.file{border-color:rgba(255,255,255,.12)}
+    }
+
+    /* Card */
+    .workspace{display:none;margin-top:24px}
+    .stats{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:0 0 12px}
+    .chip{background:var(--card);border:1px solid rgba(0,0,0,.08);padding:6px 10px;border-radius:999px;box-shadow:var(--shadow);font-size:13px}
+    @media (prefers-color-scheme: dark){.chip{border-color:rgba(255,255,255,.12)}}
+    .progress{height:8px;background:rgba(0,0,0,.07);border-radius:999px;overflow:hidden;flex:1}
+    @media (prefers-color-scheme: dark){.progress{background:rgba(255,255,255,.12)}}
+    .progress > div{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));width:0%}
+
+    .card{position:relative;background:var(--card);border-radius:24px;box-shadow:var(--shadow);padding:26px;min-height:220px;display:flex;align-items:center;justify-content:center;text-align:center}
+    .face{max-width:90ch}
+    .q{font-size:clamp(18px,2.4vw,22px);font-weight:700}
+    .a{font-size:clamp(16px,2.1vw,20px);margin-top:10px;display:none;color:var(--muted)}
+
+    .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;margin-top:16px}
+    .ctrl{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:12px;border:1.5px solid rgba(0,0,0,.08);background:var(--card);cursor:pointer;box-shadow:var(--shadow);font-weight:700}
+    .ctrl:hover{transform:translateY(-1px)}
+    @media (prefers-color-scheme: dark){.ctrl{border-color:rgba(255,255,255,.12)}}
+    .ctrl.ok{border-color:rgba(0,0,0,.08);color:var(--ok)}
+    .ctrl.bad{border-color:rgba(0,0,0,.08);color:var(--bad)}
+
+    .topbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:10px}
+    .left{display:flex;gap:8px;align-items:center}
+    .right{display:flex;gap:8px;align-items:center}
+
+    .tiny{font-size:12px;color:var(--muted)}
+    .kbd{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; background:rgba(0,0,0,.08); padding:2px 6px;border-radius:6px}
+
+    .hidden{display:none !important}
+    .error{padding:12px 14px;border-radius:12px;background:rgba(255,0,0,.1);border:1px solid rgba(255,0,0,.25)}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">Q↔A</div>
+      <div>
+        <h1>CSV Flashcards</h1>
+        <div class="sub">Колонка A — вопрос, колонка B — ответ. Импортируй CSV и учи как флеш‑карты.</div>
+      </div>
+    </header>
+
+    <section class="uploader" id="uploader" aria-label="Загрузка CSV">
+      <h2>1) Загрузите файл CSV</h2>
+      <p>Поддержка: разделители "," / ";" / табуляция. Первая строка‑заголовок игнорируется, если содержит <em>question/answer</em>.</p>
+      <div class="row" style="margin-bottom:12px">
+        <label for="file" class="file" id="fileLabel">📄 Выбрать CSV</label>
+        <input type="file" id="file" accept=".csv,text/csv" />
+        <button class="btn secondary" id="templateBtn" type="button">Скачать шаблон CSV</button>
+        <button class="btn ghost" id="demoBtn" type="button">Загрузить демо‑набор</button>
+      </div>
+      <div class="tiny">Можно также перетащить файл в эту область.</div>
+      <div id="error" class="error hidden" role="alert"></div>
+    </section>
+
+    <section class="workspace" id="workspace" aria-live="polite">
+      <div class="topbar">
+        <div class="left">
+          <span class="chip" id="deckName">Дек: —</span>
+          <span class="chip" id="counter">0 / 0</span>
+          <span class="chip" id="score">✓ 0 • ✗ 0</span>
+        </div>
+        <div class="right">
+          <button class="btn ghost" id="shuffleBtn" title="Перемешать (S)">Перемешать</button>
+          <button class="btn ghost" id="resetBtn" title="Сбросить прогресс">Сбросить</button>
+          <label class="file" for="reupload">↻ Заменить CSV</label>
+          <input type="file" id="reupload" accept=".csv,text/csv" />
+        </div>
+      </div>
+
+      <div class="progress" aria-hidden="true"><div id="progressBar"></div></div>
+
+      <div class="card" id="card">
+        <div class="face">
+          <div class="q" id="q">Загрузите CSV, чтобы начать</div>
+          <div class="a" id="a"></div>
+        </div>
+      </div>
+
+      <div class="controls" aria-label="Управление">
+        <button class="ctrl" id="prevBtn" title="Назад (←)">← Назад</button>
+        <button class="ctrl" id="revealBtn" title="Показать/скрыть ответ (Пробел/Enter)">Показать ответ</button>
+        <button class="ctrl" id="nextBtn" title="Вперёд (→)">Вперёд →</button>
+        <button class="ctrl ok" id="markOkBtn" title="Отметить как знаю (K)">✓ Знаю</button>
+        <button class="ctrl bad" id="markBadBtn" title="Отметить как не знаю (J)">✗ Не знаю</button>
+      </div>
+      <div class="tiny" style="text-align:center;margin-top:8px">
+        Горячие клавиши: <span class="kbd">Space</span>/<span class="kbd">Enter</span> — ответ, 
+        <span class="kbd">→</span>/<span class="kbd">←</span> — навигация, 
+        <span class="kbd">K</span>/<span class="kbd">J</span> — знаю/не знаю, 
+        <span class="kbd">S</span> — перемешать.
+      </div>
+    </section>
+  </div>
+
+  <script>
+  // ================== Utils ==================
+  const $ = (sel) => document.querySelector(sel);
+  const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+
+  function sniffDelimiter(sample){
+    const first = sample.split(/\r?\n/).slice(0,3).join("\n");
+    const candidates = [',',';','\t'];
+    let best = ','; let bestCount = -1;
+    for(const d of candidates){
+      const c = (first.match(new RegExp(`\\${d}`,'g'))||[]).length;
+      if(c>bestCount){bestCount=c;best=d}
+    }
+    return best;
+  }
+
+  function parseCSV(text){
+    // Remove BOM
+    if(text.charCodeAt(0)===0xFEFF){ text = text.slice(1); }
+    const delim = sniffDelimiter(text);
+    const rows = [];
+    let i=0, cur='', row=[], inQuotes=false;
+    while(i < text.length){
+      const ch = text[i];
+      if(ch === '"'){
+        if(inQuotes && text[i+1] === '"'){ cur += '"'; i+=2; continue; }
+        inQuotes = !inQuotes; i++; continue;
+      }
+      if(!inQuotes && (ch === '\n' || ch === '\r')){
+        // commit row
+        row.push(cur); cur='';
+        if(row.length>0){ rows.push(row); }
+        row=[];
+        // handle CRLF
+        if(ch==='\r' && text[i+1]==='\n') i++;
+        i++; continue;
+      }
+      if(!inQuotes && ch === delim){ row.push(cur); cur=''; i++; continue; }
+      cur += ch; i++;
+    }
+    // last cell
+    row.push(cur);
+    if(row.length>1 || (row.length===1 && row[0].trim()!=='')) rows.push(row);
+    return rows;
+  }
+
+  function looksLikeHeader([a,b]){
+    if(!a || !b) return false;
+    const ha = a.trim().toLowerCase();
+    const hb = b.trim().toLowerCase();
+    return ["q","question","вопрос","вопросы"].includes(ha) && ["a","answer","ответ","ответы"].includes(hb);
+  }
+
+  function toDeck(rows){
+    if(rows.length===0) return [];
+    // ensure at least 2 columns
+    const filtered = rows.map(r => [r[0]??'', r[1]??'']).filter(r => (r[0].trim()+r[1].trim()) !== '');
+    if(filtered.length===0) return [];
+    // drop header if detected
+    const startIdx = looksLikeHeader(filtered[0]) ? 1 : 0;
+    return filtered.slice(startIdx).map(r => ({q:r[0].trim(), a:r[1].trim(), ok:false, bad:false}));
+  }
+
+  function shuffle(arr){
+    for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; }
+    return arr;
+  }
+
+  // ================== State ==================
+  let deck = [];
+  let idx = 0;
+  let shown = false;
+  let deckName = '—';
+
+  function updateUI(){
+    const ws = $('#workspace');
+    const qEl = $('#q');
+    const aEl = $('#a');
+    const countEl = $('#counter');
+    const scoreEl = $('#score');
+    const nameEl = $('#deckName');
+    const bar = $('#progressBar');
+
+    if(deck.length===0){
+      qEl.textContent = 'Загрузите CSV, чтобы начать';
+      aEl.textContent = '';
+      aEl.style.display = 'none';
+      countEl.textContent = '0 / 0';
+      scoreEl.textContent = '✓ 0 • ✗ 0';
+      nameEl.textContent = 'Дек: —';
+      bar.style.width = '0%';
+      return;
+    }
+    const card = deck[idx];
+    qEl.textContent = card.q || '(пустой вопрос)';
+    aEl.textContent = card.a || '(пустой ответ)';
+    aEl.style.display = shown ? 'block' : 'none';
+    countEl.textContent = `${idx+1} / ${deck.length}`;
+    const ok = deck.filter(c=>c.ok).length;
+    const bad = deck.filter(c=>c.bad).length;
+    scoreEl.textContent = `✓ ${ok} • ✗ ${bad}`;
+    nameEl.textContent = `Дек: ${deckName}`;
+    bar.style.width = `${Math.round(((ok+bad)/Math.max(deck.length,1))*100)}%`;
+
+    $('#revealBtn').textContent = shown ? 'Скрыть ответ' : 'Показать ответ';
+  }
+
+  function showWorkspace(){
+    $('#uploader').classList.add('hidden');
+    $('#workspace').style.display = 'block';
+  }
+  function showUploader(){
+    $('#workspace').style.display = 'none';
+    $('#uploader').classList.remove('hidden');
+  }
+
+  function loadCSVText(text, name='Мой набор'){
+    try{
+      const rows = parseCSV(text);
+      const d = toDeck(rows);
+      if(d.length===0) throw new Error('Не удалось найти пары вопрос/ответ (2 колонки).');
+      deck = d; idx = 0; shown = false; deckName = name;
+      persist();
+      showWorkspace();
+      updateUI();
+    }catch(e){
+      const err = $('#error');
+      err.textContent = 'Ошибка: ' + e.message;
+      err.classList.remove('hidden');
+      showUploader();
+    }
+  }
+
+  // ================== Persistence ==================
+  const KEY = 'csv-flashcards-deck-v1';
+  function persist(){
+    const payload = {deck, idx, shown, deckName};
+    localStorage.setItem(KEY, JSON.stringify(payload));
+  }
+  function restore(){
+    try{
+      const raw = localStorage.getItem(KEY); if(!raw) return;
+      const {deck: d, idx: i, shown: s, deckName: n} = JSON.parse(raw);
+      if(Array.isArray(d) && d.length){ deck = d; idx = Math.min(Math.max(0, i|0), d.length-1); shown = !!s; deckName = n||'—'; showWorkspace(); updateUI(); }
+    }catch{}
+  }
+
+  // ================== Events ==================
+  function handleFile(file){
+    const reader = new FileReader();
+    reader.onload = () => loadCSVText(String(reader.result), file.name.replace(/\.[^.]+$/, ''));
+    reader.onerror = () => alert('Не удалось прочитать файл');
+    reader.readAsText(file);
+  }
+
+  $('#file').addEventListener('change', (e)=>{
+    const f = e.target.files?.[0]; if(f) handleFile(f);
+  });
+  $('#reupload').addEventListener('change', (e)=>{
+    const f = e.target.files?.[0]; if(f) handleFile(f);
+  });
+
+  // Drag & drop
+  const up = $('#uploader');
+  ;['dragenter','dragover'].forEach(ev=> up.addEventListener(ev, (e)=>{ e.preventDefault(); e.stopPropagation(); up.classList.add('drag'); }));
+  ;['dragleave','drop'].forEach(ev=> up.addEventListener(ev, (e)=>{ e.preventDefault(); e.stopPropagation(); up.classList.remove('drag'); }));
+  up.addEventListener('drop', (e)=>{
+    const f = e.dataTransfer?.files?.[0]; if(f) handleFile(f);
+  });
+
+  // Buttons
+  $('#templateBtn').addEventListener('click', ()=>{
+    const csv = 'question,answer\n"Столица Франции?","Париж"\n"2+2?","4"\n"Главный цвет неба днём","Синий"\n';
+    const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'flashcards_template.csv'; a.click();
+    setTimeout(()=>URL.revokeObjectURL(url), 1000);
+  });
+
+  $('#demoBtn').addEventListener('click', ()=>{
+    const demo = `question,answer\n"HTTP статус 200","OK — успешный запрос"\n"Git команда для клонирования","git clone <url>"\n"Колонка A в CSV","Вопрос"\n"Колонка B в CSV","Ответ"\n`;
+    loadCSVText(demo, 'Демо');
+  });
+
+  $('#prevBtn').addEventListener('click', ()=>{ if(deck.length){ idx = (idx-1+deck.length)%deck.length; shown=false; updateUI(); persist(); } });
+  $('#nextBtn').addEventListener('click', ()=>{ if(deck.length){ idx = (idx+1)%deck.length; shown=false; updateUI(); persist(); } });
+  $('#revealBtn').addEventListener('click', ()=>{ shown=!shown; updateUI(); persist(); });
+  $('#shuffleBtn').addEventListener('click', ()=>{ if(deck.length){ shuffle(deck); idx=0; shown=false; updateUI(); persist(); }});
+  $('#resetBtn').addEventListener('click', ()=>{ deck.forEach(c=>{c.ok=false; c.bad=false}); idx=0; shown=false; updateUI(); persist(); });
+  $('#markOkBtn').addEventListener('click', ()=>{ if(deck.length){ deck[idx].ok=true; deck[idx].bad=false; idx = Math.min(idx+1, deck.length-1); shown=false; updateUI(); persist(); }});
+  $('#markBadBtn').addEventListener('click', ()=>{ if(deck.length){ deck[idx].bad=true; deck[idx].ok=false; idx = Math.min(idx+1, deck.length-1); shown=false; updateUI(); persist(); }});
+
+  // Keyboard shortcuts
+  window.addEventListener('keydown', (e)=>{
+    if(['INPUT','TEXTAREA'].includes(document.activeElement?.tagName)) return;
+    if(e.key===' '|| e.key==='Enter'){ e.preventDefault(); $('#revealBtn').click(); }
+    else if(e.key==='ArrowRight'){ $('#nextBtn').click(); }
+    else if(e.key==='ArrowLeft'){ $('#prevBtn').click(); }
+    else if(e.key.toLowerCase()==='s'){ $('#shuffleBtn').click(); }
+    else if(e.key.toLowerCase()==='k'){ $('#markOkBtn').click(); }
+    else if(e.key.toLowerCase()==='j'){ $('#markBadBtn').click(); }
+  });
+
+  // Click to toggle answer
+  $('#card').addEventListener('click', ()=>{ shown=!shown; updateUI(); persist(); });
+
+  // Restore previous deck if any
+  restore();
+
+  // Accessibility tweaks: focus outlines
+  $$('.btn, .ctrl, label.file').forEach(el=>{ el.addEventListener('keydown', (e)=>{ if(e.key===' '||e.key==='Enter'){ e.preventDefault(); el.click(); } }); });
+
+  // File label clicks
+  $('#fileLabel').addEventListener('click', ()=> $('#file').click());
+  </script>
+</body>
+</html>
