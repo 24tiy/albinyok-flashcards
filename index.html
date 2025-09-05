@@ -20,13 +20,8 @@
       --shadow:0 14px 38px rgba(12,18,42,.3),0 3px 8px rgba(13,18,41,.08);
     }
     html, body {height:100%;}
-    body {
-      margin:0;
-      font-family:'Inter',ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Noto Sans,Arial;
-      background:var(--bg); color:var(--text); min-height:100vh;
-      transition:background .5s,color .5s; line-height:1.45;
-      font-size:15.7px;
-    }
+    body {margin:0; font-family:'Inter',ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Noto Sans,Arial;
+      background:var(--bg); color:var(--text); min-height:100vh; transition:background .5s,color .5s; line-height:1.45; font-size:14px;}
     h1 {font-size:2.0rem;margin:0 0 2px 0;font-weight:900;letter-spacing:-.5px;}
     .container {max-width:750px; margin:35px auto 32px; padding:0; background: transparent; border-radius:var(--radius);}
     header {display:flex;align-items:flex-start;gap:16px;margin-bottom:11px;flex-wrap:wrap;}
@@ -42,7 +37,7 @@
       display:flex;flex-direction:column;gap:10px;
     }
     .uploader h2{font-weight:800;font-size:1.10rem;}
-    .row, .gh-bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
     label.file{display:inline-flex;align-items:center;gap:11px;background:var(--card);font-weight:600;border:1.5px solid #e2e6ef;padding:10px 15px; border-radius:13px;cursor:pointer;box-shadow:var(--shadow);}
     input[type=file]{display:none;}
     input[type=url],input[type=text],select{
@@ -50,46 +45,19 @@
       box-shadow:0 2px 9px rgba(70,80,120,.015);
     }
     input[type=url]:focus,input[type=text]:focus,select:focus{border:1.5px solid var(--accent);}
-    /* Фиолетовые стеклянные кнопки */
-    .btn-glass-violet {
-      background: rgba(125,100,255, 0.13);
-      color: #5239ca;
-      border: 2.1px solid #9277f5;
-      border-radius: 18px;
-      font-weight:700;font-size:1.07rem;
-      padding: 12px 24px;
-      box-shadow: 0 7px 26px 0 rgba(126,91,255,.13), 0 2px 7px 0 rgba(126,91,255,.09);
-      backdrop-filter: blur(9px);
-      margin:0 6px 8px 0;
-      transition:.18s;
-      display:inline-block;
-    }
-    .btn-glass-violet.selected,
-    .btn-glass-violet:active,
-    .btn-glass-violet.primary {background: #8d6dff;color:#fff;border-color: #8769e6;}
-    .btn-glass-violet.outline {background: transparent;color: #7857de;border-style:dashed;}
+    .btn-glass-violet {background:rgba(125,100,255,.13);color:#5239ca;border:2.1px solid #9277f5;border-radius:18px;font-weight:700;
+      font-size:1.07rem;padding:12px 24px;box-shadow:0 7px 26px 0 rgba(126,91,255,.13),0 2px 7px 0 rgba(126,91,255,.09);
+      backdrop-filter:blur(9px);margin:0 6px 8px 0;transition:.18s;display:inline-block;}
+    .btn-glass-violet.selected,.btn-glass-violet:active,.btn-glass-violet.primary {background: #8d6dff;color:#fff;border-color: #8769e6;}
+    .btn-glass-violet.outline {background:transparent;color:#7857de;border-style:dashed;}
     .btn-glass-violet.small {font-size:.97rem;padding:7px 13px;margin:7px 7px 7px 0;}
     .settings-bar{display:flex;gap:12px;align-items:center;justify-content:center;margin:13px 0 17px 0;}
     .switchbtn{display:inline-block;margin-right:9px;vertical-align:middle;}
-    /* Современные кнопки внизу */
-    .btn-new {
-      background: rgba(82,195,255,0.18);
-      color: #233542;
-      border-radius: 18px;
-      border: 2.1px solid #43c6f6;
-      font-weight: 800;
-      font-size: 1.07rem;
-      backdrop-filter: blur(9px);
-      box-shadow: 0 6px 36px 0 rgba(64,170,255,0.11), 0 2px 8px 0 rgba(90,180,255,0.08);
-      padding: 13.5px 25px;
-      transition:.19s;
-      margin:0 6px 0 0;
-      letter-spacing:.01em;
-      display:inline-block;
-    }
-    .btn-new.selected,
-    .btn-new:active,
-    .btn-new.primary {background: #52d1fd;color: #16304d;border-color: #14bfff;}
+    .btn-new {background:rgba(82,195,255,0.18);color:#233542;border-radius:18px;border:2.1px solid #43c6f6;
+      font-weight:800;font-size:1.07rem;backdrop-filter:blur(9px);
+      box-shadow:0 6px 36px 0 rgba(64,170,255,.11),0 2px 8px 0 rgba(90,180,255,.08);
+      padding:13.5px 25px;transition:.19s;margin:0 6px 0 0;letter-spacing:.01em;display:inline-block;}
+    .btn-new.selected,.btn-new:active,.btn-new.primary {background: #52d1fd;color:#16304d;border-color: #14bfff;}
     .workspace{display:none;margin-top:24px;}
     .topbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:14px;margin-top:7px;}
     .chip{background:var(--card);border:1.2px solid #e2e6ef;padding:7px 12px;border-radius:999px;box-shadow:var(--shadow);font-size:14.5px;}
@@ -112,19 +80,6 @@
     .exportbar{display:flex;gap:8px;margin-top:23px;justify-content:center;flex-wrap:wrap;padding-bottom:11px;}
     .edit-bar{margin:14px 0;text-align:center;}
     .edit-btn{margin:1px 8px;}
-    .placeholder-btn {
-      display:inline-flex;align-items:center;justify-content:center;
-      width:54px;height:54px;
-      font-size:1.15rem;
-      border-radius:16px;
-      border:2.4px dashed #52d1fd;
-      color:#43a1e6;
-      background:rgba(82,195,255,0.10);
-      margin:0 6px 12px 0;
-      box-shadow: 0 2px 28px 0 rgba(64,170,255,0.09);
-      transition:.16s;
-    }
-    .placeholder-btn strong{font-size:1.02em;}
     @media (max-width:900px){.container{max-width:99vw;}}
     @media (max-width:600px){
       .container{padding:0;margin:0;}
@@ -171,16 +126,17 @@
         <input type="file" id="file" accept=".csv,text/csv" />
         <input type="url" id="urlInput" style="width:220px;margin-left:7px;" />
         <button class="btn-glass-violet" id="loadUrlBtn" type="button">По ссылке</button>
+      </div>
+      <div class="row" style="margin-bottom:12px">
+        <input id="ghOwner" type="text" placeholder="Owner (напр. 24tiy)" value="24tiy" style="width:110px;">
+        <input id="ghRepo" type="text" placeholder="Repo (напр. albinyok-flashcards)" value="albinyok-flashcards" style="width:160px;">
+        <input id="ghBranch" type="text" placeholder="Ветка" value="main" style="width:80px;">
         <select id="csvPicker" style="margin-left:7px;"><option value=""></option></select>
         <button class="btn-glass-violet" id="loadPickedBtn" type="button" disabled>Загрузить с GitHub</button>
         <button class="btn-glass-violet" id="changeGHBtn" type="button">Сменить репозиторий</button>
       </div>
-      <div class="gh-bar">
-        <!-- можно добавить что-то еще -->
-      </div>
       <div id="error" class="error hidden" role="alert"></div>
     </section>
-
     <div class="settings-bar switch">
       <label class="switchbtn">
         <input type="checkbox" id="toggleRating" style="vertical-align:middle;">
@@ -192,12 +148,6 @@
       </label>
       <button class="btn-glass-violet" id="trainHardBtn" type="button">Тренировать сложные</button>
     </div>
-
-    <div style="display:flex;justify-content:center;align-items:center;margin: 12px 0 11px 0;gap:19px;">
-      <div class="placeholder-btn"><strong>Свободно</strong></div>
-      <div class="placeholder-btn"><strong>Добавить действие</strong></div>
-    </div>
-
     <section class="workspace" id="workspace" aria-live="polite">
       <div class="topbar">
         <div>
@@ -217,9 +167,7 @@
         <div class="q" id="q"></div>
         <div class="a" id="a"></div>
       </div>
-      <div class="controls" id="controlsBar" aria-label="Управление">
-        <!-- Кнопки генерируются JS -->
-      </div>
+      <div class="controls" id="controlsBar" aria-label="Управление"></div>
       <div class="tiny" style="text-align:center;margin-top:8px" id="hotkeysTip"></div>
     </section>
     <section class="edit-bar" id="editorBar" style="display:none"></section>
