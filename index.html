@@ -2,56 +2,95 @@
 <html lang="ru">
 <head>
   <meta charset="utf-8" />
-  <title>CSV Flashcards (Q/A)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Флеш‑карты из CSV для самоподготовки. Поддержка загрузки из GitHub или файла, работает оффлайн и на мобильных.">
-  <!-- PapaParse для надёжного парсинга CSV -->
+  <title>CSV Flashcards (Q/A)</title>
+  <meta name="description" content="Флеш‑карты из CSV для самоподготовки. Двуязычный интерфейс, работа оффлайн и мобильная адаптивность.">
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <style>
-    :root{ --bg:hsl(220 20% 98%); --bg-alt:hsl(220 30% 96%); --card:#fff; --text:hsl(222 47% 18%); --muted:hsl(222 22% 40%); --accent:hsl(258 90% 66%); --accent-2:hsl(200 90% 60%); --ok:hsl(150 70% 40%); --bad:hsl(0 80% 55%); --shadow:0 10px 30px rgba(20,20,40,.08); }
-    @media (prefers-color-scheme: dark){ :root { --bg:hsl(222 20% 9%); --bg-alt:hsl(222 18% 13%); --card:hsl(222 15% 12%); --text:hsl(0 0% 98%); --muted:hsl(220 10% 70%); --shadow:0 10px 30px rgba(0,0,0,.35) } }
-    html,body{height:100%}
-    body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Noto Sans,Arial; background:radial-gradient(1200px 600px at 10% -20%, var(--bg-alt), transparent 60%), radial-gradient(1200px 600px at 110% 10%, var(--bg-alt), transparent 60%), var(--bg); color:var(--text); line-height:1.45}
-    .container{max-width:980px;margin:0 auto;padding:28px 10px 64px}
-    @media (max-width:480px){
-      .container{padding:12px 1vw 24px;}
-      .card{padding:15px;}
-      .controls{flex-direction:column; gap:7px;}
+    :root{ --bg:#f4f6fb; --bg-alt:#e6e9f2; --card:#fff; --text:#16204b; --muted:#6c7892; --accent:#865dff; --accent-2:#3fbaff; --ok:#13b77f; --bad:#f44c5c; --shadow:0 6px 24px rgba(40,40,60,0.10);}
+    @media (prefers-color-scheme: dark){
+      :root{ --bg:#121623; --bg-alt:#181f32; --card:#1c2234; --text:#f4f6fa; --muted:#a7acc6; --shadow:0 6px 24px rgba(0,0,0,0.32);}
     }
-    header{display:flex;align-items:center;gap:14px;margin-bottom:18px}
-    .logo{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:var(--shadow);display:grid;place-items:center;color:white;font-weight:800}
-    h1{font-size:clamp(22px,4vw,30px);margin:0}
-    .sub{color:var(--muted);font-size:14px}
-    .lang{margin-left:auto; font-size:13px;}
-    .uploader{margin:22px 0;padding:18px 10px 18px 18px;border:2px dashed rgba(0,0,0,.10);border-radius:20px;background:rgba(0,0,0,.03)}
-    @media (prefers-color-scheme: dark){.uploader{border-color:rgba(255,255,255,.18);background:rgba(255,255,255,.03)}}
-    .uploader.drag{border-color:var(--accent);background:rgba(139,92,246,.08)}
-    .uploader .row{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
-    .btn{appearance:none;border:none;background:var(--accent);color:#fff;border-radius:12px;padding:9px 14px;font-weight:700;cursor:pointer;box-shadow:var(--shadow);transition:filter .16s}
-    .btn.secondary{background:var(--accent-2)}
-    .btn.ghost{background:transparent;color:var(--accent);border:1.5px solid var(--accent)}
-    .btn:active,.btn.active{filter: brightness(0.83);}
-    input[type=file]{display:none}
-    label.file{display:inline-flex;gap:10px;align-items:center;background:var(--card);border:1.5px solid rgba(0,0,0,.08);padding:10px 14px;border-radius:12px;cursor:pointer;box-shadow:var(--shadow)}
-    .urlbox{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
-    .urlbox input[type=url]{flex:1;min-width:120px;border-radius:12px;border:1.5px solid rgba(0,0,0,.12);padding:8px 10px;background:var(--card);}
-    .picker{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
-    select{border-radius:12px;border:1.5px solid rgba(0,0,0,.12);padding:9px 10px;background:var(--card);}
-    .workspace{display:none;margin-top:24px}
-    .chip{background:var(--card);border:1px solid rgba(0,0,0,.08);padding:6px 10px;border-radius:999px;box-shadow:var(--shadow);font-size:13px}
-    .progress{height:8px;background:rgba(0,0,0,.07);border-radius:999px;overflow:hidden}
-    .progress>div{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));width:0%}
-    .card{position:relative;background:var(--card);border-radius:24px;box-shadow:var(--shadow);padding:26px;min-height:120px;display:flex;align-items:center;justify-content:center;text-align:center}
-    .q{font-size:clamp(18px,2.4vw,22px);font-weight:700}
-    .a{font-size:clamp(16px,2.1vw,20px);margin-top:10px;display:none;color:var(--muted)}
-    .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;margin-top:16px}
-    .ctrl{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:12px;border:1.5px solid rgba(0,0,0,.08);background:var(--card);cursor:pointer;box-shadow:var(--shadow);font-weight:700;transition:filter .15s;}
-    .ctrl.ok{color:var(--ok)} .ctrl.bad{color:var(--bad)}
-    .ctrl.active{filter: brightness(0.7);}
-    .topbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:10px}
-    .tiny{font-size:12px;color:var(--muted)} .kbd{font-family:ui-monospace,Consolas,Menlo,monospace;background:rgba(0,0,0,.08);padding:2px 6px;border-radius:6px}
-    .hidden{display:none !important} .error{padding:12px 14px;border-radius:12px;background:rgba(255,0,0,.1);border:1px solid rgba(255,0,0,.25)}
-    .exportbar{display:flex;gap:8px;margin-top:10px;}
+    html, body {height:100%;}
+    body{
+      margin:0;
+      font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Noto Sans,Arial;
+      background: var(--bg);
+      color: var(--text);
+      line-height:1.45;
+      min-height:100vh;
+    }
+    .container{
+      max-width:680px;
+      margin:0 auto;
+      background: var(--card);
+      border-radius:30px;
+      box-shadow: var(--shadow);
+      padding:32px 22px 42px;
+      margin-top:32px;
+    }
+    header{
+      display:flex;align-items:center;gap:12px;margin-bottom:22px;
+      flex-wrap:wrap;
+    }
+    .logo{
+      width:44px;height:44px;border-radius:13px;
+      background:linear-gradient(135deg,var(--accent),var(--accent-2));
+      box-shadow:var(--shadow);
+      display:grid;place-items:center;
+      color:white;font-weight:800;font-size:21px;
+    }
+    h1{font-size:27px;margin:0;}
+    .sub{color:var(--muted);font-size:15px;}
+    .sub a{color:var(--accent);}
+    .lang{margin-left:auto;font-size:13px;}
+    .lang label{margin-left:5px;}
+    .uploader{margin:16px 0;padding:15px 10px 17px 18px;border:2px dashed #ccc;border-radius:18px;background:var(--bg-alt);}
+    .uploader.drag{border-color:var(--accent);}
+    .uploader .row{display:flex;flex-wrap:wrap;align-items:center;gap:12px;}
+    .btn{appearance:none;border:none;background:var(--accent);color:#fff;border-radius:12px;padding:10px 15px;font-weight:700;cursor:pointer;box-shadow:var(--shadow);transition:filter .16s;}
+    .btn.secondary{background:var(--accent-2);}
+    .btn.ghost{background:transparent;color:var(--accent);border:1.5px solid var(--accent);}
+    .btn:active,.btn.active{filter:brightness(0.83);}
+    input[type=file]{display:none;}
+    label.file{display:inline-flex;gap:9px;align-items:center;background:var(--card);border:1.2px solid #eee;padding:11px 14px;margin-right:2px;border-radius:12px;cursor:pointer;box-shadow:var(--shadow);}
+    .urlbox{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0;}
+    .urlbox input[type=url]{flex:1;min-width:150px;border-radius:12px;border:1.5px solid #e4e5ef;padding:8px 11px;background:var(--card);}
+    .picker{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0;}
+    select{border-radius:12px;border:1.5px solid #e4e5ef;padding:9px 10px;background:var(--card);}
+    .gh-bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:10px 0;}
+    .gh-bar input{border-radius:8px;border:1.2px solid #e4e5ef;padding:7px 8px;width:90px;}
+    .workspace{display:none;margin-top:24px;}
+    .chip{background:var(--card);border:1px solid #eee;padding:6px 10px 5px;border-radius:999px;box-shadow:var(--shadow);font-size:13px}
+    .progress{margin-top:6px;height:8px;background:#e2e3ed;border-radius:999px;overflow:hidden;}
+    .progress>div{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));width:0%;}
+    .card{position:relative;background:var(--card);border-radius:26px;box-shadow:var(--shadow);padding:31px 10px 30px;min-height:110px;display:flex;align-items:center;justify-content:center;text-align:center;}
+    .q{font-size:clamp(18px,2.4vw,21px);font-weight:700;}
+    .a{font-size:clamp(16px,2vw,19px);margin-top:13px;display:none;color:var(--muted);}
+    .controls{display:flex;flex-wrap:wrap;gap:9px;align-items:center;justify-content:center;margin-top:14px;}
+    .ctrl{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:12px;border:1.5px solid #eaeaf0;background:var(--card);cursor:pointer;box-shadow:var(--shadow);font-weight:700;transition:filter .15s;}
+    .ctrl.ok{color:var(--ok);}
+    .ctrl.bad{color:var(--bad);}
+    .ctrl.active{filter:brightness(0.66);}
+    .topbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:10px;}
+    .tiny{font-size:12px;color:var(--muted);}
+    .kbd{font-family:ui-monospace,Consolas,Menlo,monospace;background:#e6e9f2;padding:2px 6px;border-radius:6px;}
+    .hidden{display:none !important;}
+    .error{padding:12px 14px;border-radius:12px;background:rgba(255,0,0,.09);border:1px solid #e49c9c;margin-top:10px;color:#b11212;}
+    .exportbar{display:flex;gap:8px;margin-top:11px;}
+    @media (max-width:600px){
+      .container{padding:11px 3.5vw 22px;margin:8px;}
+      .card{padding:11px 2vw 16px;}
+      header h1{font-size:19px;}
+      .row,.controls{flex-direction:column;gap:6px;}
+      .uploader{padding:7px 2vw 16px;}
+    }
+    @media (max-width:400px){
+      .card{font-size:16px;min-height:94px;}
+      header{gap:5px;}
+      .sub{font-size:12px;}
+      .btn,.ctrl,label.file{font-size:13px;}
+    }
   </style>
 </head>
 <body>
@@ -59,18 +98,18 @@
     <header>
       <div class="logo">Q↔A</div>
       <div>
-        <h1>CSV Flashcards</h1>
-        <div class="sub">Флеш‑карты из CSV — загрузите файл или ссылку с GitHub. Ваш прогресс сохраняется локально. <a href="README.md" style="color:var(--accent)">Помощь</a></div>
+        <h1 id="siteTitle">CSV Flashcards</h1>
+        <div class="sub" id="siteSub"><a id="helpLink" href="README.md" target="_blank">Помощь</a></div>
       </div>
-      <div class="lang">
+      <div class="lang" aria-label="Выбор языка / Language switcher">
         <label><input type="radio" name="lang" value="ru" checked>RU</label>
         <label><input type="radio" name="lang" value="en">EN</label>
       </div>
     </header>
     <section class="uploader" id="uploader" aria-label="Загрузка CSV">
-      <h2>1) Файл или ссылка</h2>
-      <div class="row" style="margin-bottom:12px">
-        <label for="file" class="file" id="fileLabel">📄 Файл CSV</label>
+      <h2 id="fileOrLink">1) Файл или ссылка</h2>
+      <div class="row" style="margin-bottom:13px">
+        <label for="file" class="file" id="fileLabel"><span id="fileIcon">📄</span> <span id="fileBtnTxt">Файл CSV</span></label>
         <input type="file" id="file" accept=".csv,text/csv" />
         <button class="btn secondary" id="templateBtn" type="button">Шаблон CSV</button>
         <button class="btn ghost" id="demoBtn" type="button">Демо‑набор</button>
@@ -83,7 +122,13 @@
         <select id="csvPicker"><option value="">…ищем CSV в репозитории…</option></select>
         <button class="btn" id="loadPickedBtn" type="button" disabled>Загрузить из GitHub</button>
       </div>
-      <div class="tiny">URL‑параметры: <code>?owner=…&repo=…&branch=…&csv=path/in/repo.csv</code>. По умолчанию owner=<b>24tiy</b>, repo=<b>flashcards-naturalisation</b>, branch=<b>main</b>.</div>
+      <div class="gh-bar">
+        <input id="ghOwner" value="24tiy" maxlength="32" aria-label="GitHub User/Org"/>
+        <input id="ghRepo" value="flashcards-naturalisation" maxlength="40" aria-label="GitHub Repo"/>
+        <input id="ghBranch" value="main" maxlength="24" aria-label="Branch"/>
+        <button class="btn ghost" id="changeGHBtn" type="button">Сменить репозиторий</button>
+      </div>
+      <div class="tiny" id="urlParamsHelp"></div>
       <div id="error" class="error hidden" role="alert"></div>
     </section>
     <section class="workspace" id="workspace" aria-live="polite">
@@ -96,12 +141,15 @@
         <div>
           <button class="btn ghost" id="shuffleBtn" title="Перемешать (S)">Перемешать</button>
           <button class="btn ghost" id="resetBtn" title="Сбросить прогресс">Сбросить</button>
-          <label class="file" for="reupload">↻ Файл CSV</label>
+          <label class="file" for="reupload">↻ CSV</label>
           <input type="file" id="reupload" accept=".csv,text/csv" />
         </div>
       </div>
       <div class="progress" aria-hidden="true"><div id="progressBar"></div></div>
-      <div class="card" id="card"><div class="q" id="q">Загрузите CSV или выберите файл из репозитория</div><div class="a" id="a"></div></div>
+      <div class="card" id="card">
+        <div class="q" id="q">Загрузите CSV или выберите файл из репозитория</div>
+        <div class="a" id="a"></div>
+      </div>
       <div class="controls" aria-label="Управление">
         <button class="ctrl" id="prevBtn" title="Назад (←)">← Назад</button>
         <button class="ctrl" id="revealBtn" title="Показать/скрыть ответ (Пробел/Enter)">Показать ответ</button>
@@ -109,291 +157,355 @@
         <button class="ctrl ok" id="markOkBtn" title="Отметить как знаю (K)">✓ Знаю</button>
         <button class="ctrl bad" id="markBadBtn" title="Отметить как не знаю (J)">✗ Не знаю</button>
       </div>
-      <div class="tiny" style="text-align:center;margin-top:8px">Space/Enter — ответ · ←/→ — навигация · J/K — не знаю/знаю · S — перемешать</div>
+      <div class="tiny" style="text-align:center;margin-top:8px" id="hotkeysTip">Space/Enter — ответ · ←/→ — навигация · J/K — не знаю/знаю · S — перемешать</div>
       <div class="exportbar">
         <button class="btn" id="exportBtn">Экспорт прогресса</button>
         <button class="btn ghost" id="clearBtn">Очистить всё</button>
       </div>
     </section>
   </div>
-  <script>
-  // ====== Переводы для language switcher ======
-  const translations = {
-    ru:{
-      q: "Вопрос",
-      a: "Ответ",
-      file: "Файл CSV",
-      template: "Шаблон CSV",
-      demo: "Демо‑набор",
-      url: "По ссылке",
-      repo: "Загрузить из GitHub",
-      error: "Ошибка",
-      empty: "Загрузите CSV или выберите репозиторий",
-      reveal: "Показать ответ",
-      hide: "Скрыть ответ",
-      prev: "← Назад",
-      next: "Вперёд →",
-      know: "✓ Знаю",
-      dont: "✗ Не знаю",
-      shuffle: "Перемешать",
-      reset: "Сбросить прогресс",
-      deck: "Дек",
-      progress: "Экспорт прогресса",
-      clear: "Очистить всё"
-    },
-    en:{
-      q: "Question",
-      a: "Answer",
-      file: "CSV File",
-      template: "Download Template",
-      demo: "Demo Set",
-      url: "Load URL",
-      repo: "Load from GitHub",
-      error: "Error",
-      empty: "Upload a CSV or select a repo file",
-      reveal: "Show answer",
-      hide: "Hide answer",
-      prev: "← Back",
-      next: "Next →",
-      know: "✓ I know",
-      dont: "✗ I don't know",
-      shuffle: "Shuffle",
-      reset: "Reset",
-      deck: "Deck",
-      progress: "Export progress",
-      clear: "Clear all"
+<script>
+const translations = {
+  ru: {
+    siteTitle:"CSV Flashcards",
+    siteSub:'Флеш‑карты из CSV — загрузите файл или ссылку с GitHub. Ваш прогресс сохраняется локально. <a id="helpLink" href="README.md" target="_blank">Помощь</a>',
+    fileOrLink:"1) Файл или ссылка",
+    fileBtn:"Файл CSV",
+    template:"Шаблон CSV",
+    demo:"Демо-набор",
+    urlBtn:"По ссылке",
+    repoBtn:"Загрузить из GitHub",
+    ghBarBtn:"Сменить репозиторий",
+    owner:"Пользователь",
+    repo:"Репозиторий",
+    branch:"Ветка",
+    noCSVs:"CSV в репозитории не найдены",
+    ghApiErr:"Ошибка доступа к GitHub: ",
+    selectPlaceholder:"…ищем CSV в репозитории…",
+    urlPlaceholder:"https://raw.githubusercontent.com/24tiy/flashcards-naturalisation/main/Questions_et_r_ponses.csv",
+    urlParams:'URL‑параметры: <code>?owner=…&repo=…&branch=…&csv=path/in/repo.csv</code>. По умолчанию owner=<b>24tiy</b>, repo=<b>flashcards-naturalisation</b>, branch=<b>main</b>.',
+    reveal:"Показать ответ",
+    hide:"Скрыть ответ",
+    prev:"← Назад",
+    next:"Вперёд →",
+    know:"✓ Знаю",
+    dont:"✗ Не знаю",
+    shuffle:"Перемешать",
+    reset:"Сбросить прогресс",
+    deck:"Дек",
+    empty:"Загрузите CSV или выберите файл из репозитория",
+    progress:"Экспорт прогресса",
+    clear:"Очистить всё",
+    hotkeys:"Space/Enter — ответ · ←/→ — навигация · J/K — не знаю/знаю · S — перемешать",
+    errorPref:"Ошибка: ",
+    ghInvalid:"Нет файлов .csv или ошибка доступа к GitHub.",
+    ghChanged:"Репозиторий обновлён, попытайтесь снова загрузить файл.",
+    fetchFail:"Ошибка загрузки",
+    fileTooBig:"Файл слишком большой!",
+    csvNotPairs:"Не найдено пар 'вопрос/ответ'"
+  },
+  en: {
+    siteTitle:"CSV Flashcards",
+    siteSub:'Flashcards from CSV — upload a file or paste a GitHub link. Your progress is saved locally. <a id="helpLink" href="README.md" target="_blank">Help</a>',
+    fileOrLink:"1) File or Link",
+    fileBtn:"CSV File",
+    template:"Template CSV",
+    demo:"Demo Set",
+    urlBtn:"From Link",
+    repoBtn:"Load from GitHub",
+    ghBarBtn:"Change Repo",
+    owner:"User",
+    repo:"Repo",
+    branch:"Branch",
+    noCSVs:"No CSV files found in repo",
+    ghApiErr:"GitHub API failure: ",
+    selectPlaceholder:"…searching CSVs in repo…",
+    urlPlaceholder:"https://raw.githubusercontent.com/24tiy/flashcards-naturalisation/main/Questions_et_r_ponses.csv",
+    urlParams:'URL params: <code>?owner=…&repo=…&branch=…&csv=path/in/repo.csv</code>. Defaults — owner=<b>24tiy</b>, repo=<b>flashcards-naturalisation</b>, branch=<b>main</b>.',
+    reveal:"Show answer",
+    hide:"Hide answer",
+    prev:"← Back",
+    next:"Next →",
+    know:"✓ I know",
+    dont:"✗ Don\'t know",
+    shuffle:"Shuffle",
+    reset:"Reset progress",
+    deck:"Deck",
+    empty:"Upload a CSV or select from repo",
+    progress:"Export progress",
+    clear:"Clear all",
+    hotkeys:"Space/Enter — answer · ←/→ — navigation · J/K — don\'t/know · S — shuffle",
+    errorPref:"Error: ",
+    ghInvalid:"No CSV files present or GitHub access error.",
+    ghChanged:"Repo settings updated. Try loading a file again.",
+    fetchFail:"Download error",
+    fileTooBig:"File too large!",
+    csvNotPairs:"No question/answer pairs found"
+  }
+}; 
+let curLang = "ru";
+function t(k){return translations[curLang][k]||k;}
+document.querySelectorAll('input[name=lang]').forEach(r=>r.addEventListener('change',e=>{
+  curLang=e.target.value; updateLang();
+}));
+// Основной update-lang, весь UI!
+function updateLang(){
+  document.documentElement.lang = curLang;
+  $("#siteTitle").textContent = t("siteTitle");
+  $("#siteSub").innerHTML = t("siteSub");
+  $("#helpLink").href = curLang==="ru" ? "README.md" : "README-en.md";
+  $("#fileOrLink").textContent = t("fileOrLink");
+  $("#fileBtnTxt").textContent = t("fileBtn");
+  $("#templateBtn").textContent = t("template");
+  $("#demoBtn").textContent = t("demo");
+  $("#loadUrlBtn").textContent = t("urlBtn");
+  $("#loadPickedBtn").textContent = t("repoBtn");
+  $("#changeGHBtn").textContent = t("ghBarBtn");
+  $("#ghOwner").setAttribute("aria-label", t("owner"));
+  $("#ghRepo").setAttribute("aria-label", t("repo"));
+  $("#ghBranch").setAttribute("aria-label", t("branch"));
+  $("#urlInput").placeholder = t("urlPlaceholder");
+  $("#urlParamsHelp").innerHTML = t("urlParams");
+  $("#prevBtn").textContent = t("prev");
+  $("#revealBtn").textContent = t("reveal");
+  $("#nextBtn").textContent = t("next");
+  $("#markOkBtn").textContent = t("know");
+  $("#markBadBtn").textContent = t("dont");
+  $("#shuffleBtn").textContent = t("shuffle");
+  $("#resetBtn").textContent = t("reset");
+  $("#exportBtn").textContent = t("progress");
+  $("#clearBtn").textContent = t("clear");
+  $("#deckName").textContent = `${t('deck')}: —`;
+  $("#hotkeysTip").textContent = t("hotkeys");
+  // select-плейсхолдер
+  let pick=$("#csvPicker");
+  if (pick && (!pick.options.length || pick.options[0].value==="")){
+    pick.options[0].textContent = t("selectPlaceholder");
+  }
+}
+// ----- Вся остальная логика -----------------
+function $(s){ return document.querySelector(s); }
+function sniffHeader(a){
+  if(!a || a.length<2) return false;
+  let ha=(a[0]||'').toLowerCase(), hb=(a[1]||'').toLowerCase();
+  return ['q','question','вопрос'].includes(ha) && ['a','answer','ответ'].includes(hb);
+}
+function toDeck(rows){
+  if(!rows||!rows.length) return [];
+  let filtered=[];
+  for(let r of rows){
+    let q=(r[0]||'').trim(), a=(r[1]||'').trim();
+    if(q+a==='') continue;
+    filtered.push([q,a]);
+  }
+  if(!filtered.length) return [];
+  let skip=sniffHeader(filtered[0]) ? 1:0, out=[];
+  for(let i=skip;i<filtered.length;i++)
+    out.push({q:filtered[i][0], a:filtered[i][1], ok:false, bad:false});
+  return out;
+}
+let deck=[], idx=0, shown=false, deckName='—';
+function updateUI(){
+  let q=$("#q"), a=$("#a"), c=$("#counter"), s=$("#score"), n=$("#deckName"), bar=$("#progressBar");
+  if(!deck.length){
+    q.textContent = t("empty"); a.textContent = ""; a.style.display = "none";
+    if (c) c.textContent = "0 / 0";
+    if (s) s.textContent = "✓ 0 • ✗ 0";
+    if (n) n.textContent = `${t('deck')}: —`;
+    if (bar) bar.style.width = "0%";
+    return;
+  }
+  let card=deck[idx];
+  q.textContent = card.q || `(${t('deck')})`;
+  a.textContent = card.a || `(—)`;
+  a.style.display = shown?"block":"none";
+  if (c) c.textContent = `${idx+1} / ${deck.length}`;
+  let ok=deck.filter(x=>x.ok).length, bad=deck.filter(x=>x.bad).length;
+  if (s) s.textContent = `✓ ${ok} • ✗ ${bad}`;
+  if (n) n.textContent = `${t('deck')}: ${deckName}`;
+  let rb=$("#revealBtn"); if(rb) rb.textContent = shown?t("hide"):t("reveal");
+}
+function showWorkspace(){ $("#uploader").classList.add("hidden"); $("#workspace").style.display="block"; }
+function showUploader(){ $("#uploader").classList.remove("hidden"); $("#workspace").style.display="none"; }
+function persist(){
+  localStorage.setItem('csv-flashcards-v7',JSON.stringify({deck,idx,shown,deckName,lang:curLang}));
+}
+function restore(){
+  try{
+    let raw=localStorage.getItem('csv-flashcards-v7');
+    if(!raw) return false;
+    let p=JSON.parse(raw);
+    if(p && p.deck && p.deck.length){
+      deck=p.deck; idx=Math.min(Math.max(0,p.idx|0),deck.length-1); shown=!!p.shown; deckName=p.deckName||'—';
+      if(p.lang) { curLang=p.lang; $("input[name=lang][value='"+curLang+"']").checked=true; }
+      updateLang(); showWorkspace(); updateUI(); return true;
     }
-  };
-  let curLang = "ru";
-  function t(k){ return translations[curLang][k]||k; }
-  document.querySelectorAll('input[name=lang]').forEach(r=>r.addEventListener('change', e=>{ curLang=e.target.value; updateLang(); }));
-  function updateLang(){
-    // пример базового перевода UI, можешь доработать для остальных надписей
-    document.querySelector("label[for='file']").textContent = "📄 "+t('file');
-    document.getElementById("templateBtn").textContent = t('template');
-    document.getElementById("demoBtn").textContent = t('demo');
-    document.getElementById("loadUrlBtn").textContent = t('url');
-    document.getElementById("loadPickedBtn").textContent = t('repo');
-    document.getElementById("prevBtn").textContent = t('prev');
-    document.getElementById("revealBtn").textContent = t('reveal');
-    document.getElementById("nextBtn").textContent = t('next');
-    document.getElementById("markOkBtn").textContent = t('know');
-    document.getElementById("markBadBtn").textContent = t('dont');
-    document.getElementById("shuffleBtn").textContent = t('shuffle');
-    document.getElementById("resetBtn").textContent = t('reset');
-    document.getElementById("exportBtn").textContent = t('progress');
-    document.getElementById("clearBtn").textContent = t('clear');
+  }catch(e){}
+  return false;
+}
+function loadCSVText(text,name){
+  try{
+    let parsed = Papa.parse(text.trim(), {skipEmptyLines:true});
+    if(parsed.errors && parsed.errors.length) throw new Error(parsed.errors[0].message);
+    let d=toDeck(parsed.data);
+    if(!d.length) throw new Error(t("csvNotPairs"));
+    deck = d; idx=0; shown=false; deckName=name||'';
+    persist(); showWorkspace(); updateUI();
+  }catch(e){
+    let err=$("#error");
+    if(err){ err.textContent=t("errorPref") + (e.message||e); err.classList.remove("hidden"); }
+    showUploader();
   }
-
-  // ===== Вся логика ниже =====
-  function $(s){ return document.querySelector(s); }
-  function sniffHeader(a){
-    if(!a || a.length<2) return false;
-    var ha=(a[0]||'').toLowerCase(), hb=(a[1]||'').toLowerCase();
-    return ['q','question','вопрос'].includes(ha) && ['a','answer','ответ'].includes(hb);
+}
+function loadFromURL(url){
+  return fetch(url,{cache:"no-store"}).then(res=>{
+    if(!res.ok) throw new Error(`${t("fetchFail")} (${res.status})`);
+    if(+res.headers.get("content-length")>500000) throw new Error(t("fileTooBig"));
+    return res.text();
+  }).then(txt=>{
+    let name=decodeURIComponent(url.split("/").pop()||"Remote CSV");
+    loadCSVText(txt,name);
+  });
+}
+function rawURL(owner,repo,branch,path){
+  return `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${path}`;
+}
+function listCsvViaTrees(owner,repo,branch){
+  let url=`https://api.github.com/repos/${owner}/${repo}/git/trees/${encodeURIComponent(branch)}?recursive=1`;
+  return fetch(url,{headers:{"Accept":"application/vnd.github+json"}})
+    .then(res=>{
+      if(!res.ok) throw new Error(`${t("ghApiErr")}${res.status}`);
+      return res.json();
+    })
+    .then(data=>{
+      let tree=(data&&data.tree)?data.tree:[], files=[];
+      for(let it of tree){ if(it.type==="blob" && /\.csv$/i.test(it.path)) files.push({path:it.path, name:it.path.split("/").pop()}); }
+      return files;
+    });
+}
+function handleFileInput(e){
+  let f=(e.target&&e.target.files&&e.target.files[0])?e.target.files[0]:null; if(!f) return;
+  let r=new FileReader();
+  r.onload=()=>{ loadCSVText(String(r.result), f.name.replace(/\.[^.]+$/,"")); };
+  r.onerror=()=>{ alert(t("errorPref")+" Read file error"); };
+  r.readAsText(f);
+}
+function addHandlers(){
+  ["file","reupload"].forEach(id=>{
+    let el=$("#"+id); if(el) el.addEventListener("change",handleFileInput);
+  });
+  let up=$("#uploader");
+  if(up){
+    ["dragenter","dragover"].forEach(ev=>up.addEventListener(ev,e=>{
+      e.preventDefault(); e.stopPropagation(); up.classList.add("drag");
+    }));
+    ["dragleave","drop"].forEach(ev=>up.addEventListener(ev,e=>{
+      e.preventDefault(); e.stopPropagation(); up.classList.remove("drag");
+    }));
+    up.addEventListener("drop",e=>{
+      let f=(e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0])?e.dataTransfer.files[0]:null;
+      if(f) handleFileInput({target:{files:[f]}});
+    });
   }
-  function toDeck(rows){
-    if(!rows||!rows.length) return [];
-    let filtered=[];
-    for(let i=0;i<rows.length;i++){
-      let r=rows[i], q=(r[0]||'').trim(), a=(r[1]||'').trim();
-      if(q+a==='') continue;
-      filtered.push([q,a]);
+  $("#templateBtn")?.addEventListener("click",()=>{
+    let csv='question,answer\n"Столица Франции?","Париж"\n"2+2?","4"\n"Главный цвет неба днём","Синий"\n';
+    let blob=new Blob([csv],{type:"text/csv;charset=utf-8;"}),url=URL.createObjectURL(blob),a=document.createElement("a");
+    a.href=url; a.download="flashcards_template.csv"; a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000);
+  });
+  $("#demoBtn")?.addEventListener("click",()=>{
+    let demo='question,answer\n"HTTP статус 200","OK — успешный запрос"\n"Git команда для клонирования","git clone <url>"\n"Колонка A в CSV","Вопрос"\n"Колонка B в CSV","Ответ"\n';
+    loadCSVText(demo,"Демо");
+  });
+  $("#loadUrlBtn")?.addEventListener("click",()=>{
+    let inp=$("#urlInput"),url=(inp&&inp.value)?inp.value.trim():"";
+    if(!url) return alert("Вставь ссылку на CSV");
+    loadFromURL(url)["catch"](e=>alert(e.message||e));
+  });
+  $("#loadPickedBtn")?.addEventListener("click",()=>{
+    let pick=$("#csvPicker");
+    if(!pick||!pick.value) return;
+    let owner=pick.getAttribute("data-owner"),repo=pick.getAttribute("data-repo"),branch=pick.getAttribute("data-branch")||"main";
+    let url=rawURL(owner,repo,branch,pick.value);
+    loadFromURL(url)["catch"](e=>alert(e.message||e));
+  });
+  window.addEventListener("keydown",function(e){
+    let tag=(document.activeElement&&document.activeElement.tagName)||"";
+    if(["INPUT","TEXTAREA","SELECT"].includes(tag)) return;
+    let f=(id)=>{let el=$(id);if(!el)return; el.classList.add("active");setTimeout(()=>el.classList.remove("active"),180);}
+    if(e.key===" "||e.key==="Enter"){ e.preventDefault(); $("#revealBtn").click(); f("#revealBtn"); }
+    else if(e.key==="ArrowRight"){ $("#nextBtn").click(); f("#nextBtn"); }
+    else if(e.key==="ArrowLeft"){ $("#prevBtn").click(); f("#prevBtn"); }
+    else if((e.key||"").toLowerCase()==="s"){ $("#shuffleBtn").click(); f("#shuffleBtn"); }
+    else if((e.key||"").toLowerCase()==="k"){ $("#markOkBtn").click(); f("#markOkBtn"); }
+    else if((e.key||"").toLowerCase()==="j"){ $("#markBadBtn").click(); f("#markBadBtn"); }
+  });
+  $("#card")?.addEventListener("click",()=>{shown=!shown; updateUI(); persist();});
+  $("#prevBtn")?.addEventListener("click",()=>{ if(deck.length){ idx=(idx-1+deck.length)%deck.length; shown=false; updateUI(); persist();}});
+  $("#nextBtn")?.addEventListener("click",()=>{ if(deck.length){ idx=(idx+1)%deck.length; shown=false; updateUI(); persist();}});
+  $("#revealBtn")?.addEventListener("click",()=>{ shown=!shown; updateUI(); persist();});
+  $("#shuffleBtn")?.addEventListener("click",()=>{
+    if(deck.length){
+      deck=deck.slice(); for(let i=deck.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]];}
+      idx=0; shown=false; updateUI(); persist();
     }
-    if(!filtered.length) return [];
-    let skip=sniffHeader(filtered[0]) ? 1:0, out=[];
-    for(let i=skip;i<filtered.length;i++){
-      out.push({q:filtered[i][0], a:filtered[i][1], ok:false, bad:false});
-    }
-    return out;
-  }
-  
-  var deck=[], idx=0, shown=false, deckName='—';
-  function updateUI(){
-    var q=$('#q'), a=$('#a'), c=$('#counter'), s=$('#score'), n=$('#deckName'), bar=$('#progressBar');
-    if(!deck.length){
-      q.textContent = t('empty');
-      a.textContent = '';
-      a.style.display = 'none';
-      if(c) c.textContent = '0 / 0';
-      if(s) s.textContent = '✓ 0 • ✗ 0';
-      if(n) n.textContent = t('deck') + ': —';
-      if(bar) bar.style.width = '0%';
-      return;
-    }
-    var card=deck[idx];
-    q.textContent = card.q || '('+ t('q').toLowerCase() +'?)';
-    a.textContent = card.a || '('+ t('a').toLowerCase() +'?)';
-    a.style.display=shown?'block':'none';
-    if(c) c.textContent=(idx+1)+' / '+deck.length;
-    var ok=deck.filter(x=>x.ok).length, bad=deck.filter(x=>x.bad).length;
-    if(s) s.textContent='✓ '+ok+' • ✗ '+bad;
-    if(n) n.textContent=t('deck')+': '+deckName;
-    if(bar) bar.style.width=Math.round(((ok+bad)/Math.max(deck.length,1))*100)+'%';
-    var rb=$('#revealBtn'); if(rb) rb.textContent=shown?t('hide'):t('reveal');
-  }
-  function showWorkspace(){ $('#uploader').classList.add('hidden'); $('#workspace').style.display='block'; }
-  function showUploader(){ $('#uploader').classList.remove('hidden'); $('#workspace').style.display='none'; }
-  function persist(){
-    localStorage.setItem('csv-flashcards-v6',JSON.stringify({deck,idx,shown,deckName,lang:curLang}))
-  }
-  function restore(){
-    try{
-      let raw=localStorage.getItem('csv-flashcards-v6');
-      if(!raw) return false;
-      let p=JSON.parse(raw);
-      if(p && p.deck && p.deck.length){
-        deck=p.deck; idx=Math.min(Math.max(0,p.idx|0),deck.length-1); shown=!!p.shown; deckName=p.deckName||'—';
-        if(p.lang) { curLang=p.lang; $("input[name=lang][value='"+curLang+"']").checked=true; updateLang(); }
-        showWorkspace(); updateUI(); return true;
-      }
-    }catch(e){}
-    return false;
-  }
-  function loadCSVText(text,name){
-    try{
-      // ---- Надёжный CSV-парсинг через PapaParse ---
-      let parsed = Papa.parse(text.trim(), {skipEmptyLines:true});
-      if(parsed.errors && parsed.errors.length) throw new Error(parsed.errors[0].message);
-      let d=toDeck(parsed.data);
-      if(!d.length) throw new Error("Не найдено пар 'вопрос/ответ'");
-      deck = d; idx=0; shown=false; deckName=name||'';
-      persist(); showWorkspace(); updateUI();
-    }catch(e){
-      let err=$('#error');
-      if(err){ err.textContent=(t('error')+': ')+(e.message||e); err.classList.remove('hidden'); }
-      showUploader();
-    }
-  }
-  function loadFromURL(url){
-    return fetch(url,{cache:'no-store'}).then(res=>{
-      if(!res.ok) throw new Error('Ошибка загрузки ('+res.status+')');
-      if(+res.headers.get('content-length')>500000) throw new Error('Файл слишком большой!');
-      return res.text();
-    }).then(txt=>{
-      let name=decodeURIComponent(url.split('/').pop()||'Удалённый CSV');
-      loadCSVText(txt,name);
-    });
-  }
-  function getParams(){
-    var p={},qs=location.search.replace(/^\?/,'').split('&');
-    for(var i=0;i<qs.length;i++){
-      var kv=qs[i].split('='); if(kv[0]) p[decodeURIComponent(kv[0])]=decodeURIComponent(kv[1]||'');
-    }
-    return p;
-  }
-  function rawURL(owner,repo,branch,path){
-    return `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${path}`;
-  }
-  // ---- GitHub Trees API ----
-  function defaults(){ return { owner:'24tiy',repo:'flashcards-naturalisation',branch:'main' }; }
-  function listCsvViaTrees(owner,repo,branch){
-    var url=`https://api.github.com/repos/${owner}/${repo}/git/trees/${encodeURIComponent(branch)}?recursive=1`;
-    return fetch(url,{headers:{'Accept':'application/vnd.github+json'}})
-        .then(res=>{ if(!res.ok) throw new Error('GitHub API: '+res.status); return res.json(); })
-        .then(data=>{
-          var tree=(data&&data.tree)?data.tree:[], files=[];
-          for(let it of tree){ if(it.type==='blob' && /\.csv$/i.test(it.path)) files.push({path:it.path, name:it.path.split('/').pop()}); }
-          return files;
-        });
-  }
-  function handleFileInput(e){
-    var f=(e.target&&e.target.files&&e.target.files[0])?e.target.files[0]:null; if(!f) return;
-    var r=new FileReader();
-    r.onload=()=>{ loadCSVText(String(r.result), f.name.replace(/\.[^.]+$/,'')); };
-    r.onerror=()=>{ alert('Ошибка чтения файла'); };
-    r.readAsText(f);
-  }
-  // ------ UI handlers ------
-  function addHandlers(){
-    let file=$('#file'); if(file) file.addEventListener('change',handleFileInput);
-    let reu=$('#reupload'); if(reu) reu.addEventListener('change',handleFileInput);
-    let up=$('#uploader');
-    if(up){
-      ['dragenter','dragover'].forEach(ev=>up.addEventListener(ev,e=>{
-        e.preventDefault(); e.stopPropagation(); up.classList.add('drag');
-      }));
-      ['dragleave','drop'].forEach(ev=>up.addEventListener(ev,e=>{
-        e.preventDefault(); e.stopPropagation(); up.classList.remove('drag');
-      }));
-      up.addEventListener('drop',e=>{
-        var f=(e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0])?e.dataTransfer.files[0]:null;
-        if(f) handleFileInput({target:{files:[f]}});
-      });
-    }
-    $('#templateBtn')?.addEventListener('click',()=>{
-      let csv='question,answer\n"Столица Франции?","Париж"\n"2+2?","4"\n"Главный цвет неба днём","Синий"\n';
-      let blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}),url=URL.createObjectURL(blob),a=document.createElement('a');
-      a.href=url; a.download='flashcards_template.csv'; a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000);
-    });
-    $('#demoBtn')?.addEventListener('click',()=>{
-      let demo='question,answer\n"HTTP статус 200","OK — успешный запрос"\n"Git команда для клонирования","git clone <url>"\n"Колонка A в CSV","Вопрос"\n"Колонка B в CSV","Ответ"\n';
-      loadCSVText(demo,'Демо');
-    });
-    $('#loadUrlBtn')?.addEventListener('click',()=>{
-      let inp=$('#urlInput'),url=(inp&&inp.value)?inp.value.trim():'';
-      if(!url) return alert('Вставь ссылку на CSV');
-      loadFromURL(url)['catch'](e=>alert(e.message||e));
-    });
-    $('#loadPickedBtn')?.addEventListener('click',()=>{
-      var pick=$('#csvPicker');
-      if(!pick||!pick.value) return;
-      var owner=pick.getAttribute('data-owner'),repo=pick.getAttribute('data-repo'),branch=pick.getAttribute('data-branch')||'main';
-      var url=rawURL(owner,repo,branch,pick.value);
-      loadFromURL(url)['catch'](e=>alert(e.message||e));
-    });
-    // горячие клавиши и подсветка
-    window.addEventListener('keydown',function(e){
-      var tag=(document.activeElement&&document.activeElement.tagName)||'';
-      if(['INPUT','TEXTAREA','SELECT'].includes(tag)) return;
-      let f=(id)=>{let el=$(id);if(!el)return; el.classList.add('active');setTimeout(()=>el.classList.remove('active'),180);}
-      if(e.key===' '||e.key==='Enter'){ e.preventDefault(); $('#revealBtn').click(); f("#revealBtn"); }
-      else if(e.key==='ArrowRight'){ $('#nextBtn').click(); f("#nextBtn"); }
-      else if(e.key==='ArrowLeft'){ $('#prevBtn').click(); f("#prevBtn"); }
-      else if((e.key||'').toLowerCase()==='s'){ $('#shuffleBtn').click(); f("#shuffleBtn"); }
-      else if((e.key||'').toLowerCase()==='k'){ $('#markOkBtn').click(); f("#markOkBtn"); }
-      else if((e.key||'').toLowerCase()==='j'){ $('#markBadBtn').click(); f("#markBadBtn"); }
-    });
-    $('#card')?.addEventListener('click',()=>{ shown=!shown; updateUI(); persist(); });
-    $('#prevBtn')?.addEventListener('click',()=>{ if(deck.length){ idx=(idx-1+deck.length)%deck.length; shown=false; updateUI(); persist(); } });
-    $('#nextBtn')?.addEventListener('click',()=>{ if(deck.length){ idx=(idx+1)%deck.length; shown=false; updateUI(); persist(); } });
-    $('#revealBtn')?.addEventListener('click',()=>{ shown=!shown; updateUI(); persist(); });
-    $('#shuffleBtn')?.addEventListener('click',()=>{ if(deck.length){ deck=deck.slice(); for(let i=deck.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]];} idx=0; shown=false; updateUI(); persist(); } });
-    $('#resetBtn')?.addEventListener('click',()=>{ for(let i=0;i<deck.length;i++){ deck[i].ok=false; deck[i].bad=false } idx=0; shown=false; updateUI(); persist(); });
-    $('#markOkBtn')?.addEventListener('click',()=>{ if(deck.length){ deck[idx].ok=true; deck[idx].bad=false; idx=Math.min(idx+1,deck.length-1); shown=false; updateUI(); persist(); } });
-    $('#markBadBtn')?.addEventListener('click',()=>{ if(deck.length){ deck[idx].bad=true; deck[idx].ok=false; idx=Math.min(idx+1,deck.length-1); shown=false; updateUI(); persist(); } });
-    $('#exportBtn')?.addEventListener('click',()=>{
-      let out=deck.map((x,i)=>({i,q:x.q,a:x.a,ok:x.ok,bad:x.bad}));
-      let blob=new Blob([JSON.stringify(out,null,2)],{type:"application/json"});
-      let url=URL.createObjectURL(blob),a=document.createElement('a'); a.href=url; a.download="deck-progress.json";
-      a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000);
-    });
-    $('#clearBtn')?.addEventListener('click',()=>{
-      if(confirm("Удалить весь прогресс?")){ localStorage.removeItem('csv-flashcards-v6'); location.reload(); }
-    });
-  }
-  function populatePicker(){
-    var pick=$('#csvPicker'), btn=$('#loadPickedBtn');
-    if(!pick) return;
-    var p=getParams(), owner=p.owner||defaults().owner, repo=p.repo||defaults().repo, branch=p.branch||defaults().branch;
-    listCsvViaTrees(owner,repo,branch).then(list=>{
-      if(!list.length){ pick.innerHTML='<option>CSV в репозитории не найдены</option>'; if(btn) btn.disabled = true; return;}
+  });
+  $("#resetBtn")?.addEventListener("click",()=>{ for(let i=0;i<deck.length;i++){deck[i].ok=false;deck[i].bad=false;} idx=0; shown=false; updateUI();persist();});
+  $("#markOkBtn")?.addEventListener("click",()=>{if(deck.length){deck[idx].ok=true;deck[idx].bad=false;idx=Math.min(idx+1,deck.length-1);shown=false;updateUI();persist();}});
+  $("#markBadBtn")?.addEventListener("click",()=>{if(deck.length){deck[idx].bad=true;deck[idx].ok=false;idx=Math.min(idx+1,deck.length-1);shown=false;updateUI();persist();}});
+  $("#exportBtn")?.addEventListener("click",()=>{
+    let out=deck.map((x,i)=>({i,q:x.q,a:x.a,ok:x.ok,bad:x.bad}));
+    let blob=new Blob([JSON.stringify(out,null,2)],{type:"application/json"});
+    let url=URL.createObjectURL(blob),a=document.createElement("a");
+    a.href=url; a.download="deck-progress.json";
+    a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000);
+  });
+  $("#clearBtn")?.addEventListener("click",()=>{
+    if(confirm("Удалить весь прогресс?")){ localStorage.removeItem("csv-flashcards-v7"); location.reload(); }
+  });
+  // Input для смены репозитория/ветки
+  $("#changeGHBtn")?.addEventListener("click",()=>{
+    let owner=$("#ghOwner").value.trim(), repo=$("#ghRepo").value.trim(), branch=$("#ghBranch").value.trim();
+    populatePicker(owner,repo,branch);
+    let pick=$("#csvPicker"); if(pick){pick.innerHTML = `<option>${t("selectPlaceholder")}</option>`;}
+    $("#error").classList.add("hidden");
+    setTimeout(()=>alert(t("ghChanged")),200);
+  });
+}
+function populatePicker(owner,repo,branch){
+  owner=owner||$("#ghOwner").value.trim(); repo=repo||$("#ghRepo").value.trim();branch=branch||$("#ghBranch").value.trim();
+  let pick=$("#csvPicker"), btn=$("#loadPickedBtn");
+  if(!pick) return;
+  pick.innerHTML = `<option>${t("selectPlaceholder")}</option>`; btn.disabled = true;
+  listCsvViaTrees(owner,repo,branch)
+    .then(list=>{
+      if(!list.length){pick.innerHTML = `<option>${t("noCSVs")}</option>`; btn.disabled = true;return;}
       list.sort((a,b)=>a.path.localeCompare(b.path));
-      let html=''; for(let i=0;i<list.length;i++){ html+=`<option value="${list[i].path}">${list[i].path}</option>`; }
-      pick.innerHTML=html; pick.setAttribute('data-owner',owner); pick.setAttribute('data-repo',repo); pick.setAttribute('data-branch',branch); btn.disabled=false;
-      // авто‑подгрузка первого CSV
-      let first=list[0]; let url=rawURL(owner,repo,branch,first.path); return loadFromURL(url);
-    })['catch'](e=>{ pick.innerHTML='<option>Ошибка списка CSV: '+(e.message||e)+'</option>'; if(btn) btn.disabled=true; });
+      let html=""; for(let item of list){ html+=`<option value="${item.path}">${item.path}</option>`;}
+      pick.innerHTML=html;
+      pick.setAttribute("data-owner",owner);
+      pick.setAttribute("data-repo",repo);
+      pick.setAttribute("data-branch",branch);
+      btn.disabled=false;
+    })["catch"](e=>{
+      pick.innerHTML = `<option>${t("ghInvalid")} (${e.message||e})</option>`;
+      btn.disabled=true;
+    });
+}
+function bootstrap(){
+  addHandlers();
+  updateLang();
+  if(restore()) return;
+  var params=new URLSearchParams(window.location.search);
+  let owner=params.get("owner")||$("#ghOwner").value,repo=params.get("repo")||$("#ghRepo").value,branch=params.get("branch")||$("#ghBranch").value;
+  if(params.get("csv")){
+    let url=rawURL(owner,repo,branch,params.get("csv"));
+    loadFromURL(url)["catch"](()=>populatePicker(owner,repo,branch));
+    return;
   }
-  function bootstrap(){
-    addHandlers();
-    if(restore()) return;
-    var p=getParams();
-    if(p.csv){ loadFromURL(p.csv)['catch'](()=>populatePicker()); return;}
-    populatePicker();
-  }
-  // init
-  if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded',bootstrap); } else { bootstrap(); }
-  </script>
+  populatePicker(owner,repo,branch);
+}
+// Init на загрузку
+if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",bootstrap);}else{bootstrap();}
+</script>
 </body>
 </html>
