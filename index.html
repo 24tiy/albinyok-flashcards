@@ -4,207 +4,157 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Albinyok Flashcards</title>
-  <meta name="description" content="Современное приложение для повторения и редактирования карточек из CSV/Albinyok на любом устройстве.">
+  <meta name="description" content="Приложение для повтора и редактирования карточек из CSV/Google Sheets/Excel на любом устройстве.">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
-:root {
-  --bg:#f7f9fc; --bg-alt:#f1f4fa; --card:#fff; --text:#212c45; --muted:#98a3b8;
-  --accent:#715AFF; --accent-2:#53D1FD; --btn:#715AFF; --btn-hover:#533BE6;
-  --ok:#22bb88; --bad:#f03d61;
-  --shadow:0 14px 38px rgba(43,51,104,.16), 0 3px 8px rgba(43,51,104,.08);
-  --radius:18px;
-}
-[data-theme="dark"] {
-  --bg:#11121b; --bg-alt:#191b28; --card:#121320; --text:#f7f7fa; --muted:#98a3b890;
-  --accent:#99A8FF; --accent-2:#38A2DC; --btn:#533BE6; --btn-hover:#715AFF;
-  --shadow:0 14px 38px rgba(12,18,42,.3),0 3px 8px rgba(13,18,41,.08);
-}
-html, body {height:100%;}
-body {margin:0; font-family:'Inter',ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Noto Sans,Arial;
-  background:var(--bg); color:var(--text); min-height:100vh; transition:background .5s,color .5s; line-height:1.45; font-size:14px;}
-h1 {font-size:2.0rem;margin:0 0 2px 0;font-weight:900;letter-spacing:-.5px;}
-.container {max-width:700px; margin:24px auto 24px; padding:0; background: transparent;}
-header {display:flex;align-items:flex-start;gap:12px;margin-bottom:11px;flex-wrap:wrap;}
-.logo {width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:var(--shadow);display:grid;place-items:center;color:#fff;font-weight:900;font-size:25px;margin-top:3px;}
-.sub {color:var(--muted);font-size:15px;margin-top:2px;}
-.sub-secondary {color:var(--muted);font-size:14px;margin-top:5px;line-height:1.7;display:block;}
-.lang-select{margin-left:auto;display:flex;gap:8px;}
-.lang-flags{border:none;background:var(--bg-alt);padding:8px 11px;font-size:13.5px;appearance:none;border-radius:11px;font-weight:600;}
-.theme-toggle{border:none;background:var(--bg-alt);font-size:19px;border-radius:12px;padding:5px 11px;cursor:pointer;transition:background .2s;}
-.theme-toggle:active{background:var(--accent-2);}
-.uploader {
-  margin:18px 0 10px; padding:17px 12px 12px 12px;
-  border-radius:22px;background:var(--bg-alt);box-shadow:var(--shadow);border:none;
-  display:flex;flex-direction:column;gap:8px;
-}
-.uploader h2{font-weight:800;font-size:1.08rem;}
-.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
-label.file{display:inline-flex;align-items:center;gap:7px;background:var(--card);font-weight:600;border:1.2px solid #e2e6ef;padding:8px 10px; border-radius:12px;cursor:pointer;box-shadow:var(--shadow);}
-input[type=file]{display:none;}
-input[type=url],input[type=text],select{
-  font-size:14px;padding:7px 7px;border-radius:var(--radius);border:1.2px solid #e2e6ef;background:var(--card);color:var(--text);
-  box-shadow:0 2px 9px rgba(70,80,120,.015);
-}
-input[type=url]:focus,input[type=text]:focus,select:focus{border:1.5px solid var(--accent);}
-.btn-glass-violet {background:rgba(125,100,255,.13);color:#5239ca;border:1.6px solid #9277f5;border-radius:16px;font-weight:700;
-  font-size:1.02rem;padding:10px 18px;box-shadow:0 7px 26px 0 rgba(126,91,255,.13),0 2px 7px 0 rgba(126,91,255,.09);
-  backdrop-filter:blur(7px);margin:0 4px 6px 0;transition:.16s;display:inline-block;}
-.btn-glass-violet.selected,.btn-glass-violet:active,.btn-glass-violet.primary {background: #8d6dff;color:#fff;border-color: #8769e6;}
-.btn-glass-violet.outline {background:transparent;color:#7857de;border-style:dashed;}
-.settings-bar{display:flex;gap:10px;align-items:center;justify-content:center;margin:13px 0 14px 0;flex-wrap:wrap;}
-.settings-bar.rowbar{flex-direction:row;}
-.btn-new {background:rgba(82,195,255,0.18);color:#233542;border-radius:14px;border:1.6px solid #43c6f6;
-  font-weight:800;font-size:1.01rem;backdrop-filter:blur(7px);
-  box-shadow:0 5px 32px 0 rgba(64,170,255,.10),0 1.5px 7px 0 rgba(90,180,255,.07);
-  padding:10px 18px;transition:.15s;margin:0 4px 0 0;letter-spacing:.01em;display:inline-block;}
-.btn-new.selected,.btn-new:active,.btn-new.primary {background: #52d1fd;color:#16304d;border-color: #14bfff;}
-.workspace{display:none;margin-top:20px;}
-.topbar{display:flex;gap:7px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:12px;margin-top:7px;}
-.chip{background:var(--card);border:1px solid #e2e6ef;padding:6px 9px;border-radius:999px;box-shadow:var(--shadow);font-size:13px;}
-.progress{margin-top:8px;height:8px;background:#e2e3ed;border-radius:999px;overflow:hidden;}
-.progress>div{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));width:0%;transition:width .44s;}
-.card{position:relative;background:var(--card);border-radius:18px;box-shadow:var(--shadow);padding:17px 5px 14px;display:flex;flex-direction:column;align-items:stretch;justify-content:center;text-align:center;min-height:70px;}
-.q{font-size:clamp(17px,2vw,20px);font-weight:800;margin-bottom:14px;}
-.a{font-size:clamp(14px,2vw,16px);color:var(--muted);font-weight:600;}
-.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;margin-top:15px;}
-.ctrl{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border-radius:12px;border:1px solid #d2d2df;background:var(--card);cursor:pointer;box-shadow:var(--shadow);font-weight:700;transition:filter .15s;font-size:1.04rem;}
-.ctrl .icon-ok {font-size:1.13em;color:#22bb88;margin-right:3px;}
-.ctrl .icon-bad {font-size:1.13em;color:#f03d61;margin-right:3px;}
-.ctrl.ok{color:var(--ok);}
-.ctrl.bad{color:var(--bad);}
-.ctrl.active{filter:brightness(0.66);}
-.ctrl[disabled] {opacity:.50;pointer-events:none;}
-.next-btn-main {
-  background:var(--accent);color:#fff;font-weight:700;border-radius:13px;padding:10px 26px;font-size:1.08rem;
-  box-shadow:var(--shadow);border:none;transition:.15s;
-  margin-left:7px;
-}
-.tiny{font-size:12px;color:var(--muted);}
-.kbd{font-family:ui-monospace,Consolas,Menlo,monospace;background:var(--bg-alt);padding:2px 7px;border-radius:7px;}
-.hidden{display:none !important;}
-.error{padding:9px 8px;border-radius:12px;background:rgba(255,0,0,.09);border:1px solid #e49c9c;margin-top:7px;color:#b11212;}
-.exportbar{display:flex;gap:6px;margin-top:18px;justify-content:center;flex-wrap:wrap;padding-bottom:7px;}
-.edit-bar{margin:14px 0;text-align:center;}
-.edit-btn{margin:1px 6px;}
-.feedback-link{text-align:center;font-size:14.6px;margin:13px 0;}
-.feedback-link a{color:#51a5e6;text-decoration:none;font-weight:700;transition:.18s;font-size:16px;}
-.feedback-link a:hover{color:#715aff;text-decoration:underline;}
-.modal-tip {display:none;position:fixed;z-index:999;max-width:230px;line-height:1.55;padding:13px 17px;background:#fff;box-shadow:0 4px 24px #0002;border-radius:11px;color:#232b45;font-size:15px;}
-.help-centered{text-align:center;padding-top:2px;}
-.btn-help{background:none;border:none;display:inline;padding:0 2px;vertical-align:middle;font-size:17px;cursor:pointer;color:#8c95ff;}
-.btn-help:active, .btn-help:focus{color:#478fff;}
-.testSwitch { display:inline-flex; align-items:center; gap:6px;}
-#testModeCheck {transform:scale(1.18); accent-color: #715aff; margin:0 6px 0 0; vertical-align:middle;}
-@media (max-width:900px){.container{max-width:99vw;}}
-@media (max-width:600px){
-  .container{padding:0 2vw;margin:0;}
-  .card{padding:7px 2vw 11px;}
-  header h1{font-size:18px;}
-  .row,.controls,.settings-bar,.exportbar{flex-direction:column;gap:10px;}
-  .uploader{padding:7px 2vw 8px;}
-  .exportbar,.settings-bar{align-items:stretch;}
-  .q, .a, .chip, .ctrl, .btn-new, .btn-glass-violet {font-size:13px;}
-  .sub,.sub-secondary,.feedback-link {font-size:12px;}
-}
-@media (max-width:390px){
-  .controls {gap:4px;}
-  .btn-new, .btn-glass-violet, .chip {font-size:11px;padding:6px 4px;}
-}
-::-webkit-scrollbar{background:var(--bg-alt);}
-::-webkit-scrollbar-thumb{background:var(--bg);border-radius:999px;}
+    :root {
+      --bg:#f7f9fc; --bg-alt:#f1f4fa; --card:#fff; --text:#212c45; --muted:#98a3b8;
+      --accent:#715AFF; --accent-2:#53D1FD; --btn:#715AFF; --btn-hover:#533BE6;
+      --ok:#22bb88; --bad:#f03d61;
+      --shadow:0 14px 38px rgba(43,51,104,.16), 0 3px 8px rgba(43,51,104,.08);
+      --radius:18px;
+    }
+    [data-theme="dark"] {
+      --bg:#11121b; --bg-alt:#191b28; --card:#121320; --text:#f7f7fa; --muted:#98a3b890;
+      --accent:#99A8FF; --accent-2:#38A2DC; --btn:#533BE6; --btn-hover:#715AFF;
+      --shadow:0 14px 38px rgba(12,18,42,.3),0 3px 8px rgba(13,18,41,.08);
+    }
+    html, body {height:100%;}
+    body {margin:0; font-family:'Inter',ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Noto Sans,Arial;
+      background:var(--bg); color:var(--text); min-height:100vh; transition:background .5s,color .5s; line-height:1.45; font-size:14px;}
+    h1 {font-size:2.0rem;margin:0 0 2px 0;font-weight:900;letter-spacing:-.5px;}
+    .container {max-width:700px; margin:24px auto 24px; padding:0; background: transparent;}
+    header {display:flex;align-items:flex-start;gap:12px;margin-bottom:11px;flex-wrap:wrap;}
+    .logo {width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:var(--shadow);display:grid;place-items:center;color:#fff;font-weight:900;font-size:25px;margin-top:3px;}
+    .sub {color:var(--muted);font-size:15px;margin-top:2px;}
+    .sub-secondary {color:var(--muted);font-size:14px;margin-top:5px;line-height:1.7;display:block;}
+    .lang-select{margin-left:auto;display:flex;gap:8px;}
+    .lang-flags{border:none;background:var(--bg-alt);padding:8px 11px;font-size:13.5px;appearance:none;border-radius:11px;font-weight:600;}
+    .theme-toggle{border:none;background:var(--bg-alt);font-size:19px;border-radius:12px;padding:5px 11px;cursor:pointer;transition:background .2s;}
+    .theme-toggle:active{background:var(--accent-2);}
+    .uploader { margin:18px 0 10px; padding:17px 12px 12px 12px; border-radius:22px;background:var(--bg-alt);box-shadow:var(--shadow);border:none; display:flex;flex-direction:column;gap:8px;}
+    .uploader h2{font-weight:800;font-size:1.08rem;}
+    .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+    label.file{display:inline-flex;align-items:center;gap:7px;background:var(--card);font-weight:600;border:1.2px solid #e2e6ef;padding:8px 10px; border-radius:12px;cursor:pointer;box-shadow:var(--shadow);}
+    input[type=file]{display:none;}
+    input[type=url],input[type=text],select{ font-size:14px;padding:7px 7px;border-radius:var(--radius);border:1.2px solid #e2e6ef;background:var(--card);color:var(--text); box-shadow:0 2px 9px rgba(70,80,120,.015);}
+    input[type=url]:focus,input[type=text]:focus,select:focus{border:1.5px solid var(--accent);}
+    .btn-glass-violet {background:rgba(125,100,255,.13);color:#5239ca;border:1.6px solid #9277f5;border-radius:16px;font-weight:700; font-size:1.02rem;padding:10px 18px;box-shadow:0 7px 26px 0 rgba(126,91,255,.13),0 2px 7px 0 rgba(126,91,255,.09);
+      backdrop-filter:blur(7px);margin:0 4px 6px 0;transition:.16s;display:inline-block;}
+    .btn-glass-violet.selected,.btn-glass-violet:active,.btn-glass-violet.primary {background: #8d6dff;color:#fff;border-color: #8769e6;}
+    .settings-bar{display:flex;gap:10px;align-items:center;justify-content:center;margin:13px 0 14px 0;flex-wrap:wrap;}
+    .testSwitch{display:inline-flex;align-items:center;gap:6px;}
+    #testModeCheck{transform:scale(1.18);accent-color:#715aff;margin:0 6px 0 0;vertical-align:middle;}
+    .btn-new {background:rgba(82,195,255,0.18);color:#233542;border-radius:14px;border:1.6px solid #43c6f6;
+      font-weight:800;font-size:1.01rem;backdrop-filter:blur(7px);
+      box-shadow:0 5px 32px 0 rgba(64,170,255,.10),0 1.5px 7px 0 rgba(90,180,255,.07);
+      padding:10px 18px;transition:.15s;margin:0 4px 0 0;letter-spacing:.01em;display:inline-block;}
+    .workspace{display:none;margin-top:20px;}
+    .topbar{display:flex;gap:7px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:12px;margin-top:7px;}
+    .chip{background:var(--card);border:1px solid #e2e6ef;padding:6px 9px;border-radius:999px;box-shadow:var(--shadow);font-size:13px;}
+    .progress{margin-top:8px;height:8px;background:#e2e3ed;border-radius:999px;overflow:hidden;}
+    .progress>div{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));width:0%;transition:width .44s;}
+    .card{position:relative;background:var(--card);border-radius:18px;box-shadow:var(--shadow);padding:17px 5px 14px;display:flex;flex-direction:column;align-items:stretch;justify-content:center;text-align:center;min-height:70px;}
+    .q{font-size:clamp(17px,2vw,20px);font-weight:800;margin-bottom:14px;}
+    .a{font-size:clamp(14px,2vw,16px);color:var(--muted);font-weight:600;}
+    .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;margin-top:15px;}
+    .ctrl{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border-radius:12px;border:1px solid #d2d2df;background:var(--card);cursor:pointer;box-shadow:var(--shadow);font-weight:700;transition:filter .15s;font-size:1.04rem;}
+    .next-btn-main {background:var(--accent);color:#fff;font-weight:700;border-radius:13px;padding:10px 26px;font-size:1.08rem;box-shadow:var(--shadow);border:none;transition:.15s; margin-left:7px;}
+    .error{padding:9px 8px;border-radius:12px;background:rgba(255,0,0,.09);border:1px solid #e49c9c;margin-top:7px;color:#b11212;}
+    .exportbar{display:flex;gap:6px;margin-top:18px;justify-content:center;flex-wrap:wrap;padding-bottom:7px;}
+    .edit-bar{margin:14px 0;text-align:center;}
+    .feedback-link{text-align:center;font-size:14.6px;margin:13px 0;}
+    .feedback-link a{color:#51a5e6;text-decoration:none;font-weight:700;transition:.18s;font-size:16px;}
+    .feedback-link a:hover{color:#715aff;text-decoration:underline;}
+    .modal-tip {display:none;position:fixed;z-index:999;max-width:230px;line-height:1.55;padding:13px 17px;background:#fff;box-shadow:0 4px 24px #0002;border-radius:11px;color:#232b45;font-size:15px;}
+    .tiny{font-size:12px;color:var(--muted);}
   </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <div class="logo">Q↔A</div>
-      <div>
-        <h1 id="siteTitle">Albinyok Flashcards</h1>
-        <div class="sub">
-          Приложение для повтора карточек из CSV — учи на телефоне и на ПК.
-          <span class="sub-secondary">Ваш прогресс сохраняется локально.</span>
-        </div>
+<div class="container">
+  <header>
+    <div class="logo">Q↔A</div>
+    <div>
+      <h1 id="siteTitle">Albinyok Flashcards</h1>
+      <div class="sub">
+        Приложение для повтора карточек из CSV — учи на телефоне и на ПК.
+        <span class="sub-secondary">Ваш прогресс сохраняется локально.</span>
       </div>
-      <div class="lang-select">
-        <select id="langSelect" class="lang-flags" aria-label="Language">
-          <option value="ru">🇷🇺 Русский</option>
-          <option value="en">🇬🇧 English</option>
-          <option value="fr">🇫🇷 Français</option>
-        </select>
-        <button class="theme-toggle" id="themeToggle" title="Theme">🌙</button>
-      </div>
-    </header>
-    <section class="uploader" id="uploader" aria-label="Загрузка CSV">
-      <h2 id="fileOrLink"></h2>
-      <div class="row" style="margin-bottom:11px">
-        <label for="file" class="file" id="fileLabel"><span id="fileIcon">📄</span>
-          <span id="fileBtnTxt"></span>
-        </label>
-        <input type="file" id="file" accept=".csv,text/csv" />
-        <input type="url" id="urlInput" style="width:180px;margin-left:4px;" />
-        <button class="btn-glass-violet" id="loadUrlBtn" type="button">По ссылке</button>
-      </div>
-      <div class="row" style="margin-bottom:9px">
-        <input id="ghOwner" type="text" placeholder="Owner" value="24tiy" style="width:88px;">
-        <input id="ghRepo" type="text" placeholder="Repo" value="albinyok-flashcards" style="width:125px;">
-        <input id="ghBranch" type="text" placeholder="Ветка" value="main" style="width:60px;">
-        <select id="csvPicker" style="margin-left:4px;"><option value=""></option></select>
-        <button class="btn-glass-violet" id="loadPickedBtn" type="button" disabled>Загрузить с GitHub</button>
-        <button class="btn-glass-violet" id="changeGHBtn" type="button">Сменить репозиторий</button>
-      </div>
-      <div id="error" class="error hidden" role="alert"></div>
-    </section>
-    <div class="settings-bar rowbar">
-      <button class="btn-glass-violet" id="toggleEditBtn" type="button">📝 Редактор карточек
-        <button class="btn-help" id="editHelp" tabindex="0" aria-label="О редакторе">?</button>
-      </button>
-      <label class="testSwitch">
-        <input type="checkbox" id="testModeCheck">
-        <span class="btn-glass-violet" id="testBtn">🧑‍🎓 Тест</span>
-        <button class="btn-help" id="testHelp" tabindex="0" aria-label="О тесте">?</button>
+    </div>
+    <div class="lang-select">
+      <select id="langSelect" class="lang-flags" aria-label="Language">
+        <option value="ru">🇷🇺 Русский</option>
+        <option value="en">🇬🇧 English</option>
+        <option value="fr">🇫🇷 Français</option>
+      </select>
+      <button class="theme-toggle" id="themeToggle" title="Theme">🌙</button>
+    </div>
+  </header>
+  <section class="uploader" id="uploader" aria-label="Загрузка CSV">
+    <h2 id="fileOrLink"></h2>
+    <div class="row" style="margin-bottom:11px">
+      <label for="file" class="file" id="fileLabel"><span id="fileIcon">📄</span>
+        <span id="fileBtnTxt"></span>
       </label>
-      <button class="btn-glass-violet" id="trainHardBtn" type="button">💪 Тренировать сложные
-        <button class="btn-help" id="hardHelp" tabindex="0" aria-label="О трудных карточках">?</button>
-      </button>
+      <input type="file" id="file" accept=".csv,.tsv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/*" />
+      <input type="url" id="urlInput" style="width:220px;margin-left:7px;" placeholder="https://...csv, .tsv, google sheet etc" />
+      <button class="btn-glass-violet" id="loadUrlBtn" type="button">По ссылке</button>
     </div>
-    <div class="test-status" id="testStatus" style="text-align:center;margin:3px 0 2px;font-size:15px;color:#8258e1;display:none;">
-      <b>Режим теста включён</b> — только "Знаю/Не знаю", далее <b>Дальше</b>
-    </div>
-    <section class="workspace" id="workspace" aria-live="polite">
-      <div class="topbar">
-        <div>
-          <span class="chip" id="deckName"></span>
-          <span class="chip" id="counter">0 / 0</span>
-          <span class="chip" id="score">✅ 0 • ❌ 0</span>
-        </div>
-        <div>
-          <button class="btn-glass-violet" id="shuffleBtn" title="S">Перемешать</button>
-          <button class="btn-glass-violet" id="resetBtn" title="R">Сбросить прогресс</button>
-          <label class="file" for="reupload">Сменить документ</label>
-          <input type="file" id="reupload" accept=".csv,text/csv" />
-        </div>
-      </div>
-      <div class="progress" aria-hidden="true"><div id="progressBar"></div></div>
-      <div class="card" id="card">
-        <div class="q" id="q"></div>
-        <div class="a" id="a"></div>
-      </div>
-      <div class="controls" id="controlsBar" aria-label="Управление"></div>
-    </section>
-    <section class="edit-bar" id="editorBar" style="display:none"></section>
-    <div class="exportbar">
-      <button class="btn-new" id="templateBtn" type="button">Шаблон CSV</button>
-      <button class="btn-new" id="demoBtn" type="button">Демо-набор</button>
-      <a id="helpLink" href="README.md" target="_blank" class="btn-new help-centered" style="text-align:center;text-decoration:none;">Помощь</a>
-      <button class="btn-new" id="exportBtn">Экспорт прогресса</button>
-      <button class="btn-new" id="clearBtn">Очистить всё</button>
-    </div>
-    <div class="feedback-link">
-      <span>Обратная связь: <a href="https://t.me/sasha24tiy" target="_blank">@sasha24tiy</a></span>
-    </div>
-    <div class="modal-tip" id="modalTip"></div>
+    <div id="error" class="error hidden" role="alert"></div>
+    <div id="downloadManual" class="error hidden" style="margin-top:8px;font-size:16px;"></div>
+  </section>
+  <div class="settings-bar rowbar">
+    <button class="btn-glass-violet" id="toggleEditBtn" type="button">📝 Редактор карточек
+      <button class="btn-help" id="editHelp" tabindex="0" aria-label="О редакторе">?</button>
+    </button>
+    <label class="testSwitch">
+      <input type="checkbox" id="testModeCheck">
+      <span class="btn-glass-violet" id="testBtn">🧑‍🎓 Тест</span>
+      <button class="btn-help" id="testHelp" tabindex="0" aria-label="О тесте">?</button>
+    </label>
+    <button class="btn-glass-violet" id="trainHardBtn" type="button">💪 Тренировать сложные
+      <button class="btn-help" id="hardHelp" tabindex="0" aria-label="О трудных карточках">?</button>
+    </button>
   </div>
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-  <script src="flashcards.js"></script>
+  <div class="test-status" id="testStatus" style="text-align:center;margin:3px 0 2px;font-size:15px;color:#8258e1;display:none;">
+    <b>Режим теста включён</b> — только "Знаю/Не знаю", далее <b>Дальше</b>
+  </div>
+  <section class="workspace" id="workspace" aria-live="polite">
+    <div class="topbar">
+      <div>
+        <span class="chip" id="deckName"></span>
+        <span class="chip" id="counter">0 / 0</span>
+        <span class="chip" id="score">✅ 0 • ❌ 0</span>
+      </div>
+      <div>
+        <button class="btn-glass-violet" id="shuffleBtn" title="S">Перемешать</button>
+        <button class="btn-glass-violet" id="resetBtn" title="R">Сбросить прогресс</button>
+        <label class="file" for="reupload">Сменить документ</label>
+        <input type="file" id="reupload" accept=".csv,.tsv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/*" />
+      </div>
+    </div>
+    <div class="progress" aria-hidden="true"><div id="progressBar"></div></div>
+    <div class="card" id="card">
+      <div class="q" id="q"></div>
+      <div class="a" id="a"></div>
+    </div>
+    <div class="controls" id="controlsBar" aria-label="Управление"></div>
+  </section>
+  <div class="tiny" style="text-align:center;margin-top:8px" id="hotkeysTip"></div>
+  <section class="edit-bar" id="editorBar" style="display:none"></section>
+  <div class="exportbar">
+    <button class="btn-new" id="templateBtn" type="button">Шаблон CSV</button>
+    <button class="btn-new" id="demoBtn" type="button">Демо-набор</button>
+    <a id="helpLink" href="README.md" target="_blank" class="btn-new help-centered" style="text-align:center;text-decoration:none;">Помощь</a>
+    <button class="btn-new" id="exportBtn">Экспорт прогресса</button>
+    <button class="btn-new" id="clearBtn">Очистить всё</button>
+  </div>
+  <div class="feedback-link">
+    <span>Обратная связь: <a href="https://t.me/sasha24tiy" target="_blank">@sasha24tiy</a></span>
+  </div>
+  <div class="modal-tip" id="modalTip"></div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+<script src="flashcards.js"></script>
 </body>
 </html>
