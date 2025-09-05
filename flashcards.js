@@ -1,7 +1,7 @@
 let curLang = "ru";
 let theme = "light";
 let editMode = false;
-let testLocked = false;
+let testLocked = false, awaitingTestAnswer = false;
 let mainDeck = [];
 let deck=[], idx=0, shown=false, deckName='—', localKey = 'albinyok-flashcards-v1';
 
@@ -45,12 +45,16 @@ const translations = {
     add_card:"Добавить карточку",
     save_cards:"Сохранить изменения",
     del:"Удалить",
-    edit:"Править",
+    edit:"Редактор карточек",
     train_hard:"Тренировать сложные",
     save_success:"Карточки сохранены!",
     train_all_done:"Все сложные карточки выучены! МОЛОДЕЦ!",
-    testmode_tip:"Режим теста: только кнопки 'Знаю' и 'Не знаю'. Появляется 'Дальше' → переход к следующему вопросу. Выйти можно повторно кликнув на 🧑‍🎓 Тест выше.",
-    hard_tip:"Показать только сложные карточки, которые были помечены 'Не знаю'.",
+    test: "Тест",
+    next: "Дальше",
+    test_enabled: "Режим теста включён",
+    test_status: "Только 'Знаю', 'Не знаю' и 'Дальше' для перехода.",
+    testmode_tip:"Режим теста: только кнопки 'Знаю' и 'Не знаю'. После ответа появится 'Дальше' для перехода к следующей. Выйти — выключи чекбокс.",
+    hard_tip:"Показать только сложные карточки, которые ты отметил 'Не знаю'.",
     editor_tip:"В редакторе можно добавлять, изменять и удалять любые карточки, не забывайте сохранять."
   },
   en: {
@@ -92,13 +96,17 @@ const translations = {
     add_card:"Add card",
     save_cards:"Save changes",
     del:"Delete",
-    edit:"Edit",
+    edit:"Card editor",
     train_hard:"Train hard cards",
     save_success:"Saved!",
     train_all_done:"All hard cards done! NICE!",
-    testmode_tip:"Test mode: only Know/Don't know, then Next. Turn off test by clicking 🧑‍🎓 Test again.",
-    hard_tip:"Show only cards marked as Don't know.",
-    editor_tip:"You can add, edit and delete cards. Don't forget to save."
+    test: "Test",
+    next: "Next",
+    test_enabled: "Test mode enabled",
+    test_status: "Only 'Know', 'Don't know' and 'Next' for navigation.",
+    testmode_tip:"Test mode: only 'Know' and 'Don't know'. After choice, click 'Next' to continue. Turn off by unchecking the box.",
+    hard_tip:"Show only cards you've marked as 'Don't know'.",
+    editor_tip:"You can add, edit and delete cards below, don't forget to save!"
   },
   fr: {
     siteTitle:"Albinyok Flashcards",
@@ -139,18 +147,21 @@ const translations = {
     add_card:"Ajouter carte",
     save_cards:"Enregistrer",
     del:"Supprimer",
-    edit:"Éditer",
+    edit:"Éditeur de cartes",
     train_hard:"Difficile",
     save_success:"Cartes enregistrées!",
     train_all_done:"Toutes les difficiles apprises !",
-    testmode_tip:"Mode test : seulement Je sais/Je ne sais pas, puis Suivant. Quitter : cliquez 🧑‍🎓 Test.",
+    test: "Test",
+    next: "Suivant",
+    test_enabled: "Mode test activé",
+    test_status: "Seulement 'Je sais', 'Je ne sais pas' et 'Suivant'.",
+    testmode_tip:"Mode test : seulement 'Je sais'/'Je ne sais pas'. Cliquez 'Suivant' ensuite. Désactivez — décochez la case.",
     hard_tip:"Afficher seulement les difficiles marquées.",
-    editor_tip:"Modifiez ou supprimez des cartes puis sauvegardez."
+    editor_tip:"Ajoutez/éditez/supprimez vos cartes ci-dessous, sauvegardez !"
   }
 };
 function $(sel){ return document.querySelector(sel);}
-function t(k){return translations[curLang][k]||k;}
-
+function t(k){return (translations[curLang]&&translations[curLang][k])||k;}
 function updateLang() {
   document.documentElement.lang = curLang;
   $("#siteTitle").textContent = t("siteTitle");
@@ -162,7 +173,7 @@ function updateLang() {
   $("#loadUrlBtn").textContent = t("urlBtn");
   $("#loadPickedBtn").textContent = t("repoBtn");
   $("#changeGHBtn").textContent = t("ghBarBtn");
-  $("#testBtn").childNodes[0].nodeValue = "🧑‍🎓 " + (testLocked ? t("hide") : "Тест");
+  $("#testBtn").textContent = "🧑‍🎓 " + t("test");
   $("#trainHardBtn").childNodes[0].nodeValue = "💪 " + t("train_hard");
   $("#toggleEditBtn").childNodes[0].nodeValue = "📝 " + t("edit");
   $("#ghOwner").setAttribute("aria-label", t("owner"));
@@ -174,7 +185,9 @@ function updateLang() {
     pick.options[0].textContent = t("selectPlaceholder");
   }
   $("#deckName").textContent = `${t('deck')}: —`;
-  $("#helpLink").textContent = t("help");
+  $("#testStatus").innerHTML = testLocked ? `<b>${t("test_enabled")}</b> — ${t("test_status")}` : "";
+  $("#testStatus").style.display = testLocked ? "" : "none";
+  $("#testModeCheck").checked = !!testLocked;
   updateControlsBar();
 }
 $("#langSelect").addEventListener("change",function(e){
@@ -192,7 +205,6 @@ function initTheme(){
   $("#themeToggle").textContent = theme==="dark" ? "🌞" : "🌙";
 }
 initTheme();
-
 function sniffHeader(a){
   if(!a || a.length<2) return false;
   let ha=(a[0]||'').toLowerCase(), hb=(a[1]||'').toLowerCase();
@@ -219,14 +231,17 @@ function updateControlsBar() {
   if (!testLocked) {
     el.appendChild(createCtrl("ctrl showhide","", shown ? t("hide") : t("reveal"),()=>toggleShowHide()));
   }
-  el.appendChild(createCtrl("ctrl ok","", t("know"),()=>onKnowClick()));
-  el.appendChild(createCtrl("ctrl bad","", t("dont"),()=>onDontKnowClick()));
+  let okBtn = createCtrl("ctrl ok","", t("know"),()=>onKnowClick());
+  let badBtn = createCtrl("ctrl bad","", t("dont"),()=>onDontKnowClick());
+  if(testLocked && awaitingTestAnswer) { okBtn.disabled=true; badBtn.disabled=true; }
+  el.appendChild(okBtn);
+  el.appendChild(badBtn);
   if (testLocked) {
     let next = document.createElement("button");
     next.className = "next-btn-main";
     next.textContent = t("next") || "Дальше";
     next.onclick = () => { nextTestStep(); };
-    next.disabled = true;
+    next.disabled=!awaitingTestAnswer;
     el.appendChild(next);
   }
 }
@@ -264,31 +279,57 @@ function toggleShowHide() {
   persist();
 }
 function onKnowClick(){
-  if(testLocked){
-    deck[idx].ok=true; deck[idx].bad=false;
-    [...document.querySelectorAll("#controlsBar .ctrl")].map(b=>b.disabled=true);
-    document.querySelector(".next-btn-main").disabled=false;
-    persist();
+  if(testLocked && !awaitingTestAnswer){
+     deck[idx].ok=true; deck[idx].bad=false; awaitingTestAnswer=true; persist();
+     updateControlsBar();
+  } else if(!testLocked){
+     deck[idx].ok=true; deck[idx].bad=false; idx=(idx+1)%deck.length; shown=false; persist(); updateUI();
   }
 }
 function onDontKnowClick(){
-  if(testLocked){
-    deck[idx].bad=true; deck[idx].ok=false;
-    [...document.querySelectorAll("#controlsBar .ctrl")].map(b=>b.disabled=true);
-    document.querySelector(".next-btn-main").disabled=false;
-    persist();
+  if(testLocked && !awaitingTestAnswer){
+    deck[idx].bad=true; deck[idx].ok=false; awaitingTestAnswer=true; persist();
+    updateControlsBar();
+  } else if(!testLocked){
+     deck[idx].bad=true; deck[idx].ok=false; idx=(idx+1)%deck.length; shown=false; persist(); updateUI();
   }
 }
 function nextTestStep(){
-  shown = false;
+  shown = false; awaitingTestAnswer=false;
   idx = (idx+1)%deck.length;
   updateUI();
-  setTimeout(() => {
-    [...document.querySelectorAll("#controlsBar .ctrl")].map(b=>b.disabled=false);
-    document.querySelector(".next-btn-main").disabled=true;
-  }, 50);
   persist();
 }
+$("#testModeCheck").onchange=function(){
+  testLocked=this.checked;
+  awaitingTestAnswer = false;
+  updateLang(); updateUI();
+};
+document.addEventListener("DOMContentLoaded",function(){
+  updateLang();
+  if(restore()) return;
+  $("#testModeCheck").checked = testLocked;
+  updateLang();
+});
+function modalTipBind(id, textKey) {
+  let btn = $(id);
+  btn && (btn.onmouseenter = btn.onclick = function (e) {
+    let mt = $("#modalTip");
+    mt.textContent = t(textKey);
+    mt.style.display = "block";
+    let rect = btn.getBoundingClientRect();
+    mt.style.left = (rect.left + window.scrollX - 80) + "px";
+    mt.style.top = (rect.bottom + window.scrollY + 2) + "px";
+  }, btn.onmouseleave = function () {
+    $("#modalTip").style.display = "none";
+  });
+}
+modalTipBind("#testHelp", "testmode_tip");
+modalTipBind("#hardHelp", "hard_tip");
+modalTipBind("#editHelp", "editor_tip");
+
+// ---- карточки, загрузка, редактор
+
 function persist(){
   localStorage.setItem(localKey,JSON.stringify({deck,idx,shown,deckName,lang:curLang,theme:theme,editMode}));
 }
@@ -326,7 +367,7 @@ function loadCSVText(text,name){
     if(!d.length) throw new Error(t("csvNotPairs"));
     mainDeck = JSON.parse(JSON.stringify(d));
     deck = d; idx=0; shown=false; deckName=name||'';
-    persist(); showWorkspace(); testLocked=false; updateUI();
+    persist(); showWorkspace(); testLocked=false; awaitingTestAnswer=false; updateUI();
     $("#editorBar").style.display = "none";
   }catch(e){
     let err=$("#error");
@@ -466,21 +507,11 @@ $("#trainHardBtn").onclick = ()=>{
   let hard = deck.filter(x=>x.bad);
   if(!hard.length) { alert(t("train_all_done")); return; }
   deck = hard.map(x=>({...x}));
-  idx=0; shown=false;
+  idx=0; shown=false; testLocked=false; awaitingTestAnswer=false;
   deckName=t("train_hard");
-  testLocked = false;
   persist(); showWorkspace(); updateUI();
 };
 $("#shuffleBtn").onclick = () => {deck=shuffle(deck);idx=0;shown=false;updateUI();persist();};
-$("#testBtn").onclick = () => {
-  testLocked = !testLocked;
-  shown = false;
-  idx = 0;
-  showWorkspace();
-  updateUI();
-  updateLang();
-};
-function shuffle(a){ for(let i=a.length-1;i>0;i--){ let j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 $("#resetBtn").onclick = () => {
   for(let i=0;i<deck.length;i++){deck[i].ok=false;deck[i].bad=false;}
   idx=0;shown=false;updateUI();persist();
@@ -502,28 +533,7 @@ function showHotkeys(){ $("#hotkeysTip").textContent = t("hotkeys"); }
 function bootstrap(){
   updateLang();
   if(restore()) return;
-  var params=new URLSearchParams(window.location.search);
-  let owner=params.get("owner")||($("#ghOwner")?$("#ghOwner").value:""),
-      repo=params.get("repo")||($("#ghRepo")?$("#ghRepo").value:""),
-      branch=params.get("branch")||($("#ghBranch")?$("#ghBranch").value:"");
-  populatePicker(owner,repo,branch);
   showHotkeys();
+  $("#testModeCheck").checked = testLocked;
 }
 document.addEventListener("DOMContentLoaded",bootstrap);
-
-function modalTipBind(id, textKey) {
-  let btn = $(id);
-  btn && (btn.onmouseenter = btn.onclick = function (e) {
-    let mt = $("#modalTip");
-    mt.textContent = t(textKey);
-    mt.style.display = "block";
-    let rect = btn.getBoundingClientRect();
-    mt.style.left = (rect.left + window.scrollX - 80) + "px";
-    mt.style.top = (rect.bottom + window.scrollY + 2) + "px";
-  }, btn.onmouseleave = function () {
-    $("#modalTip").style.display = "none";
-  });
-}
-modalTipBind("#testHelp", "testmode_tip");
-modalTipBind("#hardHelp", "hard_tip");
-modalTipBind("#editHelp", "editor_tip");
