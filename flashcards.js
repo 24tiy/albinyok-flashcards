@@ -173,14 +173,7 @@ function updateLang() {
   $("#loadUrlBtn").textContent = t("urlBtn");
   $("#trainHardBtn").childNodes[0].nodeValue = "💪 " + t("train_hard");
   $("#toggleEditBtn").childNodes[0].nodeValue = "📝 " + t("edit");
-  $("#ghOwner")?.setAttribute("aria-label", t("owner"));
-  $("#ghRepo")?.setAttribute("aria-label", t("repo"));
-  $("#ghBranch")?.setAttribute("aria-label", t("branch"));
   $("#urlInput").placeholder = t("urlPlaceholder");
-  let pick=$("#csvPicker");
-  if(pick && pick.options.length && pick.options[0].value===""){
-    pick.options[0].textContent = t("selectPlaceholder");
-  }
   $("#deckName").textContent = `${t('deck')}: —`;
   $("#testBtn").textContent = "🧑‍🎓 " + t("test");
   $("#testStatus").innerHTML = testLocked ? `<b>${t("test_enabled")}</b> — ${t("test_status")}` : "";
@@ -320,7 +313,6 @@ function modalTipBind(id, textKey) {
 modalTipBind("#testHelp", "testmode_tip");
 modalTipBind("#hardHelp", "hard_tip");
 modalTipBind("#editHelp", "editor_tip");
-// --- Таблицы: загрузка по файлу и ссылке
 
 $("#file").addEventListener("change",function(e){
   let f=(e.target&&e.target.files&&e.target.files[0])?e.target.files[0]:null; if(!f) return;
@@ -338,9 +330,12 @@ $("#reupload").addEventListener("change",function(e){
 });
 $("#loadUrlBtn").onclick=function(){
   let err = $("#error"), man = $("#downloadManual");
-  err.classList.add("hidden"); man.classList.add("hidden"); err.textContent = man.textContent = "";
+  err.classList.remove("show"); man.classList.remove("show"); err.textContent = man.textContent = "";
   let inp=$("#urlInput"), url=(inp&&inp.value)?inp.value.trim():"";
-  if (!url) { err.textContent="Вставьте ссылку!"; err.classList.remove("hidden"); return; }
+  if (!url) { err.textContent="Вставьте ссылку!"; err.classList.add("show"); return; }
+  // GitHub: автоматически превращаем в raw
+  if (/github\.com\/.+\/.+\/blob\//i.test(url))
+    url = url.replace('github.com/', 'raw.githubusercontent.com/').replace('/blob/', '/');
   // Google Sheets - auto to CSV
   if(url.includes("docs.google.com/spreadsheets/") && !/export\?format=csv/.test(url))
     url = url.replace(/\/edit.*$/, '') + '/export?format=csv';
@@ -351,16 +346,16 @@ $("#loadUrlBtn").onclick=function(){
       return res.text();
     })
     .then(txt=>{
-      if(txt.trim().length<50 || /<(html|body)[ >]/i.test(txt)) throw new Error("Не похоже на таблицу/CSV: скорее всего, файл защищён или отсутствует публично.");
+      if(txt.trim().length<50 || /<(html|body)[ >]/i.test(txt)) throw new Error("Не похоже на таблицу/CSV: возможно, файл защищён или отсутствует публично.");
       let name = decodeURIComponent(url.split("/").pop()||"Remote Table");
       loadCSVText(txt, name);
     })
     .catch(e=>{
-      man.textContent = "Не удалось скачать таблицу. Проверь, что она публична и это CSV/таблица. Или скачай файл к себе, а затем загрузи вручную. Ошибка: " + (e.message||e);
-      man.classList.remove("hidden");
+      man.textContent = "Не удалось скачать таблицу. Проверь, что она публична и это CSV/таблица. Или скачай файл к себе, а затем загрузи через 'Файл'. Ошибка: " + (e.message||e);
+      man.classList.add("show");
     });
 };
-// --- Editor, Train Hard, Shuffle и прочее из предыдущих вариантов, ничего добавлять не нужно
+
 function persist(){ localStorage.setItem(localKey,JSON.stringify({deck,idx,shown,deckName,lang:curLang,theme:theme,editMode})); }
 function restore(){ try{ let raw=localStorage.getItem(localKey); if(!raw) return false; let p=JSON.parse(raw);
 if(p && p.deck && p.deck.length){ deck=p.deck; idx=Math.min(Math.max(0,p.idx|0),deck.length-1); shown=!!p.shown; deckName=p.deckName||'—';
@@ -390,7 +385,7 @@ function loadCSVText(text,name){
     $("#editorBar").style.display = "none";
   }catch(e){
     let err=$("#error");
-    if(err){ err.textContent=t("errorPref") + (e.message||e); err.classList.remove("hidden"); }
+    if(err){ err.textContent=t("errorPref") + (e.message||e); err.classList.add("show"); }
     showUploader();
   }
 }
