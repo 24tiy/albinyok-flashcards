@@ -1,59 +1,118 @@
-# CSV Flashcards
+# CSV Flashcards — Простое приложение для повторения карточек из CSV
 
-**Двуязычные флеш‑карты.**  
-— Загружайте свои CSV-файлы/репозитории с вопросами и ответами (2 колонки: "Вопрос","Ответ")  
-— Работает офлайн и на мобильных (рекомендуется запуск через GitHub Pages)  
-— Прогресс сохраняется только у вас локально  
-— Можно импортировать/экспортировать результаты (JSON)
-
-## Как пользоваться
-
-1. Нажмите "Файл CSV" — загрузите файл с двумя колонками: вопрос, ответ.
-2. Либо вставьте ссылку на .csv с GitHub (например из другого репозитория).
-3. Для быстрой работы с типовыми наборами переключите ветку/репозиторий через форму внизу.
-
-## Структура CSV
-
-question,answer
-"Главная планета России?","Москва"
-"1+1?","2"
-"Язык JavaScript — это?","Язык программирования"
-
-text
-
-## Смена языка
-
-В правом верхнем углу переключайте интерфейс между Русским и Английским.
-
-## Вклад и форки
-
-Вы можете дорабатывать и делиться своим репозиторием свободно!
+### 🚀 Быстрый просмотр, повторение и самообучение по карточкам любых форматов CSV и на любых языках.  
+**Лёгкое трёхъязычное приложение для работы с флеш‑картами напрямую из файлов и GitHub!**
 
 ---
 
-### README-en.md
+## 🇷🇺 Для чего это приложение
 
-CSV Flashcards
-Bilingual flashcards.
-— Upload your CSV files/repos with questions and answers (2 columns: "Question","Answer")
-— Works offline and on mobile (recommended for GitHub Pages)
-— Your progress is saved locally only
-— You can import/export your learning progress (JSON)
+**CSV Flashcards** — это не очередной "генератор", а минималистичное приложение для изучения и повтора карточек из любых CSV.  
+Идеально подходит для:
+- Быстрого импорта (и самостоятельного изучения) вопросов и ответов из таблиц/файлов.
+- Практики иностранного языка, подготовки к экзамену, заучивания терминов, тренировки памяти.
+- Работает с карточками любого формата (русский/английский/французский), без лишних функций.
 
-How to use
-Click "CSV File" — upload a file with two columns: question, answer.
+### Как работает
 
-Or paste a GitHub .csv link (from any public repo).
+1. Выберите язык интерфейса (RU/EN/FR) в меню-флажке справа сверху.
+2. Загрузите свой файл CSV (или вставьте публичную ссылку на raw CSV с GitHub).  
+   - **Требование:** 2 колонки — вопрос и ответ (шапка не обязательна, но желательна).
+3. Отвечайте на вопросы, отмечайте «знаю/не знаю», используйте горячие клавиши или клик.
+4. Карточки можно перемешивать, сбрасывать прогресс, экспортировать ответы.
+5. Ваш прогресс сохраняется только локально (анонимно, без регистрации).
 
-For fast demo use, switch GitHub repo/branch via the form below.
-
-CSV sample:
+Пример файла:
+```
 question,answer
-"What’s Russia’s capital?","Moscow"
-"1+1?","2"
-"JavaScript is a?","Programming language"
-Language switching
-Top-right corner — toggle interface between English and Russian.
+"Столица Франции?","Париж"
+"Что такое Python?","Язык программирования"
+```
 
-Contributing
-You may fork and improve this project freely!
+### Возможности
+
+- Вопрос сверху, ответ — показ по кнопке либо по клику.
+- Быстрый переход по стрелкам, горячие клавиши (J/K/S).
+- Автоматически работает с файлами из любого публичного GitHub repo (или с вашего ПК).
+- Есть кнопка скачивания шаблона и просмотра демо глобально на трёх языках.
+- Простой современный дизайн и адаптация под мобильные.
+
+---
+
+## 🇬🇧 About (ENGLISH)
+
+**CSV Flashcards** is not a "flashcard generator" —  
+it's a minimalist, fast, and modern **app for using and repeating flashcards** from any CSV right in your browser.
+
+### What is it for?
+
+- Practice, review, or drill yourself using CSV-based flashcards (2 columns: Q/A).
+- Rapid language learning, exam prep, spaced repetition — from any public file.
+- Smart import: works with any repo (default is this one) or your own CSV.
+
+### How to use
+
+1. Pick your UI language (RU/EN/FR dropdown, top right).
+2. Upload a CSV file or load a `.csv` link from GitHub (raw format).
+   - **Just two columns required:** question, answer (header optional, all languages).
+3. Go through the cards, using show/hide, mark known/unknown, shuffle/repeat.
+4. All progress is 100% local (no login, no cloud, no tracking).
+5. Download template or demo for fast testing.
+
+CSV Example:
+```
+question,answer
+"What is the capital of France?","Paris"
+"What is Python?","Programming language"
+```
+
+### Features
+
+- Always question on top, answer below.
+- Fast navigation: arrows, keyboard shortcuts (J/K/S).
+- Instant import from any public GitHub repo — or your computer.
+- Downloadable template and three-language demo included.
+- Fully mobile-friendly and simple design.
+
+---
+
+## 🇫🇷 Français — Application pour réviser ses cartes CSV
+
+**CSV Flashcards** est une appli minimaliste pour réviser, apprendre et tester vos connaissances **grâce à des fiches** issues de n’importe quel fichier CSV.
+
+### À quoi ça sert ?
+
+- Pratique/entrainement avec des questions & réponses, import automatique à partir de CSV à 2 colonnes.
+- Apprentissage express de langues, préparation d’examens, répétition espacée.
+- Charges RAW CSV depuis tout dépôt GitHub (défaut : ce repo) ou votre PC.
+
+### Mode d’emploi
+
+1. Sélectionnez la langue (RU/EN/FR en haut à droite).
+2. Chargez votre CSV (question,réponse) — ou copiez un lien vers un fichier sur GitHub.
+3. Parcourez les cartes, révélez les réponses via bouton / clic, marquez « je sais/je ne sais pas ».
+4. Mélange, réinitialisation, export du progrès locale (aucun compte nécessaire).
+
+Exemple de CSV :
+
+question,answer
+"Quelle est la capitale de la France?","Paris"
+"Python c’est quoi?","Langage de programmation"
+```
+
+### Points forts
+
+- Question format carte, toujours en haut.
+- Claviers: navigation rapide, raccourcis J/K/S.
+- Import automatique GitHub + local.
+- Démo trilingue, template téléchargeable.
+- Parfaitement utilisable sur mobile.
+
+---
+
+## 🔗 Ссылка на репозиторий / Repo / Dépôt
+
+[https://github.com/24tiy/albinyok-flashcards](https://github.com/24tiy/albinyok-flashcards)
+
+MIT License. Улучшайте под свои нужды — фичи приветствуются!
+```
