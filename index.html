@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Albinyok Flashcards</title>
-  <meta name="description" content="Приложение для повтора и редактирования карточек из CSV/Google Sheets/Excel на любом устройстве.">
+  <meta name="description" content="Приложение для повтора карточек из CSV/Google Sheets/Excel на любом устройстве.">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -42,9 +42,11 @@
     .btn-glass-violet {background:rgba(125,100,255,.13);color:#5239ca;border:1.6px solid #9277f5;border-radius:16px;font-weight:700; font-size:1.02rem;padding:10px 18px;box-shadow:0 7px 26px 0 rgba(126,91,255,.13),0 2px 7px 0 rgba(126,91,255,.09);
       backdrop-filter:blur(7px);margin:0 4px 6px 0;transition:.16s;display:inline-block;}
     .btn-glass-violet.selected,.btn-glass-violet:active,.btn-glass-violet.primary {background: #8d6dff;color:#fff;border-color: #8769e6;}
-    .settings-bar{display:flex;gap:10px;align-items:center;justify-content:center;margin:13px 0 14px 0;flex-wrap:wrap;}
-    .testSwitch{display:inline-flex;align-items:center;gap:6px;}
-    #testModeCheck{transform:scale(1.18);accent-color:#715aff;margin:0 6px 0 0;vertical-align:middle;}
+    .settings-bar{display:flex;gap:16px;align-items:center;justify-content:center;margin:13px 0 12px 0;flex-wrap:wrap;}
+    .testSwitch{display:inline-flex;align-items:center;}
+    .btn-glass-violet, .btn-help {vertical-align:middle;}
+    #testModeCheck{transform:scale(1.15);accent-color:#715aff;margin:0 5px 0 0;vertical-align:middle;}
+    .btn-help{margin-left: 2px;}
     .btn-new {background:rgba(82,195,255,0.18);color:#233542;border-radius:14px;border:1.6px solid #43c6f6;
       font-weight:800;font-size:1.01rem;backdrop-filter:blur(7px);
       box-shadow:0 5px 32px 0 rgba(64,170,255,.10),0 1.5px 7px 0 rgba(90,180,255,.07);
@@ -60,7 +62,8 @@
     .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;margin-top:15px;}
     .ctrl{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border-radius:12px;border:1px solid #d2d2df;background:var(--card);cursor:pointer;box-shadow:var(--shadow);font-weight:700;transition:filter .15s;font-size:1.04rem;}
     .next-btn-main {background:var(--accent);color:#fff;font-weight:700;border-radius:13px;padding:10px 26px;font-size:1.08rem;box-shadow:var(--shadow);border:none;transition:.15s; margin-left:7px;}
-    .error{padding:9px 8px;border-radius:12px;background:rgba(255,0,0,.09);border:1px solid #e49c9c;margin-top:7px;color:#b11212;}
+    .error{padding:9px 8px;border-radius:12px;background:rgba(255,0,0,.09);border:1px solid #e49c9c;margin-top:7px;color:#b11212;display:none;}
+    .error.show {display:block;}
     .exportbar{display:flex;gap:6px;margin-top:18px;justify-content:center;flex-wrap:wrap;padding-bottom:7px;}
     .edit-bar{margin:14px 0;text-align:center;}
     .feedback-link{text-align:center;font-size:14.6px;margin:13px 0;}
@@ -97,11 +100,11 @@
         <span id="fileBtnTxt"></span>
       </label>
       <input type="file" id="file" accept=".csv,.tsv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/*" />
-      <input type="url" id="urlInput" style="width:220px;margin-left:7px;" placeholder="https://...csv, .tsv, google sheet etc" />
+      <input type="url" id="urlInput" style="width:260px;margin-left:7px;" value="https://github.com/24tiy/albinyok-flashcards/blob/main/data.csv" placeholder="https://...csv, .tsv, google sheet etc" />
       <button class="btn-glass-violet" id="loadUrlBtn" type="button">По ссылке</button>
     </div>
-    <div id="error" class="error hidden" role="alert"></div>
-    <div id="downloadManual" class="error hidden" style="margin-top:8px;font-size:16px;"></div>
+    <div id="error" class="error" role="alert"></div>
+    <div id="downloadManual" class="error" style="margin-top:8px;font-size:16px;"></div>
   </section>
   <div class="settings-bar rowbar">
     <button class="btn-glass-violet" id="toggleEditBtn" type="button">📝 Редактор карточек
