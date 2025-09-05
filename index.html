@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CSV Flashcards (Q/A)</title>
-  <meta name="description" content="Флеш‑карты из CSV для самоподготовки. Двуязычный интерфейс, работа оффлайн и мобильная адаптивность.">
+  <title>CSV Flashcards (albinyok-flashcards)</title>
+  <meta name="description" content="Многоязычные флеш‑карты из CSV: вопросы и ответы, мобильная и офлайн поддержка.">
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <style>
     :root{ --bg:#f4f6fb; --bg-alt:#e6e9f2; --card:#fff; --text:#16204b; --muted:#6c7892; --accent:#865dff; --accent-2:#3fbaff; --ok:#13b77f; --bad:#f44c5c; --shadow:0 6px 24px rgba(40,40,60,0.10);}
@@ -33,21 +33,18 @@
       display:flex;align-items:center;gap:12px;margin-bottom:22px;
       flex-wrap:wrap;
     }
-    .logo{
-      width:44px;height:44px;border-radius:13px;
-      background:linear-gradient(135deg,var(--accent),var(--accent-2));
-      box-shadow:var(--shadow);
-      display:grid;place-items:center;
-      color:white;font-weight:800;font-size:21px;
-    }
+    .logo{width:44px;height:44px;border-radius:13px;background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:var(--shadow);display:grid;place-items:center;color:white;font-weight:800;font-size:21px;}
     h1{font-size:27px;margin:0;}
     .sub{color:var(--muted);font-size:15px;}
     .sub a{color:var(--accent);}
-    .lang{margin-left:auto;font-size:13px;}
-    .lang label{margin-left:5px;}
-    .uploader{margin:16px 0;padding:15px 10px 17px 18px;border:2px dashed #ccc;border-radius:18px;background:var(--bg-alt);}
+    .lang-select{
+      margin-left:auto;position:relative;}
+    .lang-selector{display:flex;gap:5px;align-items:center;}
+    .lang-flags{border:1.5px solid #ececec;border-radius:11px;background:var(--bg-alt);padding:5px 11px;font-size:15px;appearance:none;}
+    .flag{font-size:16px;width:21px;}
+    .uploader{margin:16px 0 10px;padding:15px 10px 15px 18px;border:2px dashed #ccc;border-radius:18px;background:var(--bg-alt);}
     .uploader.drag{border-color:var(--accent);}
-    .uploader .row{display:flex;flex-wrap:wrap;align-items:center;gap:12px;}
+    .row{display:flex;flex-wrap:wrap;align-items:center;gap:12px;}
     .btn{appearance:none;border:none;background:var(--accent);color:#fff;border-radius:12px;padding:10px 15px;font-weight:700;cursor:pointer;box-shadow:var(--shadow);transition:filter .16s;}
     .btn.secondary{background:var(--accent-2);}
     .btn.ghost{background:transparent;color:var(--accent);border:1.5px solid var(--accent);}
@@ -64,9 +61,9 @@
     .chip{background:var(--card);border:1px solid #eee;padding:6px 10px 5px;border-radius:999px;box-shadow:var(--shadow);font-size:13px}
     .progress{margin-top:6px;height:8px;background:#e2e3ed;border-radius:999px;overflow:hidden;}
     .progress>div{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));width:0%;}
-    .card{position:relative;background:var(--card);border-radius:26px;box-shadow:var(--shadow);padding:31px 10px 30px;min-height:110px;display:flex;align-items:center;justify-content:center;text-align:center;}
-    .q{font-size:clamp(18px,2.4vw,21px);font-weight:700;}
-    .a{font-size:clamp(16px,2vw,19px);margin-top:13px;display:none;color:var(--muted);}
+    .card{position:relative;background:var(--card);border-radius:26px;box-shadow:var(--shadow);padding:20px 10px 25px;display:flex;flex-direction:column;align-items:stretch;justify-content:center;text-align:center;}
+    .q{font-size:clamp(18px,2.4vw,21px);font-weight:700;margin-bottom:22px;}
+    .a{font-size:clamp(16px,2vw,19px);color:var(--muted);}
     .controls{display:flex;flex-wrap:wrap;gap:9px;align-items:center;justify-content:center;margin-top:14px;}
     .ctrl{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:12px;border:1.5px solid #eaeaf0;background:var(--card);cursor:pointer;box-shadow:var(--shadow);font-weight:700;transition:filter .15s;}
     .ctrl.ok{color:var(--ok);}
@@ -78,15 +75,17 @@
     .hidden{display:none !important;}
     .error{padding:12px 14px;border-radius:12px;background:rgba(255,0,0,.09);border:1px solid #e49c9c;margin-top:10px;color:#b11212;}
     .exportbar{display:flex;gap:8px;margin-top:11px;}
+    .tools-bar{display:flex;gap:11px;margin-top:28px;align-items:center;}
     @media (max-width:600px){
-      .container{padding:11px 3.5vw 22px;margin:8px;}
-      .card{padding:11px 2vw 16px;}
+      .container{padding:11px 2vw 22px;margin:8px;}
+      .card{padding:11px 2vw 17px;}
       header h1{font-size:19px;}
-      .row,.controls{flex-direction:column;gap:6px;}
-      .uploader{padding:7px 2vw 16px;}
+      .row,.controls,.tools-bar{flex-direction:column;gap:6px;}
+      .uploader{padding:7px 2vw 12px;}
+      .tools-bar{align-items:stretch;}
     }
     @media (max-width:400px){
-      .card{font-size:16px;min-height:94px;}
+      .card{font-size:16px;}
       header{gap:5px;}
       .sub{font-size:12px;}
       .btn,.ctrl,label.file{font-size:13px;}
@@ -99,77 +98,81 @@
       <div class="logo">Q↔A</div>
       <div>
         <h1 id="siteTitle">CSV Flashcards</h1>
-        <div class="sub" id="siteSub"><a id="helpLink" href="README.md" target="_blank">Помощь</a></div>
+        <div class="sub" id="siteSub"></div>
       </div>
-      <div class="lang" aria-label="Выбор языка / Language switcher">
-        <label><input type="radio" name="lang" value="ru" checked>RU</label>
-        <label><input type="radio" name="lang" value="en">EN</label>
+      <div class="lang-select">
+        <select id="langSelect" class="lang-flags" aria-label="Language">
+          <option value="ru">🇷🇺 Русский</option>
+          <option value="en">🇬🇧 English</option>
+          <option value="fr">🇫🇷 Français</option>
+        </select>
       </div>
     </header>
     <section class="uploader" id="uploader" aria-label="Загрузка CSV">
-      <h2 id="fileOrLink">1) Файл или ссылка</h2>
+      <h2 id="fileOrLink"></h2>
       <div class="row" style="margin-bottom:13px">
-        <label for="file" class="file" id="fileLabel"><span id="fileIcon">📄</span> <span id="fileBtnTxt">Файл CSV</span></label>
+        <label for="file" class="file" id="fileLabel"><span id="fileIcon">📄</span>
+          <span id="fileBtnTxt"></span>
+        </label>
         <input type="file" id="file" accept=".csv,text/csv" />
-        <button class="btn secondary" id="templateBtn" type="button">Шаблон CSV</button>
-        <button class="btn ghost" id="demoBtn" type="button">Демо‑набор</button>
-      </div>
-      <div class="urlbox">
-        <input type="url" id="urlInput" placeholder="https://raw.githubusercontent.com/24tiy/flashcards-naturalisation/main/Questions_et_r_ponses.csv" />
-        <button class="btn" id="loadUrlBtn" type="button">По ссылке</button>
-      </div>
-      <div class="picker">
-        <select id="csvPicker"><option value="">…ищем CSV в репозитории…</option></select>
-        <button class="btn" id="loadPickedBtn" type="button" disabled>Загрузить из GitHub</button>
+        <input type="url" id="urlInput" style="width:260px;margin-left:10px;" />
+        <button class="btn" id="loadUrlBtn" type="button"></button>
+        <select id="csvPicker" style="margin-left:10px;"><option value=""></option></select>
+        <button class="btn" id="loadPickedBtn" type="button" disabled></button>
       </div>
       <div class="gh-bar">
         <input id="ghOwner" value="24tiy" maxlength="32" aria-label="GitHub User/Org"/>
-        <input id="ghRepo" value="flashcards-naturalisation" maxlength="40" aria-label="GitHub Repo"/>
+        <input id="ghRepo" value="albinyok-flashcards" maxlength="40" aria-label="GitHub Repo"/>
         <input id="ghBranch" value="main" maxlength="24" aria-label="Branch"/>
-        <button class="btn ghost" id="changeGHBtn" type="button">Сменить репозиторий</button>
+        <button class="btn ghost" id="changeGHBtn" type="button"></button>
       </div>
-      <div class="tiny" id="urlParamsHelp"></div>
       <div id="error" class="error hidden" role="alert"></div>
     </section>
+    <div class="tools-bar">
+      <button class="btn secondary" id="templateBtn" type="button"></button>
+      <button class="btn ghost" id="demoBtn" type="button"></button>
+      <a id="helpLink" href="README.md" target="_blank" class="btn ghost">?</a>
+    </div>
     <section class="workspace" id="workspace" aria-live="polite">
       <div class="topbar">
         <div>
-          <span class="chip" id="deckName">Дек: —</span>
+          <span class="chip" id="deckName"></span>
           <span class="chip" id="counter">0 / 0</span>
           <span class="chip" id="score">✓ 0 • ✗ 0</span>
         </div>
         <div>
-          <button class="btn ghost" id="shuffleBtn" title="Перемешать (S)">Перемешать</button>
-          <button class="btn ghost" id="resetBtn" title="Сбросить прогресс">Сбросить</button>
+          <button class="btn ghost" id="shuffleBtn" title="S"></button>
+          <button class="btn ghost" id="resetBtn" title="R"></button>
           <label class="file" for="reupload">↻ CSV</label>
           <input type="file" id="reupload" accept=".csv,text/csv" />
         </div>
       </div>
       <div class="progress" aria-hidden="true"><div id="progressBar"></div></div>
       <div class="card" id="card">
-        <div class="q" id="q">Загрузите CSV или выберите файл из репозитория</div>
+        <div class="q" id="q">—</div>
         <div class="a" id="a"></div>
       </div>
       <div class="controls" aria-label="Управление">
-        <button class="ctrl" id="prevBtn" title="Назад (←)">← Назад</button>
-        <button class="ctrl" id="revealBtn" title="Показать/скрыть ответ (Пробел/Enter)">Показать ответ</button>
-        <button class="ctrl" id="nextBtn" title="Вперёд (→)">Вперёд →</button>
-        <button class="ctrl ok" id="markOkBtn" title="Отметить как знаю (K)">✓ Знаю</button>
-        <button class="ctrl bad" id="markBadBtn" title="Отметить как не знаю (J)">✗ Не знаю</button>
+        <button class="ctrl" id="prevBtn" title="←"></button>
+        <button class="ctrl" id="revealBtn" title=" "></button>
+        <button class="ctrl" id="nextBtn" title="→"></button>
+        <button class="ctrl ok" id="markOkBtn" title="K"></button>
+        <button class="ctrl bad" id="markBadBtn" title="J"></button>
       </div>
-      <div class="tiny" style="text-align:center;margin-top:8px" id="hotkeysTip">Space/Enter — ответ · ←/→ — навигация · J/K — не знаю/знаю · S — перемешать</div>
+      <div class="tiny" style="text-align:center;margin-top:8px" id="hotkeysTip"></div>
       <div class="exportbar">
-        <button class="btn" id="exportBtn">Экспорт прогресса</button>
-        <button class="btn ghost" id="clearBtn">Очистить всё</button>
+        <button class="btn" id="exportBtn"></button>
+        <button class="btn ghost" id="clearBtn"></button>
       </div>
     </section>
   </div>
 <script>
+// ----------- Переводы ----------
 const translations = {
   ru: {
     siteTitle:"CSV Flashcards",
-    siteSub:'Флеш‑карты из CSV — загрузите файл или ссылку с GitHub. Ваш прогресс сохраняется локально. <a id="helpLink" href="README.md" target="_blank">Помощь</a>',
-    fileOrLink:"1) Файл или ссылка",
+    siteSub:'Флеш‑карты из CSV — загрузите файл или ссылку с GitHub. Ваш прогресс сохраняется локально.',
+    fileOrLink:"Откуда берём информацию?",
     fileBtn:"Файл CSV",
     template:"Шаблон CSV",
     demo:"Демо-набор",
@@ -182,8 +185,7 @@ const translations = {
     noCSVs:"CSV в репозитории не найдены",
     ghApiErr:"Ошибка доступа к GitHub: ",
     selectPlaceholder:"…ищем CSV в репозитории…",
-    urlPlaceholder:"https://raw.githubusercontent.com/24tiy/flashcards-naturalisation/main/Questions_et_r_ponses.csv",
-    urlParams:'URL‑параметры: <code>?owner=…&repo=…&branch=…&csv=path/in/repo.csv</code>. По умолчанию owner=<b>24tiy</b>, repo=<b>flashcards-naturalisation</b>, branch=<b>main</b>.',
+    urlPlaceholder:"https://raw.githubusercontent.com/24tiy/albinyok-flashcards/main/Questions_et_r_ponses.csv",
     reveal:"Показать ответ",
     hide:"Скрыть ответ",
     prev:"← Назад",
@@ -192,26 +194,27 @@ const translations = {
     dont:"✗ Не знаю",
     shuffle:"Перемешать",
     reset:"Сбросить прогресс",
-    deck:"Дек",
+    deck:"Источник вопросов",
     empty:"Загрузите CSV или выберите файл из репозитория",
     progress:"Экспорт прогресса",
     clear:"Очистить всё",
     hotkeys:"Space/Enter — ответ · ←/→ — навигация · J/K — не знаю/знаю · S — перемешать",
     errorPref:"Ошибка: ",
     ghInvalid:"Нет файлов .csv или ошибка доступа к GitHub.",
-    ghChanged:"Репозиторий обновлён, попытайтесь снова загрузить файл.",
+    ghChanged:"Репозиторий обновлён. Попробуйте загрузить файл снова.",
     fetchFail:"Ошибка загрузки",
     fileTooBig:"Файл слишком большой!",
-    csvNotPairs:"Не найдено пар 'вопрос/ответ'"
+    csvNotPairs:"Не найдено пар 'вопрос/ответ'",
+    help: "Помощь"
   },
   en: {
     siteTitle:"CSV Flashcards",
-    siteSub:'Flashcards from CSV — upload a file or paste a GitHub link. Your progress is saved locally. <a id="helpLink" href="README.md" target="_blank">Help</a>',
-    fileOrLink:"1) File or Link",
+    siteSub:'Flashcards from CSV — upload a file or paste a GitHub link. Your progress is saved locally.',
+    fileOrLink:"Source of Questions?",
     fileBtn:"CSV File",
     template:"Template CSV",
     demo:"Demo Set",
-    urlBtn:"From Link",
+    urlBtn:"Load Link",
     repoBtn:"Load from GitHub",
     ghBarBtn:"Change Repo",
     owner:"User",
@@ -220,40 +223,76 @@ const translations = {
     noCSVs:"No CSV files found in repo",
     ghApiErr:"GitHub API failure: ",
     selectPlaceholder:"…searching CSVs in repo…",
-    urlPlaceholder:"https://raw.githubusercontent.com/24tiy/flashcards-naturalisation/main/Questions_et_r_ponses.csv",
-    urlParams:'URL params: <code>?owner=…&repo=…&branch=…&csv=path/in/repo.csv</code>. Defaults — owner=<b>24tiy</b>, repo=<b>flashcards-naturalisation</b>, branch=<b>main</b>.',
+    urlPlaceholder:"https://raw.githubusercontent.com/24tiy/albinyok-flashcards/main/Questions_et_r_ponses.csv",
     reveal:"Show answer",
     hide:"Hide answer",
     prev:"← Back",
     next:"Next →",
     know:"✓ I know",
-    dont:"✗ Don\'t know",
+    dont:"✗ Don't know",
     shuffle:"Shuffle",
     reset:"Reset progress",
-    deck:"Deck",
+    deck:"Source",
     empty:"Upload a CSV or select from repo",
     progress:"Export progress",
     clear:"Clear all",
-    hotkeys:"Space/Enter — answer · ←/→ — navigation · J/K — don\'t/know · S — shuffle",
+    hotkeys:"Space/Enter — answer · ←/→ — navigation · J/K — don't/know · S — shuffle",
     errorPref:"Error: ",
     ghInvalid:"No CSV files present or GitHub access error.",
     ghChanged:"Repo settings updated. Try loading a file again.",
     fetchFail:"Download error",
     fileTooBig:"File too large!",
-    csvNotPairs:"No question/answer pairs found"
+    csvNotPairs:"No question/answer pairs found",
+    help:"Help"
+  },
+  fr: {
+    siteTitle:"CSV Flashcards",
+    siteSub:'Cartes mémoire à partir de CSV : chargez un fichier ou un lien GitHub. Vos progrès sont sauvegardés localement.',
+    fileOrLink:"Source de questions ?",
+    fileBtn:"Fichier CSV",
+    template:"Modèle CSV",
+    demo:"Jeu démo",
+    urlBtn:"Depuis le lien",
+    repoBtn:"Charger depuis GitHub",
+    ghBarBtn:"Changer de dépôt",
+    owner:"Utilisateur",
+    repo:"Dépôt",
+    branch:"Branche",
+    noCSVs:"Aucun CSV trouvé dans le dépôt",
+    ghApiErr:"Erreur GitHub API : ",
+    selectPlaceholder:"…recherche des CSV dans le dépôt…",
+    urlPlaceholder:"https://raw.githubusercontent.com/24tiy/albinyok-flashcards/main/Questions_et_r_ponses.csv",
+    reveal:"Afficher réponse",
+    hide:"Cacher la réponse",
+    prev:"← Précédent",
+    next:"Suivant →",
+    know:"✓ Je sais",
+    dont:"✗ Je ne sais pas",
+    shuffle:"Mélanger",
+    reset:"Réinitialiser",
+    deck:"Source",
+    empty:"Chargez un CSV ou choisissez un fichier de dépôt",
+    progress:"Exporter progrès",
+    clear:"Tout nettoyer",
+    hotkeys:"Space/Enter — réponse · ←/→ — navigation · J/K — je ne sais/sais pas · S — mélanger",
+    errorPref:"Erreur : ",
+    ghInvalid:"Pas de CSV dans le dépôt ou erreur d’accès GitHub.",
+    ghChanged:"Dépôt mis à jour. Essayez de charger à nouveau.",
+    fetchFail:"Erreur de téléchargement",
+    fileTooBig:"Fichier trop volumineux !",
+    csvNotPairs:"Aucune paire question/réponse trouvée",
+    help:"Aide"
   }
-}; 
+};
 let curLang = "ru";
 function t(k){return translations[curLang][k]||k;}
-document.querySelectorAll('input[name=lang]').forEach(r=>r.addEventListener('change',e=>{
-  curLang=e.target.value; updateLang();
-}));
-// Основной update-lang, весь UI!
+document.getElementById("langSelect").addEventListener("change",function(e){
+  curLang = this.value; updateLang();
+});
 function updateLang(){
-  document.documentElement.lang = curLang;
+  document.documentElement.lang=curLang;
   $("#siteTitle").textContent = t("siteTitle");
-  $("#siteSub").innerHTML = t("siteSub");
-  $("#helpLink").href = curLang==="ru" ? "README.md" : "README-en.md";
+  $("#siteSub").textContent = t("siteSub");
   $("#fileOrLink").textContent = t("fileOrLink");
   $("#fileBtnTxt").textContent = t("fileBtn");
   $("#templateBtn").textContent = t("template");
@@ -265,7 +304,11 @@ function updateLang(){
   $("#ghRepo").setAttribute("aria-label", t("repo"));
   $("#ghBranch").setAttribute("aria-label", t("branch"));
   $("#urlInput").placeholder = t("urlPlaceholder");
-  $("#urlParamsHelp").innerHTML = t("urlParams");
+  // select-плейсхолдер
+  let pick=$("#csvPicker");
+  if(pick && pick.options.length && pick.options[0].value===""){
+    pick.options[0].textContent = t("selectPlaceholder");
+  }
   $("#prevBtn").textContent = t("prev");
   $("#revealBtn").textContent = t("reveal");
   $("#nextBtn").textContent = t("next");
@@ -277,18 +320,14 @@ function updateLang(){
   $("#clearBtn").textContent = t("clear");
   $("#deckName").textContent = `${t('deck')}: —`;
   $("#hotkeysTip").textContent = t("hotkeys");
-  // select-плейсхолдер
-  let pick=$("#csvPicker");
-  if (pick && (!pick.options.length || pick.options[0].value==="")){
-    pick.options[0].textContent = t("selectPlaceholder");
-  }
+  $("#helpLink").textContent = t("help");
 }
-// ----- Вся остальная логика -----------------
-function $(s){ return document.querySelector(s); }
+
+function $(s){return document.querySelector(s);}
 function sniffHeader(a){
   if(!a || a.length<2) return false;
   let ha=(a[0]||'').toLowerCase(), hb=(a[1]||'').toLowerCase();
-  return ['q','question','вопрос'].includes(ha) && ['a','answer','ответ'].includes(hb);
+  return ['q','question','вопрос','question'].includes(ha) && ['a','answer','ответ','réponse'].includes(hb);
 }
 function toDeck(rows){
   if(!rows||!rows.length) return [];
@@ -318,7 +357,8 @@ function updateUI(){
   let card=deck[idx];
   q.textContent = card.q || `(${t('deck')})`;
   a.textContent = card.a || `(—)`;
-  a.style.display = shown?"block":"none";
+  a.style.display = "block"; // ответ всегда виден, а скрывается по reveal
+  if (!shown) a.style.visibility = "hidden"; else a.style.visibility = "visible";
   if (c) c.textContent = `${idx+1} / ${deck.length}`;
   let ok=deck.filter(x=>x.ok).length, bad=deck.filter(x=>x.bad).length;
   if (s) s.textContent = `✓ ${ok} • ✗ ${bad}`;
@@ -328,16 +368,16 @@ function updateUI(){
 function showWorkspace(){ $("#uploader").classList.add("hidden"); $("#workspace").style.display="block"; }
 function showUploader(){ $("#uploader").classList.remove("hidden"); $("#workspace").style.display="none"; }
 function persist(){
-  localStorage.setItem('csv-flashcards-v7',JSON.stringify({deck,idx,shown,deckName,lang:curLang}));
+  localStorage.setItem('csv-flashcards-v8',JSON.stringify({deck,idx,shown,deckName,lang:curLang}));
 }
 function restore(){
   try{
-    let raw=localStorage.getItem('csv-flashcards-v7');
+    let raw=localStorage.getItem('csv-flashcards-v8');
     if(!raw) return false;
     let p=JSON.parse(raw);
     if(p && p.deck && p.deck.length){
       deck=p.deck; idx=Math.min(Math.max(0,p.idx|0),deck.length-1); shown=!!p.shown; deckName=p.deckName||'—';
-      if(p.lang) { curLang=p.lang; $("input[name=lang][value='"+curLang+"']").checked=true; }
+      if(p.lang) { curLang=p.lang; $("#langSelect").value=curLang; }
       updateLang(); showWorkspace(); updateUI(); return true;
     }
   }catch(e){}
@@ -460,9 +500,8 @@ function addHandlers(){
     a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000);
   });
   $("#clearBtn")?.addEventListener("click",()=>{
-    if(confirm("Удалить весь прогресс?")){ localStorage.removeItem("csv-flashcards-v7"); location.reload(); }
+    if(confirm("Удалить весь прогресс?")){ localStorage.removeItem("csv-flashcards-v8"); location.reload(); }
   });
-  // Input для смены репозитория/ветки
   $("#changeGHBtn")?.addEventListener("click",()=>{
     let owner=$("#ghOwner").value.trim(), repo=$("#ghRepo").value.trim(), branch=$("#ghBranch").value.trim();
     populatePicker(owner,repo,branch);
