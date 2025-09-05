@@ -5,12 +5,10 @@ let editMode = false;
 let hardCards = [];
 let mainDeck = [];
 let deck=[], idx=0, shown=false, deckName='—';
-let localKey = 'csv-flashcards-v9';
-
-// --- Локализация интерфейса
+let localKey = 'albinyok-flashcards-v1';
 const translations = {
   ru: {
-    siteTitle:"CSV Flashcards",
+    siteTitle:"Albinyok Flashcards",
     siteSub:'Приложение для повтора карточек из CSV — учи на телефоне и на ПК. Ваш прогресс сохраняется локально.',
     fileOrLink:"Откуда берём информацию?",
     fileBtn:"Файл CSV",
@@ -46,11 +44,9 @@ const translations = {
     fileTooBig:"Файл слишком большой!",
     csvNotPairs:"Не найдено пар 'вопрос/ответ'",
     help:"Помощь",
-    // rating mode
     rate_easy:"Легко",
     rate_hard:"Сложно",
     rate_again:"Повторить",
-    // edit/advanced
     editor_hint:"Редактируйте карточки ниже, затем сохраните! Каждая строка — одна карточка.",
     add_card:"Добавить карточку",
     save_cards:"Сохранить изменения",
@@ -64,7 +60,7 @@ const translations = {
     train_all_done:"Все сложные карточки выучены! МОЛОДЕЦ!"
   },
   en: {
-    siteTitle:"CSV Flashcards",
+    siteTitle:"Albinyok Flashcards",
     siteSub:'App for using and repeating CSV flashcards — use anywhere, progress is saved locally.',
     fileOrLink:"Where does info come from?",
     fileBtn:"CSV File",
@@ -100,7 +96,6 @@ const translations = {
     fileTooBig:"File too large!",
     csvNotPairs:"No question/answer pairs found",
     help:"Help",
-    // rating mode
     rate_easy:"Easy",
     rate_hard:"Hard",
     rate_again:"Again",
@@ -117,7 +112,7 @@ const translations = {
     train_all_done:"All hard cards learned! NICE!"
   },
   fr: {
-    siteTitle:"CSV Flashcards",
+    siteTitle:"Albinyok Flashcards",
     siteSub:'Appli pour réviser vos cartes CSV — partout, progrès sauvegardé localement.',
     fileOrLink:"D’où viennent les données ?",
     fileBtn:"Fichier CSV",
@@ -153,7 +148,6 @@ const translations = {
     fileTooBig:"Fichier trop volumineux !",
     csvNotPairs:"Aucune question/réponse trouvée",
     help:"Aide",
-    // rating mode
     rate_easy:"Facile",
     rate_hard:"Difficile",
     rate_again:"Encore",
@@ -170,8 +164,6 @@ const translations = {
     train_all_done:"Toutes les cartes difficiles sont apprises ! SUPER !"
   }
 };
-
-// ------ Утилиты интерфейса ------
 function $(sel){ return document.querySelector(sel);}
 function t(k){return translations[curLang][k]||k;}
 function updateLang() {
@@ -197,24 +189,19 @@ function updateLang() {
   $("#helpLink").textContent = t("help");
   updateControlsBar();
 }
-
-// --- Смена языка UI
 $("#langSelect").addEventListener("change",function(e){curLang=this.value;updateLang();updateControlsBar();});
-
-// --- Переключатель темы
 $("#themeToggle").onclick = () => {
   theme = (theme==="light")?"dark":"light";
-  document.body.dataset.theme = theme; // data-theme
-  localStorage.setItem("csv-flashcards-theme",theme);
+  document.body.dataset.theme = theme; 
+  localStorage.setItem("albinyok-flashcards-theme",theme);
   $("#themeToggle").textContent = theme==="dark" ? "🌞" : "🌙";
 };
 function initTheme(){
-  theme=localStorage.getItem("csv-flashcards-theme")||"light";
+  theme=localStorage.getItem("albinyok-flashcards-theme")||"light";
   document.body.dataset.theme = theme;
   $("#themeToggle").textContent = theme==="dark" ? "🌞" : "🌙";
 }
 initTheme();
-// ------ Парсинг csv и deck -----
 function sniffHeader(a){
   if(!a || a.length<2) return false;
   let ha=(a[0]||'').toLowerCase(), hb=(a[1]||'').toLowerCase();
@@ -234,20 +221,16 @@ function toDeck(rows){
     out.push({q:filtered[i][0], a:filtered[i][1], ok:false, bad:false,rating:0});
   return out;
 }
-
-// ------ UI SHOW CARD & upd ------
 function updateControlsBar() {
   let isRating = ratingMode;
   let el=$("#controlsBar");
   if (!el) return;
   el.innerHTML = "";
   if(isRating){
-    // Easy/Hard/Again
     el.appendChild(createCtrl("ctrl ok","K",t("rate_easy"),()=>rateCard(2)));
     el.appendChild(createCtrl("ctrl hard","J",t("rate_hard"),()=>rateCard(1)));
     el.appendChild(createCtrl("ctrl again","A",t("rate_again"),()=>rateCard(0)));
   } else {
-    // Простой режим
     el.appendChild(createCtrl("ctrl","←",t("prev"),()=>prevCard()));
     el.appendChild(createCtrl("ctrl","Space",t("reveal"),()=>revealCard()));
     el.appendChild(createCtrl("ctrl","→",t("next"),()=>nextCard()));
@@ -261,7 +244,6 @@ function createCtrl(className, title, text, handler) {
   btn.onclick = handler;
   return btn;
 }
-
 function updateUI(){
   let q=$("#q"), a=$("#a"), c=$("#counter"), s=$("#score"), n=$("#deckName"), bar=$("#progressBar");
   if(!deck.length){
@@ -283,16 +265,12 @@ function updateUI(){
   if (n) n.textContent = `${t('deck')}: ${deckName}`;
   updateControlsBar();
 }
-
-// -------------- Переходы
 function revealCard(){shown=!shown;updateUI();persist();}
 function prevCard(){if(deck.length){idx=(idx-1+deck.length)%deck.length;shown=false;updateUI();persist();}}
 function nextCard(){if(deck.length){idx=(idx+1)%deck.length;shown=false;updateUI();persist();}}
 function markOk(){if(deck.length){deck[idx].ok=true;deck[idx].bad=false;nextCard();persist();}}
 function markBad(){if(deck.length){deck[idx].bad=true;deck[idx].ok=false;nextCard();persist();}}
-
-// ---- Rating mode (legko/slovno/povtorit) ----
-function rateCard(val){ // 2 - легко, 1 - сложно, 0 - заново
+function rateCard(val){
   if(!deck.length) return;
   deck[idx].rating = val;
   if(val===2){deck[idx].ok=true;deck[idx].bad=false;}
@@ -300,8 +278,6 @@ function rateCard(val){ // 2 - легко, 1 - сложно, 0 - заново
   if(val===0){deck[idx].ok=false;deck[idx].bad=true;}
   nextCard(); persist();
 }
-
-// --- Система сохранения и восстановления
 function persist(){
   localStorage.setItem(localKey,JSON.stringify({deck,idx,shown,deckName,lang:curLang,theme:theme,ratingMode,editMode}));
 }
@@ -321,10 +297,8 @@ function restore(){
   }catch(e){}
   return false;
 }
-
 function showWorkspace(){ $("#uploader").classList.add("hidden"); $("#workspace").style.display="block"; }
 function showUploader(){ $("#uploader").classList.remove("hidden"); $("#workspace").style.display="none"; }
-// ========== Загрузка CSV, демо, шаблон
 $("#templateBtn").onclick = () => {
   let csv='question,answer\n"Столица Франции?","Париж"\n"2+2?","4"\n"Главный цвет неба днём","Синий"\n';
   let blob=new Blob([csv],{type:"text/csv;charset=utf-8;"}),url=URL.createObjectURL(blob),a=document.createElement("a");
@@ -334,7 +308,6 @@ $("#demoBtn").onclick = () => {
   let demo='question,answer\n"Столица Франции?","Париж"\n"What is the capital of France?","Paris"\n"Quelle est la capitale de la France?","Paris"\n"2+2?","4"\n"Язык Python — это...","Язык программирования"\n"Python is a...","Programming language"\n"Python est un...","Langage de programmation"';
   loadCSVText(demo,"Demo");
 };
-
 function loadCSVText(text,name){
   try{
     let parsed = Papa.parse(text.trim(), {skipEmptyLines:true});
@@ -351,7 +324,6 @@ function loadCSVText(text,name){
     showUploader();
   }
 }
-
 $("#file").addEventListener("change",function(e){
   let f=(e.target&&e.target.files&&e.target.files[0])?e.target.files[0]:null; if(!f) return;
   let r=new FileReader();
@@ -366,7 +338,6 @@ $("#reupload").addEventListener("change",function(e){
   r.onerror=()=>{ alert(t("errorPref")+" Read file error"); };
   r.readAsText(f);
 });
-
 $("#loadUrlBtn").onclick=function(){
   let inp=$("#urlInput"),url=(inp&&inp.value)?inp.value.trim():"";
   if(!url) return alert("Вставь ссылку на CSV");
@@ -379,7 +350,6 @@ $("#loadUrlBtn").onclick=function(){
     loadCSVText(txt,name);
   }).catch(e=>alert(e.message||e));
 };
-
 $("#loadPickedBtn").onclick=function(){
   let pick=$("#csvPicker");
   if(!pick||!pick.value) return;
@@ -394,19 +364,19 @@ $("#loadPickedBtn").onclick=function(){
     loadCSVText(txt,name);
   }).catch(e=>alert(e.message||e));
 };
-
 $("#changeGHBtn").onclick=function(){
-  let owner=$("#ghOwner").value.trim(), repo=$("#ghRepo").value.trim(), branch=$("#ghBranch").value.trim();
+  let owner=$("#ghOwner")?$("#ghOwner").value.trim():"",repo=$("#ghRepo")?$("#ghRepo").value.trim():"",branch=$("#ghBranch")?$("#ghBranch").value.trim():"";
   populatePicker(owner,repo,branch);
   let pick=$("#csvPicker"); if(pick){pick.innerHTML = `<option>${t("selectPlaceholder")}</option>`;}
   $("#error").classList.add("hidden");
   setTimeout(()=>alert(t("ghChanged")),200);
 };
 function populatePicker(owner,repo,branch){
-  owner=owner||$("#ghOwner").value.trim(); repo=repo||$("#ghRepo").value.trim();branch=branch||$("#ghBranch").value.trim();
+  owner=owner||($("#ghOwner")?$("#ghOwner").value.trim():""); repo=repo||($("#ghRepo")?$("#ghRepo").value.trim():"");branch=branch||($("#ghBranch")?$("#ghBranch").value.trim():"");
   let pick=$("#csvPicker"), btn=$("#loadPickedBtn");
   if(!pick) return;
   pick.innerHTML = `<option>${t("selectPlaceholder")}</option>`; btn.disabled = true;
+  if(!(owner&&repo&&branch)) return;
   let url=`https://api.github.com/repos/${owner}/${repo}/git/trees/${encodeURIComponent(branch)}?recursive=1`;
   fetch(url,{headers:{"Accept":"application/vnd.github+json"}})
     .then(res=>{
@@ -429,7 +399,6 @@ function populatePicker(owner,repo,branch){
       btn.disabled=true;
     });
 }
-// ==== Editor: добавлять/править/удалять карточки ====
 $("#toggleEdit").onchange = function() {
   editMode = this.checked;
   persist();
@@ -451,7 +420,7 @@ function launchEditor() {
     q.innerHTML = `<input type="text" value="${c.q.replace(/"/g,'&quot;')}" style="width:96%"/>`;
     a.innerHTML = `<input type="text" value="${c.a.replace(/"/g,'&quot;')}" style="width:96%"/>`;
     let delB = document.createElement("button");
-    delB.className="btn ghost edit-btn"; delB.textContent=t("del");
+    delB.className="btn-glass-violet small edit-btn"; delB.textContent=t("del");
     delB.onclick=()=>{ deck.splice(i,1); launchEditor(); };
     edit.appendChild(delB);
     row.appendChild(q); row.appendChild(a); row.appendChild(edit);
@@ -459,13 +428,13 @@ function launchEditor() {
   });
   bar.appendChild(tbl);
   let addBtn = document.createElement("button");
-  addBtn.className="btn secondary edit-btn"; addBtn.textContent=t("add_card");
+  addBtn.className="btn-glass-violet small edit-btn"; addBtn.textContent=t("add_card");
   addBtn.onclick=()=>{
     deck.push({q:"",a:"",ok:false,bad:false});
     launchEditor();
   };
   let saveBtn=document.createElement("button");
-  saveBtn.className="btn edit-btn"; saveBtn.textContent=t("save_cards");
+  saveBtn.className="btn-glass-violet small edit-btn"; saveBtn.textContent=t("save_cards");
   saveBtn.onclick=()=>{
     let rows=tbl.querySelectorAll("tr");
     let newDeck=[];
@@ -481,7 +450,6 @@ function launchEditor() {
   bar.appendChild(addBtn); bar.appendChild(saveBtn);
   bar.style.display="block";
 }
-// ====== Тренировка сложных карточек ======
 $("#trainHardBtn").onclick = ()=>{
   let hard = deck.filter(x=>x.bad);
   if(!hard.length) { alert(t("train_all_done")); return; }
@@ -490,11 +458,7 @@ $("#trainHardBtn").onclick = ()=>{
   deckName=t("train_hard");
   persist(); showWorkspace(); updateUI();
 };
-
-// ====== Переключатель режима rating-mode ======
 $("#toggleRating").onchange = function(){ ratingMode = this.checked; persist(); updateControlsBar(); updateUI(); };
-
-// ==== Горячие клавиши и прочее ====
 window.addEventListener("keydown",function(e){
   let tag=(document.activeElement&&document.activeElement.tagName)||"";
   if(["INPUT","TEXTAREA","SELECT"].includes(tag)) return;
@@ -506,7 +470,6 @@ window.addEventListener("keydown",function(e){
   else if((e.key||"").toLowerCase()==="j"){ if(ratingMode) rateCard(1); else markBad();}
   else if((e.key||"").toLowerCase()==="a" && ratingMode){ rateCard(0);}
 });
-
 function shuffle(a){ 
   for(let i=a.length-1;i>0;i--){ 
     let j=Math.floor(Math.random()*(i+1)); 
@@ -514,9 +477,7 @@ function shuffle(a){
   } 
   return a;
 }
-
 $("#card").onclick = () => {revealCard();};
-
 $("#prevBtn") && ($("#prevBtn").onclick = prevCard);
 $("#nextBtn") && ($("#nextBtn").onclick = nextCard);
 $("#revealBtn") && ($("#revealBtn").onclick = revealCard);
@@ -527,7 +488,6 @@ $("#resetBtn") && ($("#resetBtn").onclick = () => {
 });
 $("#markOkBtn") && ($("#markOkBtn").onclick = markOk);
 $("#markBadBtn") && ($("#markBadBtn").onclick = markBad);
-
 $("#exportBtn").onclick = ()=>{
   let out=deck.map((x,i)=>({i,q:x.q,a:x.a,ok:x.ok,bad:x.bad,rating:x.rating}));
   let blob=new Blob([JSON.stringify(out,null,2)],{type:"application/json"});
@@ -535,26 +495,21 @@ $("#exportBtn").onclick = ()=>{
   a.href=url; a.download="deck-progress.json";
   a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000);
 };
-
 $("#clearBtn").onclick = () => {
   if(confirm("Удалить весь прогресс?")){ 
     localStorage.removeItem(localKey);
     location.reload();
   }
 };
-
 function showHotkeys(){ $("#hotkeysTip").textContent = t("hotkeys"); }
-
 function bootstrap(){
   updateLang();
   if(restore()) return;
   var params=new URLSearchParams(window.location.search);
-  let owner=params.get("owner")||$("#ghOwner").value,
-      repo=params.get("repo")||$("#ghRepo").value,
-      branch=params.get("branch")||$("#ghBranch").value;
+  let owner=params.get("owner")||($("#ghOwner")?$("#ghOwner").value:""),
+      repo=params.get("repo")||($("#ghRepo")?$("#ghRepo").value:""),
+      branch=params.get("branch")||($("#ghBranch")?$("#ghBranch").value:"");
   populatePicker(owner,repo,branch);
   showHotkeys();
 }
 document.addEventListener("DOMContentLoaded",bootstrap);
-
-
