@@ -39,6 +39,8 @@ const translations = {
     save_success:"Карточки сохранены!",
     train_all_done:"Все сложные карточки выучены! МОЛОДЕЦ!",
     test: "Тест",
+    test_on: "Тест включён",
+    test_off: "Включить тест",
     next: "Дальше",
     test_enabled: "Режим теста включён",
     test_status: "Только 'Знаю', 'Не знаю' и 'Дальше' для перехода.",
@@ -79,6 +81,8 @@ const translations = {
     save_success:"Saved!",
     train_all_done:"All hard cards done! NICE!",
     test: "Test",
+    test_on: "Test enabled",
+    test_off: "Enable test",
     next: "Next",
     test_enabled: "Test mode enabled",
     test_status: "Only 'Know', 'Don't know' and 'Next' for navigation.",
@@ -119,6 +123,8 @@ const translations = {
     save_success:"Cartes enregistrées!",
     train_all_done:"Toutes les difficiles apprises !",
     test: "Test",
+    test_on: "Test activé",
+    test_off: "Activer test",
     next: "Suivant",
     test_enabled: "Mode test activé",
     test_status: "Seulement 'Je sais', 'Je ne sais pas' et 'Suivant'.",
@@ -130,6 +136,8 @@ const translations = {
 
 function $(sel){ return document.querySelector(sel);}
 function t(k){return (translations[curLang]&&translations[curLang][k])||k;}
+
+// Обновление языков, кнопок, надписей
 function updateLang() {
   document.documentElement.lang = curLang;
   $("#siteTitle").textContent = t("siteTitle");
@@ -139,16 +147,19 @@ function updateLang() {
   $("#templateBtn").textContent = t("template");
   $("#demoBtn").textContent = t("demo");
   $("#loadUrlBtn").textContent = t("urlBtn");
-  $("#trainHardBtn").childNodes[0].nodeValue = "💪 " + t("train_hard");
-  $("#toggleEditBtn").childNodes[0].nodeValue = "📝 " + t("edit");
+  $("#editLabel").textContent = t("edit");
+  $("#hardLabel").textContent = t("train_hard");
+  updateTestBtnText();
   $("#urlInput").placeholder = t("urlPlaceholder") || '';
   $("#deckName").textContent = `${t('deck')}: ${deckName}`;
-  $("#testBtn").textContent = "🧑‍🎓 " + t("test");
   $("#testStatus").innerHTML = testLocked ? `<b>${t("test_enabled")}</b> — ${t("test_status")}` : "";
   $("#testStatus").style.display = testLocked ? "" : "none";
   $("#testModeCheck").checked = !!testLocked;
   $("#hotkeysTip").textContent = '';
   updateControlsBar();
+}
+function updateTestBtnText() {
+  $("#testBtnText").textContent = testLocked ? t("test_on") : t("test_off");
 }
 
 $("#langSelect").addEventListener("change",function(e){
@@ -264,27 +275,43 @@ function nextTestStep(){
   updateUI();
   persist();
 }
-$("#testModeCheck").onchange=function(){
-  testLocked=this.checked;
-  awaitingTestAnswer = false;
-  updateLang(); updateUI();
-};
-function modalTipBind(id, textKey) {
-  let btn = $(id);
-  btn && (btn.onmouseenter = btn.onclick = function (e) {
+// Клик по кликабельным иконкам "?"
+function bindModalTip(btnId, textKey){
+  let btn=$(btnId);
+  if(!btn)return;
+  function show(ev){
     let mt = $("#modalTip");
     mt.textContent = t(textKey);
     mt.style.display = "block";
-    let rect = btn.getBoundingClientRect();
-    mt.style.left = (rect.left + window.scrollX - 80) + "px";
-    mt.style.top = (rect.bottom + window.scrollY + 2) + "px";
-  }, btn.onmouseleave = function () {
-    $("#modalTip").style.display = "none";
-  });
+    const rect = btn.getBoundingClientRect();
+    mt.style.left = (rect.left + window.scrollX + 16) + "px";
+    mt.style.top = (rect.top + window.scrollY + 30) + "px";
+  }
+  function hide(){ $("#modalTip").style.display="none"; }
+  btn.onmouseenter = show;
+  btn.onclick = show;
+  btn.onmouseleave = hide;
 }
-modalTipBind("#testHelp", "testmode_tip");
-modalTipBind("#hardHelp", "hard_tip");
-modalTipBind("#editHelp", "editor_tip");
+bindModalTip("#testHelp","testmode_tip");
+bindModalTip("#hardHelp","hard_tip");
+bindModalTip("#editHelp","editor_tip");
+
+// Обработка клика по кнопке "Тест" — сразу чекбокс+переключение+название меняется!
+$("#testBtnWrap").onclick = function(e){
+  if(e.target.classList.contains('qhelp-btn')) return; // не переключаем, если клик на ?
+  testLocked = !testLocked;
+  awaitingTestAnswer = false;
+  updateTestBtnText();
+  updateLang(); updateUI();
+  $("#testModeCheck").checked = testLocked;
+};
+// чекбокс внутри тоже работает для совместимости
+$("#testModeCheck").onclick = function(e){
+  testLocked = this.checked;
+  awaitingTestAnswer = false;
+  updateTestBtnText();
+  updateLang(); updateUI();
+};
 
 $("#file").addEventListener("change",function(e){
   let f=(e.target&&e.target.files&&e.target.files[0])?e.target.files[0]:null; if(!f) return;
