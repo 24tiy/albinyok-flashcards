@@ -24,7 +24,6 @@ const translations = {
     empty:"Загрузите CSV или выберите файл из репозитория",
     progress:"Экспорт прогресса",
     clear:"Очистить всё",
-    hotkeys:"Только Знаю/Не знаю → Дальше",
     errorPref:"Ошибка: ",
     fetchFail:"Ошибка загрузки",
     fileTooBig:"Файл слишком большой!",
@@ -63,7 +62,6 @@ const translations = {
     empty:"Upload or select a CSV",
     progress:"Export progress",
     clear:"Clear all",
-    hotkeys:"Only Know/Don't know → Next",
     errorPref:"Error: ",
     fetchFail:"Load error",
     fileTooBig:"File too big!",
@@ -102,7 +100,6 @@ const translations = {
     empty:"Chargez ou choisissez un CSV",
     progress:"Exporter progrès",
     clear:"Tout nettoyer",
-    hotkeys:"Seulement Je sais/Je ne sais pas → Suivant",
     errorPref:"Erreur : ",
     fetchFail:"Erreur téléchargement",
     fileTooBig:"Fichier trop volumineux !",
@@ -219,7 +216,7 @@ function updateUI(){
     if (s) s.textContent = "✅ 0 • ❌ 0";
     if (n) n.textContent = `${t('deck')}: —`;
     if (bar) bar.style.width = "0%";
-    $("#hotkeysTip").textContent = '';
+    if($("#hotkeysTip")) $("#hotkeysTip").textContent = '';
     return;
   }
   let card=deck[idx];
@@ -232,7 +229,7 @@ function updateUI(){
   if (s) s.textContent = `✅ ${ok} • ❌ ${bad}`;
   if (n) n.textContent = `${t('deck')}: ${deckName}`;
   updateControlsBar();
-  $("#hotkeysTip").textContent = t("hotkeys");
+  if($("#hotkeysTip")) $("#hotkeysTip").textContent = ''; // <-- всегда очищай!
 }
 $("#testBtnWrap").addEventListener("click", function(e){
   if(e.target.id === "testModeCheck") return; // чекбокс сам
