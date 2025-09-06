@@ -1,118 +1,97 @@
-# Albinyok Flashcards — Простое приложение для повторения карточек из CSV
+# Albinyok Flashcards
 
-### 🚀 Быстрый просмотр, повторение и самообучение по карточкам любых форматов CSV и на любых языках.  
-**Лёгкое трёхъязычное приложение для работы с флеш‑картами напрямую из файлов и GitHub!**
+[![Demo](https://img.shields.io/badge/Demo-Open-green)](https://24tiy.github.io/albinyok-flashcards/)
 
----
-
-## 🇷🇺 Для чего это приложение
-
-**Albinyok Flashcards** — это не очередной "генератор", а минималистичное приложение для изучения и повтора карточек из любых CSV.  
-Идеально подходит для:
-- Быстрого импорта (и самостоятельного изучения) вопросов и ответов из таблиц/файлов.
-- Практики иностранного языка, подготовки к экзамену, заучивания терминов, тренировки памяти.
-- Работает с карточками любого формата (русский/английский/французский), без лишних функций.
-
-### Как работает
-
-1. Выберите язык интерфейса (RU/EN/FR) в меню-флажке справа сверху.
-2. Загрузите свой файл CSV (или вставьте публичную ссылку на raw CSV с GitHub).  
-   - **Требование:** 2 колонки — вопрос и ответ (шапка не обязательна, но желательна).
-3. Отвечайте на вопросы, отмечайте «знаю/не знаю», используйте горячие клавиши или клик.
-4. Карточки можно перемешивать, сбрасывать прогресс, экспортировать ответы.
-5. Ваш прогресс сохраняется только локально (анонимно, без регистрации).
-
-Пример файла:
-```
-question,answer
-"Столица Франции?","Париж"
-"Что такое Python?","Язык программирования"
-```
-
-### Возможности
-
-- Вопрос сверху, ответ — показ по кнопке либо по клику.
-- Быстрый переход по стрелкам, горячие клавиши (J/K/S).
-- Автоматически работает с файлами из любого публичного GitHub repo (или с вашего ПК).
-- Есть кнопка скачивания шаблона и просмотра демо глобально на трёх языках.
-- Простой современный дизайн и адаптация под мобильные.
+**Приложение для изучения и повторения информации с помощью карточек (CSV/Google Sheets/Excel) на любом устройстве.**  
+**The free universal flashcards app for learning and repeating facts from CSV, Google Sheets, and Excel on any device.**  
+**Application de flashcards pour réviser rapidement via CSV, Google Sheets ou Excel – sur tout appareil.**
 
 ---
 
-## 🇬🇧 About (ENGLISH)
+## 🇷🇺 Русский
 
-**Albinyok Flashcards** is not a "flashcard generator" —  
-it's a minimalist, fast, and modern **app for using and repeating flashcards** from any CSV right in your browser.
+### Описание
 
-### What is it for?
+**Albinyok Flashcards** — полностью бесплатное приложение для учёбы по карточкам.  
+Загружайте CSV из Excel, Google Sheets, Notion — или вставляйте ссылку.  
+Карточки локальные, всё хранится на устройстве. 
 
-- Practice, review, or drill yourself using CSV-based flashcards (2 columns: Q/A).
-- Rapid language learning, exam prep, spaced repetition — from any public file.
-- Smart import: works with any repo (default is this one) or your own CSV.
+**Возможности:**
+- Импорт карточек из CSV, Google Sheets, Excel, Notion (экспорт в csv)
+- Режим повтора: отмечайте “Знаю”, “Не знаю”, дальше идут только сложные
+- *Редактор карт*: добавляйте и изменяйте карточки прямо в браузере
+- Прогресс не теряется, работает офлайн
+- Мгновенная смена темы (день/ночь)
+- Мультиязычность: русский, английский, французский
+- Без регистрации, слежки и рекламы
 
-### How to use
+**Как пользоваться:**
+1. Загрузите свой CSV или вставьте ссылку (Google Таблицы – Файл → Экспорт → CSV).
+2. Используйте "Показать ответ", "Знаю"/"Не знаю" — повторяйте трудные.
+3. В редакторе можно изменять и добавлять карточки.
+4. Прогресс сохранится навсегда!
 
-1. Pick your UI language (RU/EN/FR dropdown, top right).
-2. Upload a CSV file or load a `.csv` link from GitHub (raw format).
-   - **Just two columns required:** question, answer (header optional, all languages).
-3. Go through the cards, using show/hide, mark known/unknown, shuffle/repeat.
-4. All progress is 100% local (no login, no cloud, no tracking).
-5. Download template or demo for fast testing.
-
-CSV Example:
-```
-question,answer
-"What is the capital of France?","Paris"
-"What is Python?","Programming language"
-```
-
-### Features
-
-- Always question on top, answer below.
-- Fast navigation: arrows, keyboard shortcuts (J/K/S).
-- Instant import from any public GitHub repo — or your computer.
-- Downloadable template and three-language demo included.
-- Fully mobile-friendly and simple design.
+**Обратная связь:** [@sasha24tiy](https://t.me/sasha24tiy)
 
 ---
 
-## 🇫🇷 Français — Application pour réviser ses cartes CSV
+## 🇬🇧 English
 
-**Albinyok Flashcards** est une appli minimaliste pour réviser, apprendre et tester vos connaissances **grâce à des fiches** issues de n’importe quel fichier CSV.
+### Description
 
-### À quoi ça sert ?
+**Albinyok Flashcards** is a free and universal app for spaced repetition using flashcards.  
+It supports CSV export from Excel, Google Sheets, Notion, and more — just upload the file or paste a link.  
+Cards and progress are always stored locally in your browser.
 
-- Pratique/entrainement avec des questions & réponses, import automatique à partir de CSV à 2 colonnes.
-- Apprentissage express de langues, préparation d’examens, répétition espacée.
-- Charges RAW CSV depuis tout dépôt GitHub (défaut : ce repo) ou votre PC.
+**Features:**
+- Import cards from CSV, Google Sheets, Excel (Notion export also supported)
+- Repetition mode: mark as “Know” / “Don’t know”, retry hard cards only
+- *Card editor*: add, edit or remove cards instantly
+- Offline support: no account, all data stored locally
+- Switch theme (Light/Dark)
+- Three interface languages: Russian, English, French
+- Zero tracking, zero ads, for everyone
 
-### Mode d’emploi
+**How to use:**
+1. Upload your .csv file or paste a public spreadsheet link (Google Sheets: File → Export → CSV).
+2. Use "Show answer", mark "Know"/"Don't know", and repeat the hard cards.
+3. Edit and add your own cards in the card editor.
+4. Your progress is always saved!
 
-1. Sélectionnez la langue (RU/EN/FR en haut à droite).
-2. Chargez votre CSV (question,réponse) — ou copiez un lien vers un fichier sur GitHub.
-3. Parcourez les cartes, révélez les réponses via bouton / clic, marquez « je sais/je ne sais pas ».
-4. Mélange, réinitialisation, export du progrès locale (aucun compte nécessaire).
-
-Exemple de CSV :
-
-question,answer
-"Quelle est la capitale de la France?","Paris"
-"Python c’est quoi?","Langage de programmation"
-```
-
-### Points forts
-
-- Question format carte, toujours en haut.
-- Claviers: navigation rapide, raccourcis J/K/S.
-- Import automatique GitHub + local.
-- Démo trilingue, template téléchargeable.
-- Parfaitement utilisable sur mobile.
+**Feedback:** [@sasha24tiy](https://t.me/sasha24tiy)
 
 ---
 
-## 🔗 Ссылка на репозиторий / Repo / Dépôt
+## 🇫🇷 Français
 
-[https://github.com/24tiy/albinyok-flashcards](https://github.com/24tiy/albinyok-flashcards)
+### Description
 
-MIT License. Улучшайте под свои нужды — фичи приветствуются!
-```
+**Albinyok Flashcards** — application de cartes mémoire, totalement gratuite.  
+Importez des CSV (Excel, Google Sheets, Notion), ou collez un lien.  
+Cartes et progrès toujours stockés localement, sans cloud ni compte.
+
+**Fonctionnalités :**
+- Import de cartes CSV, Google Sheets, Excel, Notion (export CSV possible)
+- Mode révision : cochez “Je sais”, “Je ne sais pas”, et révisez automatiquement le difficile
+- *Éditeur de cartes* : ajoutez ou modifiez vos cartes à volonté
+- Utilisable hors connexion
+- Basculer thème clair/sombre
+- 3 langues : russe, anglais, français
+- Sans pub, sans tracking, sans inscription
+
+**Utilisation :**
+1. Sélectionnez/collez votre fichier CSV (Google Sheets : Fichier → Exporter → CSV).
+2. Cliquez “Voir la réponse”, marquez “Je sais”/“Non”, révisez seulement ce qui bloque.
+3. Ajoutez et éditez vos propres cartes.
+4. Votre progrès sera toujours sauvegardé !
+
+**Contact :** [@sasha24tiy](https://t.me/sasha24tiy)
+
+---
+
+## 📥 [Открыть демо — Open Live Demo (RU/EN/FR Supported)](https://24tiy.github.io/albinyok-flashcards/)
+
+---
+
+**Исходник, предложения и обратная связь — [@sasha24tiy](https://t.me/sasha24tiy)**
+
