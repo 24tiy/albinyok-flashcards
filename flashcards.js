@@ -136,8 +136,6 @@ const translations = {
 
 function $(sel){ return document.querySelector(sel);}
 function t(k){return (translations[curLang]&&translations[curLang][k])||k;}
-
-// Обновление языков, кнопок, надписей
 function updateLang() {
   document.documentElement.lang = curLang;
   $("#siteTitle").textContent = t("siteTitle");
@@ -155,13 +153,11 @@ function updateLang() {
   $("#testStatus").innerHTML = testLocked ? `<b>${t("test_enabled")}</b> — ${t("test_status")}` : "";
   $("#testStatus").style.display = testLocked ? "" : "none";
   $("#testModeCheck").checked = !!testLocked;
-  $("#hotkeysTip").textContent = '';
   updateControlsBar();
 }
 function updateTestBtnText() {
   $("#testBtnText").textContent = testLocked ? t("test_on") : t("test_off");
 }
-
 $("#langSelect").addEventListener("change",function(e){
   curLang=this.value; updateLang(); updateUI();
 });
@@ -177,7 +173,6 @@ function initTheme(){
   $("#themeToggle").textContent = theme==="dark" ? "🌞" : "🌙";
 }
 initTheme();
-
 function sniffHeader(a){
   if(!a || a.length<2) return false;
   let ha=(a[0]||'').toLowerCase(), hb=(a[1]||'').toLowerCase();
@@ -248,6 +243,21 @@ function updateUI(){
   updateControlsBar();
   $("#hotkeysTip").textContent = t("hotkeys");
 }
+$("#testBtnWrap").addEventListener("click", function(e){
+  if(e.target.classList.contains('btn-help-inner')) return;
+  if(e.target.id === "testModeCheck") return; // чекбокс сам
+  testLocked = !testLocked;
+  awaitingTestAnswer = false;
+  updateTestBtnText();
+  updateLang(); updateUI();
+  $("#testModeCheck").checked = testLocked;
+});
+$("#testModeCheck").addEventListener("click", function(e){
+  testLocked = this.checked;
+  awaitingTestAnswer = false;
+  updateTestBtnText();
+  updateLang(); updateUI();
+});
 function toggleShowHide() {
   shown = !shown;
   updateUI();
@@ -275,7 +285,6 @@ function nextTestStep(){
   updateUI();
   persist();
 }
-// Клик по кликабельным иконкам "?"
 function bindModalTip(btnId, textKey){
   let btn=$(btnId);
   if(!btn)return;
@@ -284,8 +293,8 @@ function bindModalTip(btnId, textKey){
     mt.textContent = t(textKey);
     mt.style.display = "block";
     const rect = btn.getBoundingClientRect();
-    mt.style.left = (rect.left + window.scrollX + 16) + "px";
-    mt.style.top = (rect.top + window.scrollY + 30) + "px";
+    mt.style.left = (rect.left + window.scrollX + 8) + "px";
+    mt.style.top = (rect.bottom + window.scrollY + 8) + "px";
   }
   function hide(){ $("#modalTip").style.display="none"; }
   btn.onmouseenter = show;
@@ -295,23 +304,6 @@ function bindModalTip(btnId, textKey){
 bindModalTip("#testHelp","testmode_tip");
 bindModalTip("#hardHelp","hard_tip");
 bindModalTip("#editHelp","editor_tip");
-
-// Обработка клика по кнопке "Тест" — сразу чекбокс+переключение+название меняется!
-$("#testBtnWrap").onclick = function(e){
-  if(e.target.classList.contains('qhelp-btn')) return; // не переключаем, если клик на ?
-  testLocked = !testLocked;
-  awaitingTestAnswer = false;
-  updateTestBtnText();
-  updateLang(); updateUI();
-  $("#testModeCheck").checked = testLocked;
-};
-// чекбокс внутри тоже работает для совместимости
-$("#testModeCheck").onclick = function(e){
-  testLocked = this.checked;
-  awaitingTestAnswer = false;
-  updateTestBtnText();
-  updateLang(); updateUI();
-};
 
 $("#file").addEventListener("change",function(e){
   let f=(e.target&&e.target.files&&e.target.files[0])?e.target.files[0]:null; if(!f) return;
@@ -332,10 +324,8 @@ $("#loadUrlBtn").onclick=function(){
   err.classList.remove("show"); man.classList.remove("show"); err.textContent = man.textContent = "";
   let inp=$("#urlInput"), url=(inp&&inp.value)?inp.value.trim():"";
   if (!url) { err.textContent="Вставьте ссылку!"; err.classList.add("show"); return; }
-  // GitHub: автоматически превращаем в raw
   if (/github\.com\/.+\/.+\/blob\//i.test(url))
     url = url.replace('github.com/', 'raw.githubusercontent.com/').replace('/blob/', '/');
-  // Google Sheets - auto to CSV
   if(url.includes("docs.google.com/spreadsheets/") && !/export\?format=csv/.test(url))
     url = url.replace(/\/edit.*$/, '') + '/export?format=csv';
   fetch(url,{cache:"no-store"})
@@ -354,7 +344,6 @@ $("#loadUrlBtn").onclick=function(){
       man.classList.add("show");
     });
 };
-
 function persist(){ localStorage.setItem(localKey,JSON.stringify({deck,idx,shown,deckName,lang:curLang,theme:theme,editMode})); }
 function restore(){ try{ let raw=localStorage.getItem(localKey); if(!raw) return false; let p=JSON.parse(raw);
 if(p && p.deck && p.deck.length){ deck=p.deck; idx=Math.min(Math.max(0,p.idx|0),deck.length-1); shown=!!p.shown; deckName=p.deckName||'—';
@@ -406,7 +395,8 @@ $("#clearBtn").onclick = () => {
     location.reload();
   }
 };
-$("#toggleEditBtn").onclick = function() {
+$("#toggleEditBtn").onclick = function(e) {
+  if(e && e.target.classList.contains('btn-help-inner')) return;
   editMode = !editMode;
   persist();
   if(editMode) launchEditor();
@@ -457,7 +447,8 @@ function launchEditor() {
   bar.appendChild(addBtn); bar.appendChild(saveBtn);
   bar.style.display="block";
 }
-$("#trainHardBtn").onclick = ()=>{
+$("#trainHardBtn").onclick = function(e){
+  if(e && e.target.classList.contains('btn-help-inner')) return;
   let hard = deck.filter(x=>x.bad);
   if(!hard.length) { alert(t("train_all_done")); return; }
   deck = hard.map(x=>({...x}));
