@@ -1,4 +1,4 @@
-# CSV Flashcards — Простое приложение для повторения карточек из CSV
+# Albinyok Flashcards — Простое приложение для повторения карточек из CSV
 
 ### 🚀 Быстрый просмотр, повторение и самообучение по карточкам любых форматов CSV и на любых языках.  
 **Лёгкое трёхъязычное приложение для работы с флеш‑картами напрямую из файлов и GitHub!**
@@ -7,7 +7,7 @@
 
 ## 🇷🇺 Для чего это приложение
 
-**CSV Flashcards** — это не очередной "генератор", а минималистичное приложение для изучения и повтора карточек из любых CSV.  
+**Albinyok Flashcards** — это не очередной "генератор", а минималистичное приложение для изучения и повтора карточек из любых CSV.  
 Идеально подходит для:
 - Быстрого импорта (и самостоятельного изучения) вопросов и ответов из таблиц/файлов.
 - Практики иностранного языка, подготовки к экзамену, заучивания терминов, тренировки памяти.
@@ -41,7 +41,7 @@ question,answer
 
 ## 🇬🇧 About (ENGLISH)
 
-**CSV Flashcards** is not a "flashcard generator" —  
+**Albinyok Flashcards** is not a "flashcard generator" —  
 it's a minimalist, fast, and modern **app for using and repeating flashcards** from any CSV right in your browser.
 
 ### What is it for?
@@ -78,7 +78,7 @@ question,answer
 
 ## 🇫🇷 Français — Application pour réviser ses cartes CSV
 
-**CSV Flashcards** est une appli minimaliste pour réviser, apprendre et tester vos connaissances **grâce à des fiches** issues de n’importe quel fichier CSV.
+**Albinyok Flashcards** est une appli minimaliste pour réviser, apprendre et tester vos connaissances **grâce à des fiches** issues de n’importe quel fichier CSV.
 
 ### À quoi ça sert ?
 
