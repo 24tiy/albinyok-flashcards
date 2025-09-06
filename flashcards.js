@@ -44,9 +44,6 @@ const translations = {
     next: "Дальше",
     test_enabled: "Режим теста включён",
     test_status: "Только 'Знаю', 'Не знаю' и 'Дальше' для перехода.",
-    testmode_tip:"Режим теста: только кнопки 'Знаю' и 'Не знаю'. После ответа появится 'Дальше' для перехода к следующей. Выйти — выключи чекбокс.",
-    hard_tip:"Показать только сложные карточки, которые ты отметил 'Не знаю'.",
-    editor_tip:"В редакторе можно добавлять, изменять и удалять любые карточки, не забывайте сохранять."
   },
   en: {
     siteTitle:"Albinyok Flashcards",
@@ -86,9 +83,6 @@ const translations = {
     next: "Next",
     test_enabled: "Test mode enabled",
     test_status: "Only 'Know', 'Don't know' and 'Next' for navigation.",
-    testmode_tip:"Test mode: only 'Know' and 'Don't know'. After choice, click 'Next' to continue. Turn off by unchecking the box.",
-    hard_tip:"Show only cards you've marked as 'Don't know'.",
-    editor_tip:"You can add, edit and delete cards below, don’t forget to save!"
   },
   fr: {
     siteTitle:"Albinyok Flashcards",
@@ -128,9 +122,6 @@ const translations = {
     next: "Suivant",
     test_enabled: "Mode test activé",
     test_status: "Seulement 'Je sais', 'Je ne sais pas' et 'Suivant'.",
-    testmode_tip:"Mode test : seulement 'Je sais'/'Je ne sais pas'. Cliquez 'Suivant' ensuite. Désactivez — décochez la case.",
-    hard_tip:"Afficher seulement les difficiles marquées.",
-    editor_tip:"Ajoutez/éditez/supprimez vos cartes ci-dessous, sauvegardez !"
   }
 };
 
@@ -244,7 +235,6 @@ function updateUI(){
   $("#hotkeysTip").textContent = t("hotkeys");
 }
 $("#testBtnWrap").addEventListener("click", function(e){
-  if(e.target.classList.contains('btn-help-inner')) return;
   if(e.target.id === "testModeCheck") return; // чекбокс сам
   testLocked = !testLocked;
   awaitingTestAnswer = false;
@@ -285,26 +275,6 @@ function nextTestStep(){
   updateUI();
   persist();
 }
-function bindModalTip(btnId, textKey){
-  let btn=$(btnId);
-  if(!btn)return;
-  function show(ev){
-    let mt = $("#modalTip");
-    mt.textContent = t(textKey);
-    mt.style.display = "block";
-    const rect = btn.getBoundingClientRect();
-    mt.style.left = (rect.left + window.scrollX + 8) + "px";
-    mt.style.top = (rect.bottom + window.scrollY + 8) + "px";
-  }
-  function hide(){ $("#modalTip").style.display="none"; }
-  btn.onmouseenter = show;
-  btn.onclick = show;
-  btn.onmouseleave = hide;
-}
-bindModalTip("#testHelp","testmode_tip");
-bindModalTip("#hardHelp","hard_tip");
-bindModalTip("#editHelp","editor_tip");
-
 $("#file").addEventListener("change",function(e){
   let f=(e.target&&e.target.files&&e.target.files[0])?e.target.files[0]:null; if(!f) return;
   let r=new FileReader();
@@ -320,7 +290,6 @@ $("#reupload").addEventListener("change",function(e){
   r.readAsText(f);
 });
 $("#mainReuploadBtn label").addEventListener("click",function(e){
-  // только для клика по label сменить документ — имитация текстового label с настоящим file input
   $("#reupload").click();
 });
 $("#loadUrlBtn").onclick=function(){
@@ -400,7 +369,6 @@ $("#clearBtn").onclick = () => {
   }
 };
 $("#toggleEditBtn").onclick = function(e) {
-  if(e && e.target.classList.contains('btn-help-inner')) return;
   editMode = !editMode;
   persist();
   if(editMode) launchEditor();
@@ -452,7 +420,6 @@ function launchEditor() {
   bar.style.display="block";
 }
 $("#trainHardBtn").onclick = function(e){
-  if(e && e.target.classList.contains('btn-help-inner')) return;
   let hard = deck.filter(x=>x.bad);
   if(!hard.length) { alert(t("train_all_done")); return; }
   deck = hard.map(x=>({...x}));
