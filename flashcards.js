@@ -14,15 +14,6 @@ const translations = {
     template:"Шаблон CSV",
     demo:"Демо-набор",
     urlBtn:"По ссылке",
-    repoBtn:"Загрузить c GitHub",
-    ghBarBtn:"Сменить репозиторий",
-    owner:"Пользователь",
-    repo:"Репозиторий",
-    branch:"Ветка",
-    noCSVs:"CSV в репозитории не найдены",
-    ghApiErr:"Ошибка доступа к GitHub: ",
-    selectPlaceholder:"…ищем CSV в репозитории…",
-    urlPlaceholder:"https://...csv, .tsv, google sheet etc",
     reveal:"Показать ответ",
     hide:"Скрыть ответ",
     know:"✅ Знаю",
@@ -35,8 +26,6 @@ const translations = {
     clear:"Очистить всё",
     hotkeys:"Только Знаю/Не знаю → Дальше",
     errorPref:"Ошибка: ",
-    ghInvalid:"Нет файлов .csv или ошибка доступа к GitHub.",
-    ghChanged:"Репозиторий обновлён. Попробуйте снова.",
     fetchFail:"Ошибка загрузки",
     fileTooBig:"Файл слишком большой!",
     csvNotPairs:"Не найдено пар 'вопрос/ответ'",
@@ -65,15 +54,6 @@ const translations = {
     template:"CSV Template",
     demo:"Demo Set",
     urlBtn:"By Link",
-    repoBtn:"Load from GitHub",
-    ghBarBtn:"Change Repository",
-    owner:"Owner",
-    repo:"Repository",
-    branch:"Branch",
-    noCSVs:"No CSV files found",
-    ghApiErr:"GitHub error: ",
-    selectPlaceholder:"…searching for CSVs…",
-    urlPlaceholder:"https://...csv, .tsv, google sheet etc",
     reveal:"Show answer",
     hide:"Hide answer",
     know:"✅ Know",
@@ -86,8 +66,6 @@ const translations = {
     clear:"Clear all",
     hotkeys:"Only Know/Don't know → Next",
     errorPref:"Error: ",
-    ghInvalid:"No CSV files or GitHub error.",
-    ghChanged:"Repository updated. Retry.",
     fetchFail:"Load error",
     fileTooBig:"File too big!",
     csvNotPairs:"No question/answer pairs found",
@@ -106,7 +84,7 @@ const translations = {
     test_status: "Only 'Know', 'Don't know' and 'Next' for navigation.",
     testmode_tip:"Test mode: only 'Know' and 'Don't know'. After choice, click 'Next' to continue. Turn off by unchecking the box.",
     hard_tip:"Show only cards you've marked as 'Don't know'.",
-    editor_tip:"You can add, edit and delete cards below, don't forget to save!"
+    editor_tip:"You can add, edit and delete cards below, don’t forget to save!"
   },
   fr: {
     siteTitle:"Albinyok Flashcards",
@@ -116,15 +94,6 @@ const translations = {
     template:"Modèle CSV",
     demo:"Jeu démo",
     urlBtn:"Par lien",
-    repoBtn:"Charger GitHub",
-    ghBarBtn:"Changer dépôt",
-    owner:"Utilisateur",
-    repo:"Dépôt",
-    branch:"Branche",
-    noCSVs:"Aucun CSV trouvé",
-    ghApiErr:"Erreur GitHub : ",
-    selectPlaceholder:"…recherche des CSV…",
-    urlPlaceholder:"https://...csv, .tsv, google sheet etc",
     reveal:"Afficher réponse",
     hide:"Cacher réponse",
     know:"✅ Je sais",
@@ -137,8 +106,6 @@ const translations = {
     clear:"Tout nettoyer",
     hotkeys:"Seulement Je sais/Je ne sais pas → Suivant",
     errorPref:"Erreur : ",
-    ghInvalid:"Pas de CSV ou erreur GitHub.",
-    ghChanged:"Dépôt mis à jour. Essayez encore.",
     fetchFail:"Erreur téléchargement",
     fileTooBig:"Fichier trop volumineux !",
     csvNotPairs:"Aucune question/réponse trouvée",
@@ -160,6 +127,7 @@ const translations = {
     editor_tip:"Ajoutez/éditez/supprimez vos cartes ci-dessous, sauvegardez !"
   }
 };
+
 function $(sel){ return document.querySelector(sel);}
 function t(k){return (translations[curLang]&&translations[curLang][k])||k;}
 function updateLang() {
@@ -173,12 +141,13 @@ function updateLang() {
   $("#loadUrlBtn").textContent = t("urlBtn");
   $("#trainHardBtn").childNodes[0].nodeValue = "💪 " + t("train_hard");
   $("#toggleEditBtn").childNodes[0].nodeValue = "📝 " + t("edit");
-  $("#urlInput").placeholder = t("urlPlaceholder");
-  $("#deckName").textContent = `${t('deck')}: —`;
+  $("#urlInput").placeholder = t("urlPlaceholder") || '';
+  $("#deckName").textContent = `${t('deck')}: ${deckName}`;
   $("#testBtn").textContent = "🧑‍🎓 " + t("test");
   $("#testStatus").innerHTML = testLocked ? `<b>${t("test_enabled")}</b> — ${t("test_status")}` : "";
   $("#testStatus").style.display = testLocked ? "" : "none";
   $("#testModeCheck").checked = !!testLocked;
+  $("#hotkeysTip").textContent = '';
   updateControlsBar();
 }
 
@@ -197,6 +166,7 @@ function initTheme(){
   $("#themeToggle").textContent = theme==="dark" ? "🌞" : "🌙";
 }
 initTheme();
+
 function sniffHeader(a){
   if(!a || a.length<2) return false;
   let ha=(a[0]||'').toLowerCase(), hb=(a[1]||'').toLowerCase();
@@ -252,6 +222,7 @@ function updateUI(){
     if (s) s.textContent = "✅ 0 • ❌ 0";
     if (n) n.textContent = `${t('deck')}: —`;
     if (bar) bar.style.width = "0%";
+    $("#hotkeysTip").textContent = '';
     return;
   }
   let card=deck[idx];
@@ -264,6 +235,7 @@ function updateUI(){
   if (s) s.textContent = `✅ ${ok} • ❌ ${bad}`;
   if (n) n.textContent = `${t('deck')}: ${deckName}`;
   updateControlsBar();
+  $("#hotkeysTip").textContent = t("hotkeys");
 }
 function toggleShowHide() {
   shown = !shown;
@@ -466,11 +438,9 @@ $("#trainHardBtn").onclick = ()=>{
   deckName=t("train_hard");
   persist(); showWorkspace(); updateUI();
 };
-function showHotkeys(){ $("#hotkeysTip").textContent = t("hotkeys"); }
 function bootstrap(){
   updateLang();
   if(restore()) return;
-  showHotkeys();
   $("#testModeCheck").checked = testLocked;
 }
 document.addEventListener("DOMContentLoaded",bootstrap);
