@@ -319,6 +319,10 @@ $("#reupload").addEventListener("change",function(e){
   r.onerror=()=>{ alert(t("errorPref")+" Read file error"); };
   r.readAsText(f);
 });
+$("#mainReuploadBtn label").addEventListener("click",function(e){
+  // только для клика по label сменить документ — имитация текстового label с настоящим file input
+  $("#reupload").click();
+});
 $("#loadUrlBtn").onclick=function(){
   let err = $("#error"), man = $("#downloadManual");
   err.classList.remove("show"); man.classList.remove("show"); err.textContent = man.textContent = "";
