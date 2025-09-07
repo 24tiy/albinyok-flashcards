@@ -1,5 +1,4 @@
 let curLang = "ru";
-let theme = "light";
 let editMode = false;
 let testLocked = false, awaitingTestAnswer = false;
 let mainDeck = [];
@@ -179,19 +178,6 @@ function updateTestBtnText() {
 $("#langSelect").addEventListener("change",function(e){
   curLang=this.value; updateLang(); updateUI();
 });
-$("#themeToggle").onclick = () => {
-  theme = (theme==="light")?"dark":"light";
-  document.body.dataset.theme = theme; 
-  localStorage.setItem("albinyok-flashcards-theme",theme);
-  $("#themeToggle").textContent = theme==="dark" ? "🌞" : "🌙";
-};
-function initTheme(){
-  theme = localStorage.getItem("albinyok-flashcards-theme");
-  if (!theme) theme = "light";
-  document.body.dataset.theme = theme;
-  $("#themeToggle").textContent = theme==="dark" ? "🌞" : "🌙";
-}
-initTheme();
 function sniffHeader(a){
   if(!a || a.length<2) return false;
   let ha=(a[0]||'').toLowerCase(), hb=(a[1]||'').toLowerCase();
@@ -343,11 +329,10 @@ $("#loadUrlBtn").onclick=function(){
       man.classList.add("show");
     });
 };
-function persist(){ localStorage.setItem(localKey,JSON.stringify({deck,idx,shown,deckName,lang:curLang,theme:theme,editMode})); }
+function persist(){ localStorage.setItem(localKey,JSON.stringify({deck,idx,shown,deckName,lang:curLang,editMode})); }
 function restore(){ try{ let raw=localStorage.getItem(localKey); if(!raw) return false; let p=JSON.parse(raw);
 if(p && p.deck && p.deck.length){ deck=p.deck; idx=Math.min(Math.max(0,p.idx|0),deck.length-1); shown=!!p.shown; deckName=p.deckName||'—';
 if(p.lang) { curLang=p.lang; $("#langSelect").value=curLang; }
-if(p.theme){ theme=p.theme; document.body.dataset.theme=theme; $("#themeToggle").textContent=(theme==="dark"?"🌞":"🌙");}
 if(p.editMode!==undefined) editMode=!!p.editMode; updateLang(); showWorkspace(); updateUI(); return true;}}catch(e){} return false;}
 function showWorkspace(){ $("#uploader").classList.add("hidden"); $("#workspace").style.display="block"; }
 function showUploader(){ $("#uploader").classList.remove("hidden"); $("#workspace").style.display="none"; }
