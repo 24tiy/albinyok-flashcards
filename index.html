@@ -84,6 +84,10 @@
     .feedback-link{text-align:center;font-size:14.6px;margin:13px 0;}
     .feedback-link a{color:#51a5e6;text-decoration:none;font-weight:700;font-size:16px;}
     .feedback-link a:hover{color:#715aff;text-decoration:underline;}
+    .modal-tip {display:none;position:fixed;z-index:999;max-width:260px;line-height:1.55;padding:13px 17px 13px 13px; background:#fff;box-shadow:0 4px 24px #0002;border-radius:11px;color:#232b45;font-size:15px; border:1.8px solid #715AFF;font-weight:500;}
+    .tiny,.hotkeys-tip-centered{font-size:13px;color:var(--muted);}
+    .hotkeys-tip-centered{margin-top:20px;text-align:center;}
+    .btn-glass-violet.reupload-btn{margin-left:0;}
     @media (max-width:900px){.container{max-width:99vw;}}
     @media (max-width:600px){
       .settings-bar{flex-wrap:wrap;}
@@ -139,14 +143,14 @@
   </section>
   <div class="settings-bar rowbar">
     <button class="btn-glass-violet setbtn-main" id="toggleEditBtn" type="button">
-      <span id="editLabel">Редактор карточек</span>
+      📝 <span id="editLabel">Редактор карточек</span>
     </button>
     <button class="btn-glass-violet setbtn-main" id="testBtnWrap" type="button">
       <input type="checkbox" id="testModeCheck">
       <span id="testBtnText">Включить тест</span>
     </button>
     <button class="btn-glass-violet setbtn-main" id="trainHardBtn" type="button">
-      <span id="hardLabel">Тренировать сложные</span>
+      💪 <span id="hardLabel">Тренировать сложные</span>
     </button>
   </div>
   <div class="test-status" id="testStatus" style="text-align:center;margin:3px 0 2px;font-size:15px;color:#8258e1;display:none;">
@@ -170,6 +174,7 @@
       <div class="a" id="a"></div>
     </div>
     <div class="controls" id="controlsBar" aria-label="Управление"></div>
+    <div class="hotkeys-tip-centered" id="hotkeysTip"></div>
   </section>
   <section class="edit-bar" id="editorBar" style="display:none"></section>
   <div class="exportbar">
@@ -182,6 +187,7 @@
   <div class="feedback-link">
     <span>Обратная связь: <a href="https://t.me/sasha24tiy" target="_blank">@sasha24tiy</a></span>
   </div>
+  <div class="modal-tip" id="modalTip"></div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 <script src="flashcards.js"></script>
