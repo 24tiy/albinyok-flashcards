@@ -100,7 +100,7 @@ const translations = {
     siteTitle:"Albinyok Flashcards",
     siteSub:"Appli pour réviser vos cartes CSV — mobile et PC.",
     localProgress:"Votre progression est enregistrée localement.",
-    fileOrLink:"Source des données ?",
+    fileOrLink:"Source des données ?",
     fileBtn:"Fichier CSV",
     template:"Modèle CSV",
     demo:"Jeu démo",
@@ -113,13 +113,13 @@ const translations = {
     shuffle:"Mélanger",
     reset:"Réinitialiser",
     deck:"Source",
-    source:"Source :",
+    source:"Source :",
     empty:"Chargez ou choisissez un CSV",
     progress:"Exporter progrès",
     clear:"Tout nettoyer",
-    errorPref:"Erreur : ",
+    errorPref:"Erreur : ",
     fetchFail:"Erreur téléchargement",
-    fileTooBig:"Fichier trop volumineux !",
+    fileTooBig:"Fichier trop volumineux !",
     csvNotPairs:"Aucune question/réponse trouvée",
     help:"Aide",
     helpKey:"Aide",
@@ -130,7 +130,7 @@ const translations = {
     edit:"Éditeur de cartes",
     train_hard:"Difficile",
     save_success:"Cartes enregistrées!",
-    train_all_done:"Toutes les difficiles apprises !",
+    train_all_done:"Toutes les difficiles apprises !",
     test: "Test",
     test_on: "Test activé",
     test_off: "Activer test",
@@ -139,12 +139,14 @@ const translations = {
     test_status: "Seulement 'Je sais', 'Je ne sais pas' et 'Suivant'.",
     csvtemplate: "Modèle CSV",
     demodeck: "Jeu démo",
-    source_field: "Source :",
+    source_field: "Source :",
     feedback: 'Retour: <a href="https://t.me/sasha24tiy" target="_blank">@sasha24tiy</a>'
   }
 };
 function $(sel){ return document.querySelector(sel);}
 function t(k){return (translations[curLang]&&translations[curLang][k])||k;}
+
+/* --- Языки --- */
 function updateLang() {
   document.documentElement.lang = curLang;
   $("#siteTitle").textContent = t("siteTitle");
@@ -170,14 +172,21 @@ function updateLang() {
   $("#clearBtn").textContent = t("clear");
   $("#helpLink").textContent = t("helpKey");
   if ($("#feedback-link")) $("#feedback-link").innerHTML = t("feedback");
+
+  // Смена текста в кнопках в инпут-меню для любых языков (чтобы всегда шли в одну линию!)
+  $("#loadUrlBtn").textContent = t("urlBtn");
+  $("#mainReuploadBtn label").textContent = t("changeDoc");
   updateControlsBar();
 }
-function updateTestBtnText() {
-  $("#testBtnText").textContent = testLocked ? t("test_on") : t("test_off");
-}
+
 $("#langSelect").addEventListener("change",function(e){
   curLang=this.value; updateLang(); updateUI();
 });
+function updateTestBtnText() {
+  $("#testBtnText").textContent = testLocked ? t("test_on") : t("test_off");
+}
+
+/* --- Deck построение --- */
 function sniffHeader(a){
   if(!a || a.length<2) return false;
   let ha=(a[0]||'').toLowerCase(), hb=(a[1]||'').toLowerCase();
@@ -197,6 +206,8 @@ function toDeck(rows){
     out.push({q:filtered[i][0], a:filtered[i][1], ok:false, bad:false});
   return out;
 }
+
+/* --- Кнопки --- */
 function updateControlsBar() {
   let el=$("#controlsBar");
   if (!el) return;
@@ -246,6 +257,7 @@ function updateUI(){
   if (n) n.textContent = `${t('source_field')} ${deckName}`;
   updateControlsBar();
 }
+
 $("#testBtnWrap").addEventListener("click", function(e){
   if(e.target.id === "testModeCheck") return;
   testLocked = !testLocked;
@@ -261,9 +273,7 @@ $("#testModeCheck").addEventListener("click", function(e){
   updateLang(); updateUI();
 });
 function toggleShowHide() {
-  shown = !shown;
-  updateUI();
-  persist();
+  shown = !shown; updateUI(); persist();
 }
 function onKnowClick(){
   if(testLocked && !awaitingTestAnswer){
