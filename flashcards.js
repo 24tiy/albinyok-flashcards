@@ -101,7 +101,7 @@ const translations = {
     siteTitle:"Albinyok Flashcards",
     siteSub:"Appli pour réviser vos cartes CSV — mobile et PC.",
     localProgress:"Votre progression est enregistrée localement.",
-    fileOrLink:"Source des données ?",
+    fileOrLink:"Source des données ?",
     fileBtn:"Fichier CSV",
     template:"Modèle CSV",
     demo:"Jeu démo",
@@ -114,13 +114,13 @@ const translations = {
     shuffle:"Mélanger",
     reset:"Réinitialiser",
     deck:"Source",
-    source:"Source :",
+    source:"Source :",
     empty:"Chargez ou choisissez un CSV",
     progress:"Exporter progrès",
     clear:"Tout nettoyer",
-    errorPref:"Erreur : ",
+    errorPref:"Erreur : ",
     fetchFail:"Erreur téléchargement",
-    fileTooBig:"Fichier trop volumineux !",
+    fileTooBig:"Fichier trop volumineux !",
     csvNotPairs:"Aucune question/réponse trouvée",
     help:"Aide",
     helpKey:"Aide",
@@ -131,7 +131,7 @@ const translations = {
     edit:"Éditeur de cartes",
     train_hard:"Difficile",
     save_success:"Cartes enregistrées!",
-    train_all_done:"Toutes les difficiles apprises !",
+    train_all_done:"Toutes les difficiles apprises !",
     test: "Test",
     test_on: "Test activé",
     test_off: "Activer test",
@@ -140,7 +140,7 @@ const translations = {
     test_status: "Seulement 'Je sais', 'Je ne sais pas' et 'Suivant'.",
     csvtemplate: "Modèle CSV",
     demodeck: "Jeu démo",
-    source_field: "Source :",
+    source_field: "Source :",
     feedback: 'Retour: <a href="https://t.me/sasha24tiy" target="_blank">@sasha24tiy</a>'
   }
 };
@@ -258,6 +258,7 @@ function updateUI(){
   let ok=deck.filter(x=>x.ok).length, bad=deck.filter(x=>x.bad).length;
   if (s) s.textContent = `✅ ${ok} • ❌ ${bad}`;
   if (n) n.textContent = `${t('source_field')} ${deckName}`;
+  if (bar) bar.style.width = Math.round(((idx+1)/deck.length)*100) + "%";
   updateControlsBar();
 }
 $("#testBtnWrap").addEventListener("click", function(e){
@@ -373,3 +374,90 @@ function loadCSVText(text,name){
   }catch(e){
     let err=$("#error");
     if(err){ err.textContent=t("errorPref") + (e.message||e); err.classList.add("show"); }
+    showUploader();
+  }
+}
+$("#shuffleBtn").onclick = () => {deck=shuffle(deck);idx=0;shown=false;updateUI();persist();};
+$("#resetBtn").onclick = () => {
+  for(let i=0;i<deck.length;i++){deck[i].ok=false;deck[i].bad=false;}
+  idx=0;shown=false;updateUI();persist();
+};
+$("#exportBtn").onclick = ()=>{
+  let out=deck.map((x,i)=>({i,q:x.q,a:x.a,ok:x.ok,bad:x.bad}));
+  let blob=new Blob([JSON.stringify(out,null,2)],{type:"application/json"});
+  let url=URL.createObjectURL(blob),a=document.createElement("a");
+  a.href=url; a.download="deck-progress.json";
+  a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000);
+};
+$("#clearBtn").onclick = () => {
+  if(confirm(t("errorPref")+" Удалить весь прогресс?")){ 
+    localStorage.removeItem(localKey);
+    location.reload();
+  }
+};
+$("#toggleEditBtn").onclick = function(e) {
+  editMode = !editMode;
+  persist();
+  if(editMode) launchEditor();
+  else { $("#editorBar").style.display="none"; }
+};
+function launchEditor() {
+  let bar = $("#editorBar");
+  bar.innerHTML = `<div style="font-size:13px;margin-bottom:10px">${t("editor_hint")}</div>`;
+  let tbl = document.createElement("table");
+  tbl.style.width="100%"; tbl.style.marginBottom="8px";
+  let body = document.createElement("tbody");
+  tbl.appendChild(body);
+  deck.forEach((c,i)=>{
+    let row = document.createElement("tr");
+    let q = document.createElement("td");
+    let a = document.createElement("td");
+    let edit = document.createElement("td");
+    q.innerHTML = `<input type="text" value="${c.q.replace(/"/g,'&quot;')}" style="width:96%"/>`;
+    a.innerHTML = `<input type="text" value="${c.a.replace(/"/g,'&quot;')}" style="width:96%"/>`;
+    let delB = document.createElement("button");
+    delB.className="btn-glass-violet small edit-btn"; delB.textContent=t("del");
+    delB.onclick=()=>{ deck.splice(i,1); launchEditor(); };
+    edit.appendChild(delB);
+    row.appendChild(q); row.appendChild(a); row.appendChild(edit);
+    body.appendChild(row);
+  });
+  bar.appendChild(tbl);
+  let addBtn = document.createElement("button");
+  addBtn.className="btn-glass-violet small edit-btn"; addBtn.textContent=t("add_card");
+  addBtn.onclick=()=>{
+    deck.push({q:"",a:"",ok:false,bad:false});
+    launchEditor();
+  };
+  let saveBtn=document.createElement("button");
+  saveBtn.className="btn-glass-violet small edit-btn"; saveBtn.textContent=t("save_cards");
+  saveBtn.onclick=()=>{
+    let rows=tbl.querySelectorAll("tr");
+    let newDeck=[];
+    rows.forEach(row=>{
+      let q=row.children[0].firstChild.value.trim(),a=row.children[1].firstChild.value.trim();
+      if(q+a!=="") newDeck.push({q:q,a:a,ok:false,bad:false});
+    });
+    deck = newDeck; idx=0; shown=false;
+    persist(); showWorkspace(); updateUI();
+    bar.innerHTML=`<div style="color:var(--ok);margin:8px 0;">${t("save_success")}</div>`;
+    setTimeout(()=>bar.style.display="none",1200);
+  }
+  bar.appendChild(addBtn); bar.appendChild(saveBtn);
+  bar.style.display="block";
+}
+$("#trainHardBtn").onclick = function(e){
+  let hard = deck.filter(x=>x.bad);
+  if(!hard.length) { alert(t("train_all_done")); return; }
+  deck = hard.map(x=>({...x}));
+  idx=0; shown=false; testLocked=false; awaitingTestAnswer=false;
+  deckName=t("train_hard");
+  persist(); showWorkspace(); updateUI();
+};
+function bootstrap(){
+  updateLang();
+  if(restore()) return;
+  $("#testModeCheck").checked = testLocked;
+}
+document.addEventListener("DOMContentLoaded",bootstrap);
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ let j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
