@@ -9,6 +9,7 @@ const translations = {
   ru: {
     siteTitle:"Albinyok Flashcards",
     siteSub:'Приложение для повтора карточек из CSV — учи на телефоне и на ПК.',
+    localProgress: "Ваш прогресс сохраняется локально.",
     fileOrLink:"Откуда берём информацию?",
     fileBtn:"Файл CSV",
     template:"Шаблон CSV",
@@ -46,10 +47,6 @@ const translations = {
     next: "Дальше",
     test_enabled: "Режим теста включён",
     test_status: "Только 'Знаю', 'Не знаю' и 'Дальше' для перехода.",
-    card_editor: "📝 Редактор карточек",
-    hardcards: "💪 Тренировать сложные",
-    show: "Показать ответ",
-    hide_ans: "Скрыть ответ",
     csvtemplate: "Шаблон CSV",
     demodeck: "Демо-набор",
     source_field: "Источник:"
@@ -57,6 +54,7 @@ const translations = {
   en: {
     siteTitle:"Albinyok Flashcards",
     siteSub:'CSV flashcards app — remember better everywhere!',
+    localProgress: "Your progress is saved locally.",
     fileOrLink:"Data source?",
     fileBtn:"CSV File",
     template:"CSV Template",
@@ -94,10 +92,6 @@ const translations = {
     next: "Next",
     test_enabled: "Test mode enabled",
     test_status: "Only 'Know', 'Don't know' and 'Next' for navigation.",
-    card_editor: "📝 Card editor",
-    hardcards: "💪 Train hard cards",
-    show: "Show answer",
-    hide_ans: "Hide answer",
     csvtemplate: "CSV Template",
     demodeck: "Demo Set",
     source_field: "Source:"
@@ -105,6 +99,7 @@ const translations = {
   fr: {
     siteTitle:"Albinyok Flashcards",
     siteSub:"Appli pour réviser vos cartes CSV — mobile et PC.",
+    localProgress:"Votre progression est enregistrée localement.",
     fileOrLink:"Source des données ?",
     fileBtn:"Fichier CSV",
     template:"Modèle CSV",
@@ -142,10 +137,6 @@ const translations = {
     next: "Suivant",
     test_enabled: "Mode test activé",
     test_status: "Seulement 'Je sais', 'Je ne sais pas' et 'Suivant'.",
-    card_editor: "📝 Éditeur de cartes",
-    hardcards: "💪 Difficile",
-    show: "Afficher réponse",
-    hide_ans: "Cacher réponse",
     csvtemplate: "Modèle CSV",
     demodeck: "Jeu démo",
     source_field: "Source :"
@@ -157,7 +148,8 @@ function t(k){return (translations[curLang]&&translations[curLang][k])||k;}
 function updateLang() {
   document.documentElement.lang = curLang;
   $("#siteTitle").textContent = t("siteTitle");
-  $(".sub").firstChild.textContent = t("siteSub");
+  $("#siteSubtitle").textContent = t("siteSub");
+  $("#localProgress").textContent = t("localProgress");
   $("#fileOrLink").textContent = t("fileOrLink");
   $("#fileBtnTxt").textContent = t("fileBtn");
   $("#templateBtn").textContent = t("csvtemplate");
@@ -221,7 +213,7 @@ function updateControlsBar() {
   if (!el) return;
   el.innerHTML = "";
   if (!testLocked) {
-    el.appendChild(createCtrl("ctrl showhide","", shown ? t("hide_ans") : t("show"),()=>toggleShowHide()));
+    el.appendChild(createCtrl("ctrl showhide","", shown ? t("hide") : t("reveal"),()=>toggleShowHide()));
   }
   let okBtn = createCtrl("ctrl ok","", t("know"),()=>onKnowClick());
   let badBtn = createCtrl("ctrl bad","", t("dont"),()=>onDontKnowClick());
@@ -252,7 +244,6 @@ function updateUI(){
     if (s) s.textContent = "✅ 0 • ❌ 0";
     if (n) n.textContent = `${t('source_field')} —`;
     if (bar) bar.style.width = "0%";
-    if($("#hotkeysTip")) $("#hotkeysTip").textContent = '';
     return;
   }
   let card=deck[idx];
@@ -265,7 +256,6 @@ function updateUI(){
   if (s) s.textContent = `✅ ${ok} • ❌ ${bad}`;
   if (n) n.textContent = `${t('source_field')} ${deckName}`;
   updateControlsBar();
-  if($("#hotkeysTip")) $("#hotkeysTip").textContent = '';
 }
 $("#testBtnWrap").addEventListener("click", function(e){
   if(e.target.id === "testModeCheck") return; // чекбокс сам
