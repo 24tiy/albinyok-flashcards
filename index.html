@@ -40,7 +40,26 @@
     .main-header-centered .sub {color: var(--muted); font-size: 1.3rem; margin-top:18px; text-align: center; font-weight: 400;}
     .main-header-centered .sub-secondary {color: var(--muted); font-size: 1rem; margin-top: 10px; margin-bottom: 0; text-align: center;font-weight: 400;}
 
-    /* Input-меню */
+    /* ОРИГИНАЛЬНОЕ МЕНЮ ВЫБОРА ЯЗЫКА */
+    .lang-select{margin-left:auto;display:flex;gap:8px;}
+    .lang-flags{
+      border:none;
+      background:var(--bg-alt);
+      padding:8px 11px;
+      font-size:13.5px;
+      appearance:none;
+      border-radius:11px;
+      font-weight:600;
+      color:var(--text);
+      font-family:'Inter',ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Noto Sans,Arial;
+      cursor:pointer;
+      /* Чтобы шрифт был привычный и не большой */
+      outline:none;
+    }
+
+    .lang-flags:focus { border: 1.2px solid var(--accent); }
+    /* ---------- */
+
     .uploader, .card {max-width:700px;width:100%;margin-left:auto;margin-right:auto;}
     .uploader { margin:18px auto 10px; padding:17px 12px 12px; border-radius:22px; background:var(--bg-alt); box-shadow:var(--shadow);}
     .uploader h2{font-weight:800;font-size:1.08rem;}
@@ -69,7 +88,6 @@
       white-space:nowrap;
     }
     .btn-glass-violet:hover{background:rgba(125,100,255,.19);color:#412bba;}
-    /* row с кнопкой смены документа */
     .uploader-btns {
       display:flex;gap:15px;width:100%;margin-top:13px;justify-content:flex-start;flex-wrap:wrap;
     }
@@ -79,8 +97,6 @@
     }
     .error{padding:9px 8px;border-radius:12px;background:rgba(255,0,0,.09);border:1px solid #e49c9c;margin-top:7px;color:#b11212;display:none;}
     .error.show {display:block;}
-    
-    /* Меню настроек */
     .settings-bar{
       display: flex; justify-content:center;align-items:center;gap:15px;flex-wrap:wrap; width:100%; margin:13px 0 10px;
     }
@@ -93,8 +109,6 @@
     }
     .setbtn-main input[type=checkbox]{margin-right:7px;transform:scale(1.1);}
     .setbtn-main:hover {background:rgba(149,116,255,0.17);}
-    
-    /* --- Остальной css --- */
     .workspace{display:none;margin-top:20px;}
     .ws-topbar,.ws-buttons-block{display:flex;flex-wrap:wrap;gap:15px;justify-content:center;align-items:center;}
     .ws-topbar{flex-direction:column;margin-bottom:7px;}
@@ -179,7 +193,6 @@
   <section class="uploader" id="uploader" aria-label="Загрузка CSV">
     <h2 id="fileOrLink"></h2>
     <div class="uploader-flex">
-      <!-- --- Инпуты и кнопки меню в одну строку--- -->
       <div class="input-btn-row">
         <label for="file" class="file" id="fileLabel"><span id="fileIcon">📄</span>
           <span id="fileBtnTxt"></span>
