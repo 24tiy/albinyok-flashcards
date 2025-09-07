@@ -186,7 +186,9 @@ $("#themeToggle").onclick = () => {
   $("#themeToggle").textContent = theme==="dark" ? "🌞" : "🌙";
 };
 function initTheme(){
-  theme=localStorage.getItem("albinyok-flashcards-theme")||"light";
+  // По умолчанию светлая тема!
+  theme = localStorage.getItem("albinyok-flashcards-theme");
+  if (!theme) theme = "light";
   document.body.dataset.theme = theme;
   $("#themeToggle").textContent = theme==="dark" ? "🌞" : "🌙";
 }
