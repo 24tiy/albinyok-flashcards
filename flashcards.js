@@ -170,7 +170,6 @@ function updateLang() {
   $("#exportBtn").textContent = t("progress");
   $("#clearBtn").textContent = t("clear");
   $("#helpLink").textContent = t("helpKey");
-  // Мультиязычный feedback
   if ($("#feedback-link")) $("#feedback-link").innerHTML = t("feedback");
   updateControlsBar();
 }
