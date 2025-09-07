@@ -41,25 +41,12 @@
     .btn-glass-violet {background:rgba(125,100,255,.13);color:#5239ca;border:1.6px solid #9277f5;border-radius:16px;font-weight:700; font-size:1.02rem;padding:10px 18px;box-shadow:0 7px 26px 0 rgba(126,91,255,.13),0 2px 7px 0 rgba(126,91,255,.09);backdrop-filter:blur(7px);margin:0 4px 6px 0;display:inline-flex;align-items:center;cursor:pointer;}
     .btn-glass-violet.selected,.btn-glass-violet:active,.btn-glass-violet.primary {background: #8d6dff;color:#fff;border-color: #8769e6;}
     .settings-bar{
-      display: flex;
-      justify-content:center;
-      align-items:stretch;
-      margin:13px 0 10px 0;
-      gap:18px;
-      flex-wrap:nowrap;
-      width:100%;
+      display: flex; justify-content:center; align-items:stretch; margin:13px 0 10px 0; gap:18px;
+      flex-wrap:nowrap; width:100%;
     }
     .setbtn-main{
-      display:flex;
-      align-items:center;
-      flex:1 1 0px;
-      gap:7px;
-      min-width:0;
-      min-height:54px;
-      justify-content:center;
-      max-width:100%;
-      text-align:center;
-      box-sizing:border-box;
+      display:flex; align-items:center; flex:1 1 0px; gap:7px; min-width:0; min-height:54px;
+      justify-content:center; max-width:100%; text-align:center; box-sizing:border-box;
     }
     .setbtn-main input[type=checkbox]{margin-right:7px;transform:scale(1.15);}
     .btn-new {background:rgba(82,195,255,0.18);color:#233542;border-radius:14px;border:1.6px solid #43c6f6; font-weight:800;font-size:1.01rem; padding:10px 18px; margin:0 4px 0 0;}
@@ -84,10 +71,6 @@
     .feedback-link{text-align:center;font-size:14.6px;margin:13px 0;}
     .feedback-link a{color:#51a5e6;text-decoration:none;font-weight:700;font-size:16px;}
     .feedback-link a:hover{color:#715aff;text-decoration:underline;}
-    .modal-tip {display:none;position:fixed;z-index:999;max-width:260px;line-height:1.55;padding:13px 17px 13px 13px; background:#fff;box-shadow:0 4px 24px #0002;border-radius:11px;color:#232b45;font-size:15px; border:1.8px solid #715AFF;font-weight:500;}
-    .tiny,.hotkeys-tip-centered{font-size:13px;color:var(--muted);}
-    .hotkeys-tip-centered{margin-top:20px;text-align:center;}
-    .btn-glass-violet.reupload-btn{margin-left:0;}
     @media (max-width:900px){.container{max-width:99vw;}}
     @media (max-width:600px){
       .settings-bar{flex-wrap:wrap;}
@@ -109,8 +92,8 @@
     <div>
       <h1 id="siteTitle">Albinyok Flashcards</h1>
       <div class="sub">
-        Приложение для повтора карточек из CSV — учи на телефоне и на ПК.
-        <span class="sub-secondary">Ваш прогресс сохраняется локально.</span>
+        <span id="siteSubtitle"></span>
+        <span class="sub-secondary" id="localProgress"></span>
       </div>
     </div>
     <div class="lang-select">
@@ -174,7 +157,6 @@
       <div class="a" id="a"></div>
     </div>
     <div class="controls" id="controlsBar" aria-label="Управление"></div>
-    <div class="hotkeys-tip-centered" id="hotkeysTip"></div>
   </section>
   <section class="edit-bar" id="editorBar" style="display:none"></section>
   <div class="exportbar">
@@ -187,7 +169,6 @@
   <div class="feedback-link">
     <span>Обратная связь: <a href="https://t.me/sasha24tiy" target="_blank">@sasha24tiy</a></span>
   </div>
-  <div class="modal-tip" id="modalTip"></div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 <script src="flashcards.js"></script>
