@@ -59,15 +59,14 @@
     .chip{background:var(--card);border:1px solid #e2e6ef;padding:6px 13px;border-radius:99px;box-shadow:var(--shadow);font-size:15px;}
     .progress{margin-top:8px;height:8px;background:#e2e3ed;border-radius:999px;overflow:hidden;}
     .progress>div{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));width:0%;transition:width .44s;}
-    /* Окно вопрос-ответ — цвет как у .uploader */
+    /* Увеличенное "окно" вопрос+ответ */
     .card{
-      position:relative;background:var(--bg-alt);border-radius:18px;box-shadow:var(--shadow);
+      position:relative;background:var(--card);border-radius:18px;box-shadow:var(--shadow);
       padding:32px 24px 32px; margin:auto; margin-bottom:24px;
       min-height:260px; /* увеличено! */
       max-width:1200px;
       width:100%;
       display:flex;flex-direction:column;align-items:stretch;justify-content:center;text-align:center;
-      /* цвет как у .uploader */
     }
     .q{
       font-size:clamp(19px,2vw,24px);font-weight:800;margin-bottom:18px;
@@ -82,21 +81,8 @@
     }
     .a.hidden{color:transparent!important;opacity:1;user-select:none;pointer-events:none;}
     .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;margin-top:15px;}
-    .ctrl{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border-radius:12px;border:1px solid #d2d2df;background:var(--bg-alt);cursor:pointer;box-shadow:var(--shadow);font-weight:700;font-size:1.04rem;}
+    .ctrl{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border-radius:12px;border:1px solid #d2d2df;background:var(--card);cursor:pointer;box-shadow:var(--shadow);font-weight:700;font-size:1.04rem;}
     .next-btn-main {background:var(--accent);color:#fff;font-weight:700;border-radius:13px;padding:10px 26px;font-size:1.08rem;box-shadow:var(--shadow);border:none; margin-left:7px;}
-    /* ВАЖНО: опции всегда белые в dark (ctrl + next-btn-main + .ctrl.ok/.ctrl.bad) */
-    [data-theme="dark"] .ctrl,
-    [data-theme="dark"] .next-btn-main {
-      color: #fff !important;
-      border-color: #5e5e76 !important;
-      background: var(--bg-alt) !important;
-    }
-    [data-theme="dark"] .ctrl.ok,
-    [data-theme="dark"] .ctrl.bad {
-      color:#fff !important;
-    }
-    .ctrl.ok { color:var(--ok); }
-    .ctrl.bad { color:var(--bad); }
     .error{padding:9px 8px;border-radius:12px;background:rgba(255,0,0,.09);border:1px solid #e49c9c;margin-top:7px;color:#b11212;display:none;}
     .error.show {display:block;}
     .exportbar{display:flex;gap:6px;margin-top:18px;justify-content:center;flex-wrap:wrap;padding-bottom:7px;}
