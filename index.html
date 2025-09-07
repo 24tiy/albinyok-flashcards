@@ -18,7 +18,7 @@
       margin:0; font-family:'Inter',ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Noto Sans,Arial;
       background:var(--bg); color:var(--text); min-height:100vh; transition:background .5s,color .5s; font-size:14px;
     }
-    .container {max-width:1200px; margin:24px auto 24px; padding:0;}
+    .container {max-width:1200px; margin:24px auto; padding:0 20px;}
     /* -- Центровка шапки -- */
     .main-header-centered {
       display: flex;
@@ -35,7 +35,20 @@
       gap: 14px;
     }
     .main-header-centered .logo {
-      width:40px;height:40px;border-radius:12px;background:url('https://raw.githubusercontent.com/24tiy/albinyok-flashcards/main/logo.png') center/cover;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;
+      width:40px;
+      height:40px;
+      border-radius:12px;
+      background:linear-gradient(135deg,var(--accent),var(--accent-2));
+      box-shadow:var(--shadow);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:#fff;
+      font-weight:900;
+      font-size:18px;
+      background-image:url('logo.png');
+      background-size:cover;
+      background-position:center;
     }
     .main-header-centered .title-block {
       display: flex; flex-direction: column; align-items: flex-start; text-align: left;
@@ -47,29 +60,31 @@
       color: var(--muted); font-size: 1.3rem; margin-top:18px; text-align: center; font-weight: 400;
     }
     .main-header-centered .sub-secondary {
-      color: var(--muted); font-size: 1rem; margin-top: 10px; margin-bottom: 0; text-align: center;font-weight: 400;
+      color: var(--muted); font-size: 1rem; margin-top: 10px; margin-bottom: 0; text-align: center; font-weight: 400;
     }
-    /* --- Остальной ваш css --- */
+    /* --- Остальной css --- */
     .lang-select{margin-left:auto;display:flex;gap:8px;}
     .lang-flags{border:none;background:var(--bg-alt);padding:8px 11px;font-size:13.5px;appearance:none;border-radius:11px;font-weight:600;color:var(--text);}
     .uploader, .card {max-width:700px;width:100%;margin-left:auto;margin-right:auto;}
-    .uploader { margin:18px auto 10px auto; padding:17px 12px 12px 12px; border-radius:22px;
+    .uploader { margin:18px auto 10px; padding:17px 12px 12px; border-radius:22px;
       background:var(--bg-alt); box-shadow:var(--shadow); display:block;}
     .uploader h2{font-weight:800;font-size:1.08rem;}
     .uploader-flex{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
     .input-url-row {display:flex; align-items:center; gap:7px; flex-wrap:wrap;}
     label.file{display:inline-flex;align-items:center;gap:7px;background:var(--card);font-weight:600;border:1.2px solid #e2e6ef;padding:8px 10px; border-radius:12px;cursor:pointer;box-shadow:var(--shadow);}
     input[type=file]{display:none;}
-    input[type=url],input[type=text],select{ font-size:14px;padding:7px 7px;border-radius:var(--radius);border:1.2px solid #e2e6ef;background:var(--card);color:var(--text);}
-    input[type=url]:focus,input[type=text]:focus,select:focus{border:1.5px solid var(--accent);}
-    .btn-glass-violet {background:rgba(125,100,255,.13);color:#5239ca;border:1.6px solid #9277f5;border-radius:16px;font-weight:700; font-size:1.02rem;padding:10px 18px;box-shadow:0 7px 26px 0 rgba(126,91,255,.13),0 2px 7px 0 rgba(126,91,255,.09);backdrop-filter:blur(7px);margin:0 4px 6px 0;display:inline-flex;align-items:center;cursor:pointer;transition:color .2s,background .2s;}
+    input[type=url],input[type=text],select{ font-size:14px;padding:7px;border-radius:var(--radius);border:1.2px solid #e2e6ef;background:var(--card);color:var(--text);}
+    input[type=url]:focus,input[type=text]:focus,select:focus{border:1.5px solid var(--accent);outline:none;}
+    .btn-glass-violet {background:rgba(125,100,255,.13);color:#5239ca;border:1.6px solid #9277f5;border-radius:16px;font-weight:700; font-size:1.02rem;padding:10px 18px;box-shadow:0 7px 26px 0 rgba(126,91,255,.13),0 2px 7px 0 rgba(126,91,255,.09);backdrop-filter:blur(7px);margin:0 4px 6px 0;display:inline-flex;align-items:center;cursor:pointer;transition:color .2s,background .2s;text-decoration:none;}
+    .btn-glass-violet:hover{background:rgba(125,100,255,.2);}
     .btn-glass-violet.selected,.btn-glass-violet:active,.btn-glass-violet.primary {background: #8d6dff;color:#fff;border-color: #8769e6;}
-    .settings-bar{display: flex; justify-content:center; align-items:stretch; margin:13px 0 10px 0; gap:18px;
+    .settings-bar{display: flex; justify-content:center; align-items:stretch; margin:13px 0 10px; gap:18px;
       flex-wrap:nowrap; width:100%;}
-    .setbtn-main{display:flex; align-items:center; flex:1 1 0px; gap:7px; min-width:0; min-height:54px;
+    .setbtn-main{display:flex; align-items:center; flex:1 1 0; gap:7px; min-width:0; min-height:54px;
       justify-content:center; max-width:100%; text-align:center; box-sizing:border-box;}
     .setbtn-main input[type=checkbox]{margin-right:7px;transform:scale(1.15);}
-    .btn-new {background:rgba(82,195,255,0.18);color:#233542;border-radius:14px;border:1.6px solid #43c6f6; font-weight:800;font-size:1.01rem; padding:10px 18px; margin:0 4px 0 0;transition:color .2s,background .2s;}
+    .btn-new {background:rgba(82,195,255,0.18);color:#233542;border-radius:14px;border:1.6px solid #43c6f6; font-weight:800;font-size:1.01rem; padding:10px 18px; margin:0 4px 0 0;transition:color .2s,background .2s;text-decoration:none;cursor:pointer;}
+    .btn-new:hover{background:rgba(82,195,255,0.25);}
     .workspace{display:none;margin-top:20px;}
     .ws-topbar,.ws-buttons-block{display:flex;flex-wrap:wrap;gap:15px;justify-content:center;align-items:center;}
     .ws-topbar{flex-direction:column;margin-bottom:7px;}
@@ -80,7 +95,7 @@
     .card {
       position:relative;
       background:var(--bg-alt);border-radius:22px;box-shadow:var(--shadow);
-      padding:32px 24px 32px; margin:auto; margin-bottom:24px;
+      padding:32px 24px; margin:auto; margin-bottom:24px;
       min-height:260px;
       display:block;text-align:center;
     }
@@ -99,7 +114,9 @@
     .a.hidden{color:transparent!important;opacity:1;user-select:none;pointer-events:none;}
     .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;margin-top:15px;}
     .ctrl{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border-radius:12px;border:1px solid #d2d2df;background:var(--card);cursor:pointer;box-shadow:var(--shadow);font-weight:700;font-size:1.04rem;transition:color .2s,background .2s;}
-    .next-btn-main {background:var(--accent);color:#fff;font-weight:700;border-radius:13px;padding:10px 26px;font-size:1.08rem;box-shadow:var(--shadow);border:none; margin-left:7px;}
+    .ctrl:hover{background:#f5f5f5;}
+    .next-btn-main {background:var(--accent);color:#fff;font-weight:700;border-radius:13px;padding:10px 26px;font-size:1.08rem;box-shadow:var(--shadow);border:none; margin-left:7px;cursor:pointer;}
+    .next-btn-main:hover{background:var(--btn-hover);}
     .error{padding:9px 8px;border-radius:12px;background:rgba(255,0,0,.09);border:1px solid #e49c9c;margin-top:7px;color:#b11212;display:none;}
     .error.show {display:block;}
     .exportbar{display:flex;gap:6px;margin-top:18px;justify-content:center;flex-wrap:wrap;padding-bottom:7px;}
@@ -107,15 +124,19 @@
     .feedback-link{text-align:center;font-size:14.6px;margin:13px 0;}
     .feedback-link a{color:#51a5e6;text-decoration:none;font-weight:700;font-size:16px;}
     .feedback-link a:hover{color:#715aff;text-decoration:underline;}
-    @media (max-width:1200px){ .card,.uploader{padding:26px 6vw 26px;max-width:99vw;} }
+    @media (max-width:1200px){ 
+      .card,.uploader{padding:26px 6vw;max-width:99vw;} 
+      .container{padding:0 10px;}
+    }
     @media (max-width:700px){
-      .container{max-width:99vw;}
-      .card,.uploader{padding:12px 0 13px;max-width:99vw;}
+      .container{max-width:99vw;padding:0 8px;}
+      .card,.uploader{padding:12px 4vw;max-width:99vw;}
       .main-header-centered h1 {font-size:1.8rem;}
       .main-header-centered .sub {font-size:1.1rem; margin-top:12px;}
       .main-header-centered .sub-secondary {font-size:0.9rem; margin-top:8px;}
       .main-header-centered .header-row {gap:10px;}
-      .main-header-centered .logo {width:32px;height:32px;}
+      .main-header-centered .logo {width:32px;height:32px;font-size:14px;}
+      .lang-select{position:relative!important;top:auto!important;right:auto!important;margin:10px 0;justify-content:center;}
     }
     @media (max-width:600px){
       .settings-bar{flex-wrap:wrap;}
@@ -123,19 +144,21 @@
       .ws-topbar{gap:10px;}
       .ws-info-block{flex-direction:column;}
       .ws-buttons-block{gap:8px;}
-      .q{font-size:15px;}
+      .q{font-size:18px;}
       .a,.chip{font-size:13px;}
       .uploader-flex{flex-direction:column;gap:10px;}
       .input-url-row{width:100%;justify-content:flex-start;}
       .card,.uploader{min-height:170px;}
+      .exportbar{gap:4px;}
+      .btn-new{font-size:0.9rem;padding:8px 12px;}
     }
   </style>
 </head>
-<body data-theme="light">
+<body>
 <div class="container">
   <div class="main-header-centered">
     <div class="header-row">
-      <div class="logo"></div>
+      <div class="logo">Q↔A</div>
       <div class="title-block">
         <h1 id="siteTitle">Albinyok Flashcards</h1>
       </div>
@@ -153,7 +176,8 @@
   <section class="uploader" id="uploader" aria-label="Загрузка CSV">
     <h2 id="fileOrLink"></h2>
     <div class="uploader-flex">
-      <label for="file" class="file" id="fileLabel"><span id="fileIcon">📄</span>
+      <label for="file" class="file" id="fileLabel">
+        <span id="fileIcon">📄</span>
         <span id="fileBtnTxt"></span>
       </label>
       <input type="file" id="file" accept=".csv,.tsv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/*" />
@@ -161,7 +185,7 @@
         <input type="url" id="urlInput" style="width:260px;" value="https://github.com/24tiy/albinyok-flashcards/blob/main/data.csv" placeholder="https://...csv, .tsv, google sheet etc" />
         <button class="btn-glass-violet" id="loadUrlBtn" type="button">По ссылке</button>
       </div>
-      <button class="btn-glass-violet reupload-btn" id="mainReuploadBtn">
+      <button class="btn-glass-violet reupload-btn" id="mainReuploadBtn" type="button">
         <label for="reupload" style="margin-bottom:0;cursor:pointer;">Сменить документ</label>
         <input type="file" id="reupload" accept=".csv,.tsv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/*" />
       </button>
@@ -169,12 +193,12 @@
     <div id="error" class="error" role="alert"></div>
     <div id="downloadManual" class="error" style="margin-top:8px;font-size:16px;"></div>
   </section>
-  <div class="settings-bar rowbar">
+  <div class="settings-bar">
     <button class="btn-glass-violet setbtn-main" id="toggleEditBtn" type="button">
       📝 <span id="editLabel">Редактор карточек</span>
     </button>
     <button class="btn-glass-violet setbtn-main" id="testBtnWrap" type="button">
-      <input type="checkbox" id="testModeCheck">
+      <input type="checkbox" id="testModeCheck" />
       <span id="testBtnText">Включить тест</span>
     </button>
     <button class="btn-glass-violet setbtn-main" id="trainHardBtn" type="button">
@@ -192,8 +216,8 @@
         <span id="score" class="chip">✅ 0 • ❌ 0</span>
       </div>
       <div class="ws-buttons-block">
-        <button class="btn-glass-violet" id="shuffleBtn" title="S">Перемешать</button>
-        <button class="btn-glass-violet" id="resetBtn" title="R">Сбросить прогресс</button>
+        <button class="btn-glass-violet" id="shuffleBtn" type="button" title="S">Перемешать</button>
+        <button class="btn-glass-violet" id="resetBtn" type="button" title="R">Сбросить прогресс</button>
       </div>
     </div>
     <div class="card" id="card">
@@ -202,13 +226,13 @@
     </div>
     <div class="controls" id="controlsBar" aria-label="Управление"></div>
   </section>
-  <section class="edit-bar" id="editorBar" style="display:none"></section>
+  <section class="edit-bar" id="editorBar" style="display:none;"></section>
   <div class="exportbar">
     <button class="btn-new" id="templateBtn" type="button">Шаблон CSV</button>
     <button class="btn-new" id="demoBtn" type="button">Демо-набор</button>
-    <a id="helpLink" href="README.md" target="_blank" class="btn-new help-centered" style="text-align:center;text-decoration:none;">Помощь</a>
-    <button class="btn-new" id="exportBtn">Экспорт прогресса</button>
-    <button class="btn-new" id="clearBtn">Очистить всё</button>
+    <a id="helpLink" href="README.md" target="_blank" class="btn-new">Помощь</a>
+    <button class="btn-new" id="exportBtn" type="button">Экспорт прогресса</button>
+    <button class="btn-new" id="clearBtn" type="button">Очистить всё</button>
   </div>
   <div class="feedback-link" id="feedback-link"></div>
 </div>
