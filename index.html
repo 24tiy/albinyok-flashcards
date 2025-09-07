@@ -11,11 +11,11 @@
       --bg:#f7f9fc; --bg-alt:#f1f4fa; --card:#fff; --text:#212c45; --muted:#98a3b8;
       --accent:#715AFF; --accent-2:#53D1FD; --btn:#715AFF; --btn-hover:#533BE6;
       --ok:#22bb88; --bad:#f03d61;
-      --shadow:0 14px 38px rgba(43,51,104,.16),0 3px 8px rgba(43,51,104,.08);
+      --shadow:0 14px 38px rgba(43,51,104,.16), 0 3px 8px rgba(43,51,104,.08);
       --radius:18px;
     }
     [data-theme="dark"] {
-      --bg:#11121b; --bg-alt:#191b28; --card:#121320; --text:#fff; --muted:#98a3b890;
+      --bg:#11121b; --bg-alt:#191b28; --card:#191A26; --text:#fff; --muted:#bfc7d6;
       --accent:#99A8FF; --accent-2:#38A2DC; --btn:#533BE6; --btn-hover:#715AFF;
       --shadow:0 14px 38px rgba(12,18,42,.3),0 3px 8px rgba(13,18,41,.08);
     }
@@ -59,20 +59,25 @@
     .chip{background:var(--card);border:1px solid #e2e6ef;padding:6px 13px;border-radius:99px;box-shadow:var(--shadow);font-size:15px;}
     .progress{margin-top:8px;height:8px;background:#e2e3ed;border-radius:999px;overflow:hidden;}
     .progress>div{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));width:0%;transition:width .44s;}
+    /* Увеличенное "окно" вопрос+ответ */
     .card{
-      position:relative;background:var(--card);border-radius:18px;box-shadow:var(--shadow);padding:17px 5px 14px;
+      position:relative;background:var(--card);border-radius:18px;box-shadow:var(--shadow);
+      padding:32px 24px 32px; margin:auto; margin-bottom:24px;
+      min-height:260px; /* увеличено! */
+      max-width:1200px;
+      width:100%;
       display:flex;flex-direction:column;align-items:stretch;justify-content:center;text-align:center;
-      min-height:100px;height:140px;max-width:100%;
     }
     .q{
-      font-size:clamp(17px,2vw,20px);font-weight:800;margin-bottom:17px;color:var(--text); /* Вопрос всегда белый в dark */
-      transition:color .2s;
-      word-break:break-word;
+      font-size:clamp(19px,2vw,24px);font-weight:800;margin-bottom:18px;
+      color:var(--text); transition:color .2s; word-break:break-word; line-height:1.28;
     }
     .a{
-      font-size:clamp(14px,2vw,16px);font-weight:600;min-height:28px;max-width:100%;
+      font-size:clamp(16px,2vw,19px);font-weight:600;min-height:38px;max-width:100%;
       transition:color .3s;opacity:1;will-change:color,opacity;word-break:break-word;text-align:center;display:block;
       color:var(--muted);
+      line-height:1.55;
+      margin-bottom:0;
     }
     .a.hidden{color:transparent!important;opacity:1;user-select:none;pointer-events:none;}
     .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;margin-top:15px;}
@@ -85,17 +90,22 @@
     .feedback-link{text-align:center;font-size:14.6px;margin:13px 0;}
     .feedback-link a{color:#51a5e6;text-decoration:none;font-weight:700;font-size:16px;}
     .feedback-link a:hover{color:#715aff;text-decoration:underline;}
-    @media (max-width:900px){.container{max-width:99vw;}}
+    @media (max-width:1200px){ .card{padding:26px 6vw 26px;max-width:99vw;} }
+    @media (max-width:700px){
+      .container{max-width:99vw;}
+      .card{padding:12px 0 13px;}
+    }
     @media (max-width:600px){
       .settings-bar{flex-wrap:wrap;}
       .setbtn-main{flex-basis:100%;min-width:120px;}
       .ws-topbar{gap:10px;}
       .ws-info-block{flex-direction:column;}
       .ws-buttons-block{gap:8px;}
-      .q{font-size:14px;}
-      .a,.chip{font-size:12px;}
+      .q{font-size:15px;}
+      .a,.chip{font-size:13px;}
       .uploader-flex{flex-direction:column;gap:10px;}
       .input-url-row{width:100%;justify-content:flex-start;}
+      .card{min-height:170px;}
     }
   </style>
 </head>
@@ -180,9 +190,7 @@
     <button class="btn-new" id="exportBtn">Экспорт прогресса</button>
     <button class="btn-new" id="clearBtn">Очистить всё</button>
   </div>
-  <div class="feedback-link" id="feedback-link">
-    <!-- контент вставляется из JS мультиязычно! -->
-  </div>
+  <div class="feedback-link" id="feedback-link"></div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 <script src="flashcards.js"></script>
