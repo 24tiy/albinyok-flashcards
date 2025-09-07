@@ -5,14 +5,177 @@ let testLocked = false, awaitingTestAnswer = false;
 let mainDeck = [];
 let deck=[], idx=0, shown=false, deckName='—', localKey = 'albinyok-flashcards-v1';
 const translations = {
-  ru: { /* ... твой объект translations ... */ },
-  en: { /* ... */ },
-  fr: { /* ... */ }
+  ru: {
+    siteTitle:"Albinyok Flashcards",
+    siteSub:'Приложение для повтора карточек из CSV — учи на телефоне и на ПК.',
+    localProgress: "Ваш прогресс сохраняется локально.",
+    fileOrLink:"Откуда берём информацию?",
+    fileBtn:"Файл CSV",
+    template:"Шаблон CSV",
+    demo:"Демо-набор",
+    urlBtn:"По ссылке",
+    changeDoc:"Сменить документ",
+    reveal:"Показать ответ",
+    hide:"Скрыть ответ",
+    know:"✅ Знаю",
+    dont:"❌ Не знаю",
+    shuffle:"Перемешать",
+    reset:"Сбросить прогресс",
+    deck:"Источник вопросов",
+    source:"Источник:",
+    empty:"Загрузите CSV или выберите файл из репозитория",
+    progress:"Экспорт прогресса",
+    clear:"Очистить всё",
+    errorPref:"Ошибка: ",
+    fetchFail:"Ошибка загрузки",
+    fileTooBig:"Файл слишком большой!",
+    csvNotPairs:"Не найдено пар 'вопрос/ответ'",
+    help:"Помощь",
+    helpKey:"Помощь",
+    editor_hint:"Редактируйте карточки ниже, затем сохраните! Каждая строка — одна карточка.",
+    add_card:"Добавить карточку",
+    save_cards:"Сохранить изменения",
+    del:"Удалить",
+    edit:"Редактор карточек",
+    train_hard:"Тренировать сложные",
+    save_success:"Карточки сохранены!",
+    train_all_done:"Все сложные карточки выучены! МОЛОДЕЦ!",
+    test: "Тест",
+    test_on: "Тест включён",
+    test_off: "Включить тест",
+    next: "Дальше",
+    test_enabled: "Режим теста включён",
+    test_status: "Только 'Знаю', 'Не знаю' и 'Дальше' для перехода.",
+    csvtemplate: "Шаблон CSV",
+    demodeck: "Демо-набор",
+    source_field: "Источник:",
+    feedback: 'Обратная связь: <a href="https://t.me/sasha24tiy" target="_blank">@sasha24tiy</a>'
+  },
+  en: {
+    siteTitle:"Albinyok Flashcards",
+    siteSub:'CSV flashcards app — remember better everywhere!',
+    localProgress: "Your progress is saved locally.",
+    fileOrLink:"Data source?",
+    fileBtn:"CSV File",
+    template:"CSV Template",
+    demo:"Demo Set",
+    urlBtn:"By Link",
+    changeDoc:"Change document",
+    reveal:"Show answer",
+    hide:"Hide answer",
+    know:"✅ Know",
+    dont:"❌ Don't know",
+    shuffle:"Shuffle",
+    reset:"Reset progress",
+    deck:"Source",
+    source:"Source:",
+    empty:"Upload or select a CSV",
+    progress:"Export progress",
+    clear:"Clear all",
+    errorPref:"Error: ",
+    fetchFail:"Load error",
+    fileTooBig:"File too big!",
+    csvNotPairs:"No question/answer pairs found",
+    help:"Help",
+    helpKey:"Help",
+    editor_hint:"Edit cards below and save! 1 row = 1 card.",
+    add_card:"Add card",
+    save_cards:"Save changes",
+    del:"Delete",
+    edit:"Card editor",
+    train_hard:"Train hard cards",
+    save_success:"Saved!",
+    train_all_done:"All hard cards done! NICE!",
+    test: "Test",
+    test_on: "Test enabled",
+    test_off: "Enable test",
+    next: "Next",
+    test_enabled: "Test mode enabled",
+    test_status: "Only 'Know', 'Don't know' and 'Next' for navigation.",
+    csvtemplate: "CSV Template",
+    demodeck: "Demo Set",
+    source_field: "Source:",
+    feedback: 'Feedback: <a href="https://t.me/sasha24tiy" target="_blank">@sasha24tiy</a>'
+  },
+  fr: {
+    siteTitle:"Albinyok Flashcards",
+    siteSub:"Appli pour réviser vos cartes CSV — mobile et PC.",
+    localProgress:"Votre progression est enregistrée localement.",
+    fileOrLink:"Source des données ?",
+    fileBtn:"Fichier CSV",
+    template:"Modèle CSV",
+    demo:"Jeu démo",
+    urlBtn:"Par lien",
+    changeDoc:"Changer de document",
+    reveal:"Afficher réponse",
+    hide:"Cacher réponse",
+    know:"✅ Je sais",
+    dont:"❌ Je ne sais pas",
+    shuffle:"Mélanger",
+    reset:"Réinitialiser",
+    deck:"Source",
+    source:"Source :",
+    empty:"Chargez ou choisissez un CSV",
+    progress:"Exporter progrès",
+    clear:"Tout nettoyer",
+    errorPref:"Erreur : ",
+    fetchFail:"Erreur téléchargement",
+    fileTooBig:"Fichier trop volumineux !",
+    csvNotPairs:"Aucune question/réponse trouvée",
+    help:"Aide",
+    helpKey:"Aide",
+    editor_hint:"Éditez, puis sauvegardez. 1 ligne = 1 carte.",
+    add_card:"Ajouter carte",
+    save_cards:"Enregistrer",
+    del:"Supprimer",
+    edit:"Éditeur de cartes",
+    train_hard:"Difficile",
+    save_success:"Cartes enregistrées!",
+    train_all_done:"Toutes les difficiles apprises !",
+    test: "Test",
+    test_on: "Test activé",
+    test_off: "Activer test",
+    next: "Suivant",
+    test_enabled: "Mode test activé",
+    test_status: "Seulement 'Je sais', 'Je ne sais pas' et 'Suivant'.",
+    csvtemplate: "Modèle CSV",
+    demodeck: "Jeu démo",
+    source_field: "Source :",
+    feedback: 'Retour: <a href="https://t.me/sasha24tiy" target="_blank">@sasha24tiy</a>'
+  }
 };
 function $(sel){ return document.querySelector(sel);}
 function t(k){return (translations[curLang]&&translations[curLang][k])||k;}
-function updateLang() { /* ... как у тебя ... */ }
-function updateTestBtnText() { /* ... */ }
+function updateLang() {
+  document.documentElement.lang = curLang;
+  $("#siteTitle").textContent = t("siteTitle");
+  $("#siteSubtitle").textContent = t("siteSub");
+  $("#localProgress").textContent = t("localProgress");
+  $("#fileOrLink").textContent = t("fileOrLink");
+  $("#fileBtnTxt").textContent = t("fileBtn");
+  $("#templateBtn").textContent = t("csvtemplate");
+  $("#demoBtn").textContent = t("demodeck");
+  $("#loadUrlBtn").textContent = t("urlBtn");
+  $("#mainReuploadBtn label").textContent = t("changeDoc");
+  $("#editLabel").textContent = t("edit");
+  $("#hardLabel").textContent = t("train_hard");
+  updateTestBtnText();
+  $("#urlInput").placeholder = t("urlPlaceholder") || '';
+  $("#deckName").textContent = `${t('source_field')} ${deckName}`;
+  $("#testStatus").innerHTML = testLocked ? `<b>${t("test_enabled")}</b> — ${t("test_status")}` : "";
+  $("#testStatus").style.display = testLocked ? "" : "none";
+  $("#testModeCheck").checked = !!testLocked;
+  $("#shuffleBtn").textContent = t("shuffle");
+  $("#resetBtn").textContent = t("reset");
+  $("#exportBtn").textContent = t("progress");
+  $("#clearBtn").textContent = t("clear");
+  $("#helpLink").textContent = t("helpKey");
+  if ($("#feedback-link")) $("#feedback-link").innerHTML = t("feedback");
+  updateControlsBar();
+}
+function updateTestBtnText() {
+  $("#testBtnText").textContent = testLocked ? t("test_on") : t("test_off");
+}
 $("#langSelect").addEventListener("change",function(e){
   curLang=this.value; updateLang(); updateUI();
 });
@@ -28,8 +191,25 @@ function initTheme(){
   $("#themeToggle").textContent = theme==="dark" ? "🌞" : "🌙";
 }
 initTheme();
-function sniffHeader(a){ /* ... */ }
-function toDeck(rows){ /* ... */ }
+function sniffHeader(a){
+  if(!a || a.length<2) return false;
+  let ha=(a[0]||'').toLowerCase(), hb=(a[1]||'').toLowerCase();
+  return ['q','question','вопрос','frage'].includes(ha) && ['a','answer','ответ','réponse','antwort'].includes(hb);
+}
+function toDeck(rows){
+  if(!rows||!rows.length) return [];
+  let filtered=[];
+  for(let r of rows){
+    let q=(r[0]||'').trim(), a=(r[1]||'').trim();
+    if(q+a==='') continue;
+    filtered.push([q,a]);
+  }
+  if(!filtered.length) return [];
+  let skip=sniffHeader(filtered[0]) ? 1:0, out=[];
+  for(let i=skip;i<filtered.length;i++)
+    out.push({q:filtered[i][0], a:filtered[i][1], ok:false, bad:false});
+  return out;
+}
 function updateControlsBar() {
   let el=$("#controlsBar");
   if (!el) return;
@@ -51,8 +231,35 @@ function updateControlsBar() {
     el.appendChild(next);
   }
 }
-function createCtrl(className, title, text, handler) { /* ... */ }
-function updateUI(){ /* ... */ }
+function createCtrl(className, title, text, handler) {
+  let btn=document.createElement("button");
+  btn.className=className; btn.type="button"; btn.textContent=text; btn.title=title;
+  btn.onclick = handler;
+  return btn;
+}
+function updateUI(){
+  let q=$("#q"), a=$("#a"), c=$("#counter"), s=$("#score"), n=$("#deckName"), bar=$("#progressBar");
+  if(!deck.length){
+    q.textContent = t("empty");
+    a.textContent = "";
+    a.classList.add("hidden");
+    if (c) c.textContent = "0 / 0";
+    if (s) s.textContent = "✅ 0 • ❌ 0";
+    if (n) n.textContent = `${t('source_field')} —`;
+    if (bar) bar.style.width = "0%";
+    return;
+  }
+  let card=deck[idx];
+  q.textContent = card.q || `(${t('deck')})`;
+  a.textContent = card.a || `(—)`;
+  if (!shown) { a.classList.add("hidden"); }
+  else { a.classList.remove("hidden"); }
+  if (c) c.textContent = `${idx+1} / ${deck.length}`;
+  let ok=deck.filter(x=>x.ok).length, bad=deck.filter(x=>x.bad).length;
+  if (s) s.textContent = `✅ ${ok} • ❌ ${bad}`;
+  if (n) n.textContent = `${t('source_field')} ${deckName}`;
+  updateControlsBar();
+}
 $("#testBtnWrap").addEventListener("click", function(e){
   if(e.target.id === "testModeCheck") return;
   testLocked = !testLocked;
@@ -67,7 +274,11 @@ $("#testModeCheck").addEventListener("click", function(e){
   updateTestBtnText();
   updateLang(); updateUI();
 });
-function toggleShowHide() { shown = !shown; updateUI(); persist(); }
+function toggleShowHide() {
+  shown = !shown;
+  updateUI();
+  persist();
+}
 function onKnowClick(){
   if(testLocked && !awaitingTestAnswer){
      deck[idx].ok=true; deck[idx].bad=false; awaitingTestAnswer=true; persist();
