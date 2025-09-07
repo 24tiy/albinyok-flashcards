@@ -4,7 +4,6 @@ let editMode = false;
 let testLocked = false, awaitingTestAnswer = false;
 let mainDeck = [];
 let deck=[], idx=0, shown=false, deckName='—', localKey = 'albinyok-flashcards-v1';
-
 const translations = {
   ru: {
     siteTitle:"Albinyok Flashcards",
@@ -49,7 +48,8 @@ const translations = {
     test_status: "Только 'Знаю', 'Не знаю' и 'Дальше' для перехода.",
     csvtemplate: "Шаблон CSV",
     demodeck: "Демо-набор",
-    source_field: "Источник:"
+    source_field: "Источник:",
+    feedback: 'Обратная связь: <a href="https://t.me/sasha24tiy" target="_blank">@sasha24tiy</a>'
   },
   en: {
     siteTitle:"Albinyok Flashcards",
@@ -94,7 +94,8 @@ const translations = {
     test_status: "Only 'Know', 'Don't know' and 'Next' for navigation.",
     csvtemplate: "CSV Template",
     demodeck: "Demo Set",
-    source_field: "Source:"
+    source_field: "Source:",
+    feedback: 'Feedback: <a href="https://t.me/sasha24tiy" target="_blank">@sasha24tiy</a>'
   },
   fr: {
     siteTitle:"Albinyok Flashcards",
@@ -139,10 +140,10 @@ const translations = {
     test_status: "Seulement 'Je sais', 'Je ne sais pas' et 'Suivant'.",
     csvtemplate: "Modèle CSV",
     demodeck: "Jeu démo",
-    source_field: "Source :"
+    source_field: "Source :",
+    feedback: 'Retour: <a href="https://t.me/sasha24tiy" target="_blank">@sasha24tiy</a>'
   }
 };
-
 function $(sel){ return document.querySelector(sel);}
 function t(k){return (translations[curLang]&&translations[curLang][k])||k;}
 function updateLang() {
@@ -169,6 +170,8 @@ function updateLang() {
   $("#exportBtn").textContent = t("progress");
   $("#clearBtn").textContent = t("clear");
   $("#helpLink").textContent = t("helpKey");
+  // Мультиязычный feedback
+  if ($("#feedback-link")) $("#feedback-link").innerHTML = t("feedback");
   updateControlsBar();
 }
 function updateTestBtnText() {
@@ -239,7 +242,8 @@ function updateUI(){
   let q=$("#q"), a=$("#a"), c=$("#counter"), s=$("#score"), n=$("#deckName"), bar=$("#progressBar");
   if(!deck.length){
     q.textContent = t("empty");
-    a.textContent = ""; a.style.display = "none";
+    a.textContent = "";
+    a.classList.add("hidden");
     if (c) c.textContent = "0 / 0";
     if (s) s.textContent = "✅ 0 • ❌ 0";
     if (n) n.textContent = `${t('source_field')} —`;
@@ -249,8 +253,8 @@ function updateUI(){
   let card=deck[idx];
   q.textContent = card.q || `(${t('deck')})`;
   a.textContent = card.a || `(—)`;
-  if (!shown) { a.style.display = "none"; }
-  else { a.style.display = "block"; }
+  if (!shown) { a.classList.add("hidden"); }
+  else { a.classList.remove("hidden"); }
   if (c) c.textContent = `${idx+1} / ${deck.length}`;
   let ok=deck.filter(x=>x.ok).length, bad=deck.filter(x=>x.bad).length;
   if (s) s.textContent = `✅ ${ok} • ❌ ${bad}`;
@@ -258,7 +262,7 @@ function updateUI(){
   updateControlsBar();
 }
 $("#testBtnWrap").addEventListener("click", function(e){
-  if(e.target.id === "testModeCheck") return; // чекбокс сам
+  if(e.target.id === "testModeCheck") return;
   testLocked = !testLocked;
   awaitingTestAnswer = false;
   updateTestBtnText();
