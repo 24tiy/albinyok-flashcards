@@ -238,7 +238,7 @@ function createCtrl(className, title, text, handler) {
   return btn;
 }
 function updateUI(){
-  let q=$("#q"), a=$("#a"), c=$("#counter"), s=$("#score"), n=$("#deckName"), bar=$("#progressBar");
+  let q=$("#q"), a=$("#a"), c=$("#counter"), s=$("#score"), n=$("#deckName");
   if(!deck.length){
     q.textContent = t("empty");
     a.textContent = "";
@@ -246,7 +246,6 @@ function updateUI(){
     if (c) c.textContent = "0 / 0";
     if (s) s.textContent = "✅ 0 • ❌ 0";
     if (n) n.textContent = `${t('source_field')} —`;
-    if (bar) bar.style.width = "0%";
     return;
   }
   let card=deck[idx];
@@ -258,7 +257,6 @@ function updateUI(){
   let ok=deck.filter(x=>x.ok).length, bad=deck.filter(x=>x.bad).length;
   if (s) s.textContent = `✅ ${ok} • ❌ ${bad}`;
   if (n) n.textContent = `${t('source_field')} ${deckName}`;
-  if (bar) bar.style.width = Math.round(((idx+1)/deck.length)*100) + "%";
   updateControlsBar();
 }
 $("#testBtnWrap").addEventListener("click", function(e){
