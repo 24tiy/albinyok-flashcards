@@ -14,6 +14,7 @@ const translations = {
     template:"Шаблон CSV",
     demo:"Демо-набор",
     urlBtn:"По ссылке",
+    changeDoc:"Сменить документ",
     reveal:"Показать ответ",
     hide:"Скрыть ответ",
     know:"✅ Знаю",
@@ -21,6 +22,7 @@ const translations = {
     shuffle:"Перемешать",
     reset:"Сбросить прогресс",
     deck:"Источник вопросов",
+    source:"Источник:",
     empty:"Загрузите CSV или выберите файл из репозитория",
     progress:"Экспорт прогресса",
     clear:"Очистить всё",
@@ -29,6 +31,7 @@ const translations = {
     fileTooBig:"Файл слишком большой!",
     csvNotPairs:"Не найдено пар 'вопрос/ответ'",
     help:"Помощь",
+    helpKey:"Помощь",
     editor_hint:"Редактируйте карточки ниже, затем сохраните! Каждая строка — одна карточка.",
     add_card:"Добавить карточку",
     save_cards:"Сохранить изменения",
@@ -43,6 +46,13 @@ const translations = {
     next: "Дальше",
     test_enabled: "Режим теста включён",
     test_status: "Только 'Знаю', 'Не знаю' и 'Дальше' для перехода.",
+    card_editor: "📝 Редактор карточек",
+    hardcards: "💪 Тренировать сложные",
+    show: "Показать ответ",
+    hide_ans: "Скрыть ответ",
+    csvtemplate: "Шаблон CSV",
+    demodeck: "Демо-набор",
+    source_field: "Источник:"
   },
   en: {
     siteTitle:"Albinyok Flashcards",
@@ -52,6 +62,7 @@ const translations = {
     template:"CSV Template",
     demo:"Demo Set",
     urlBtn:"By Link",
+    changeDoc:"Change document",
     reveal:"Show answer",
     hide:"Hide answer",
     know:"✅ Know",
@@ -59,6 +70,7 @@ const translations = {
     shuffle:"Shuffle",
     reset:"Reset progress",
     deck:"Source",
+    source:"Source:",
     empty:"Upload or select a CSV",
     progress:"Export progress",
     clear:"Clear all",
@@ -67,6 +79,7 @@ const translations = {
     fileTooBig:"File too big!",
     csvNotPairs:"No question/answer pairs found",
     help:"Help",
+    helpKey:"Help",
     editor_hint:"Edit cards below and save! 1 row = 1 card.",
     add_card:"Add card",
     save_cards:"Save changes",
@@ -81,6 +94,13 @@ const translations = {
     next: "Next",
     test_enabled: "Test mode enabled",
     test_status: "Only 'Know', 'Don't know' and 'Next' for navigation.",
+    card_editor: "📝 Card editor",
+    hardcards: "💪 Train hard cards",
+    show: "Show answer",
+    hide_ans: "Hide answer",
+    csvtemplate: "CSV Template",
+    demodeck: "Demo Set",
+    source_field: "Source:"
   },
   fr: {
     siteTitle:"Albinyok Flashcards",
@@ -90,6 +110,7 @@ const translations = {
     template:"Modèle CSV",
     demo:"Jeu démo",
     urlBtn:"Par lien",
+    changeDoc:"Changer de document",
     reveal:"Afficher réponse",
     hide:"Cacher réponse",
     know:"✅ Je sais",
@@ -97,6 +118,7 @@ const translations = {
     shuffle:"Mélanger",
     reset:"Réinitialiser",
     deck:"Source",
+    source:"Source :",
     empty:"Chargez ou choisissez un CSV",
     progress:"Exporter progrès",
     clear:"Tout nettoyer",
@@ -105,6 +127,7 @@ const translations = {
     fileTooBig:"Fichier trop volumineux !",
     csvNotPairs:"Aucune question/réponse trouvée",
     help:"Aide",
+    helpKey:"Aide",
     editor_hint:"Éditez, puis sauvegardez. 1 ligne = 1 carte.",
     add_card:"Ajouter carte",
     save_cards:"Enregistrer",
@@ -119,6 +142,13 @@ const translations = {
     next: "Suivant",
     test_enabled: "Mode test activé",
     test_status: "Seulement 'Je sais', 'Je ne sais pas' et 'Suivant'.",
+    card_editor: "📝 Éditeur de cartes",
+    hardcards: "💪 Difficile",
+    show: "Afficher réponse",
+    hide_ans: "Cacher réponse",
+    csvtemplate: "Modèle CSV",
+    demodeck: "Jeu démo",
+    source_field: "Source :"
   }
 };
 
@@ -130,17 +160,23 @@ function updateLang() {
   $(".sub").firstChild.textContent = t("siteSub");
   $("#fileOrLink").textContent = t("fileOrLink");
   $("#fileBtnTxt").textContent = t("fileBtn");
-  $("#templateBtn").textContent = t("template");
-  $("#demoBtn").textContent = t("demo");
+  $("#templateBtn").textContent = t("csvtemplate");
+  $("#demoBtn").textContent = t("demodeck");
   $("#loadUrlBtn").textContent = t("urlBtn");
+  $("#mainReuploadBtn label").textContent = t("changeDoc");
   $("#editLabel").textContent = t("edit");
   $("#hardLabel").textContent = t("train_hard");
   updateTestBtnText();
   $("#urlInput").placeholder = t("urlPlaceholder") || '';
-  $("#deckName").textContent = `${t('deck')}: ${deckName}`;
+  $("#deckName").textContent = `${t('source_field')} ${deckName}`;
   $("#testStatus").innerHTML = testLocked ? `<b>${t("test_enabled")}</b> — ${t("test_status")}` : "";
   $("#testStatus").style.display = testLocked ? "" : "none";
   $("#testModeCheck").checked = !!testLocked;
+  $("#shuffleBtn").textContent = t("shuffle");
+  $("#resetBtn").textContent = t("reset");
+  $("#exportBtn").textContent = t("progress");
+  $("#clearBtn").textContent = t("clear");
+  $("#helpLink").textContent = t("helpKey");
   updateControlsBar();
 }
 function updateTestBtnText() {
@@ -185,7 +221,7 @@ function updateControlsBar() {
   if (!el) return;
   el.innerHTML = "";
   if (!testLocked) {
-    el.appendChild(createCtrl("ctrl showhide","", shown ? t("hide") : t("reveal"),()=>toggleShowHide()));
+    el.appendChild(createCtrl("ctrl showhide","", shown ? t("hide_ans") : t("show"),()=>toggleShowHide()));
   }
   let okBtn = createCtrl("ctrl ok","", t("know"),()=>onKnowClick());
   let badBtn = createCtrl("ctrl bad","", t("dont"),()=>onDontKnowClick());
@@ -214,7 +250,7 @@ function updateUI(){
     a.textContent = ""; a.style.display = "none";
     if (c) c.textContent = "0 / 0";
     if (s) s.textContent = "✅ 0 • ❌ 0";
-    if (n) n.textContent = `${t('deck')}: —`;
+    if (n) n.textContent = `${t('source_field')} —`;
     if (bar) bar.style.width = "0%";
     if($("#hotkeysTip")) $("#hotkeysTip").textContent = '';
     return;
@@ -227,9 +263,9 @@ function updateUI(){
   if (c) c.textContent = `${idx+1} / ${deck.length}`;
   let ok=deck.filter(x=>x.ok).length, bad=deck.filter(x=>x.bad).length;
   if (s) s.textContent = `✅ ${ok} • ❌ ${bad}`;
-  if (n) n.textContent = `${t('deck')}: ${deckName}`;
+  if (n) n.textContent = `${t('source_field')} ${deckName}`;
   updateControlsBar();
-  if($("#hotkeysTip")) $("#hotkeysTip").textContent = ''; // <-- всегда очищай!
+  if($("#hotkeysTip")) $("#hotkeysTip").textContent = '';
 }
 $("#testBtnWrap").addEventListener("click", function(e){
   if(e.target.id === "testModeCheck") return; // чекбокс сам
@@ -293,7 +329,7 @@ $("#loadUrlBtn").onclick=function(){
   let err = $("#error"), man = $("#downloadManual");
   err.classList.remove("show"); man.classList.remove("show"); err.textContent = man.textContent = "";
   let inp=$("#urlInput"), url=(inp&&inp.value)?inp.value.trim():"";
-  if (!url) { err.textContent="Вставьте ссылку!"; err.classList.add("show"); return; }
+  if (!url) { err.textContent=t("errorPref")+" Вставьте ссылку!"; err.classList.add("show"); return; }
   if (/github\.com\/.+\/.+\/blob\//i.test(url))
     url = url.replace('github.com/', 'raw.githubusercontent.com/').replace('/blob/', '/');
   if(url.includes("docs.google.com/spreadsheets/") && !/export\?format=csv/.test(url))
@@ -310,7 +346,7 @@ $("#loadUrlBtn").onclick=function(){
       loadCSVText(txt, name);
     })
     .catch(e=>{
-      man.textContent = "Не удалось скачать таблицу. Проверь, что она публична и это CSV/таблица. Или скачай файл к себе, а затем загрузи через 'Файл'. Ошибка: " + (e.message||e);
+      man.textContent = t("errorPref") + " " + (e.message||e);
       man.classList.add("show");
     });
 };
@@ -360,7 +396,7 @@ $("#exportBtn").onclick = ()=>{
   a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000);
 };
 $("#clearBtn").onclick = () => {
-  if(confirm("Удалить весь прогресс?")){ 
+  if(confirm(t("errorPref")+" Удалить весь прогресс?")){ 
     localStorage.removeItem(localKey);
     location.reload();
   }
