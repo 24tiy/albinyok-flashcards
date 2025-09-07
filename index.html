@@ -22,26 +22,45 @@
     body {
       margin:0; font-family:'Inter',ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Noto Sans,Arial;
       background:var(--bg); color:var(--text); min-height:100vh; transition:background .5s,color .5s; font-size:14px;
-      /* светлая по-дефолту тема */
     }
     .container {max-width:1200px; margin:24px auto 24px; padding:0;}
-    header {display:flex;align-items:flex-start;gap:12px;margin-bottom:11px;}
-    .logo {width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:var(--shadow);display:grid;place-items:center;color:#fff;font-weight:900;font-size:25px;margin-top:3px;}
-    .sub {color:var(--muted);font-size:15px;margin-top:2px;}
-    .sub-secondary {color:var(--muted);font-size:14px;margin-top:5px;line-height:1.7;display:block;}
+    /* -- Центровка шапки -- */
+    .main-header-centered {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      margin-bottom: 35px;
+      margin-top: 10px;
+    }
+    .main-header-centered .header-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+    }
+    .main-header-centered .logo {
+      width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:var(--shadow);display:grid;place-items:center;color:#fff;font-weight:900;font-size:25px;margin-top:3px;
+    }
+    .main-header-centered .title-block {
+      display: flex; flex-direction: column; align-items: flex-start; text-align: left;
+    }
+    .main-header-centered h1 {
+      margin: 0; font-size:2.7rem; font-weight:800; line-height:1.15; letter-spacing:-1.2px; color: var(--text);
+    }
+    .main-header-centered .sub {
+      color: var(--muted); font-size: 1.6rem; margin-top:26px; text-align: center; font-weight: 400;
+    }
+    .main-header-centered .sub-secondary {
+      color: var(--muted); font-size: 1.2rem; margin-top: 14px; margin-bottom: 0; text-align: center;font-weight: 400;
+    }
+    /* --- Остальной ваш css --- */
     .lang-select{margin-left:auto;display:flex;gap:8px;}
     .lang-flags{border:none;background:var(--bg-alt);padding:8px 11px;font-size:13.5px;appearance:none;border-radius:11px;font-weight:600;color:var(--text);}
     .theme-toggle{border:none;background:var(--bg-alt);font-size:19px;border-radius:12px;padding:5px 11px;cursor:pointer;color:var(--text);}
-    /* одинаковая max-width и ширина для uploader и card */
-    .uploader, .card {
-      max-width:700px;
-      width:100%;
-      margin-left:auto;margin-right:auto;
-    }
-    .uploader {
-      margin:18px auto 10px auto; padding:17px 12px 12px 12px; border-radius:22px;
-      background:var(--bg-alt); box-shadow:var(--shadow); display:block;
-    }
+    .uploader, .card {max-width:700px;width:100%;margin-left:auto;margin-right:auto;}
+    .uploader { margin:18px auto 10px auto; padding:17px 12px 12px 12px; border-radius:22px;
+      background:var(--bg-alt); box-shadow:var(--shadow); display:block;}
     .uploader h2{font-weight:800;font-size:1.08rem;}
     .uploader-flex{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
     .input-url-row {display:flex; align-items:center; gap:7px; flex-wrap:wrap;}
@@ -49,7 +68,6 @@
     input[type=file]{display:none;}
     input[type=url],input[type=text],select{ font-size:14px;padding:7px 7px;border-radius:var(--radius);border:1.2px solid #e2e6ef;background:var(--card);color:var(--text);}
     input[type=url]:focus,input[type=text]:focus,select:focus{border:1.5px solid var(--accent);}
-    /* полный белый текст на опциях и кнопках в темном режиме */
     [data-theme="dark"] .btn-glass-violet,
     [data-theme="dark"] .btn-new,
     [data-theme="dark"] .ctrl,
@@ -60,14 +78,10 @@
     }
     .btn-glass-violet {background:rgba(125,100,255,.13);color:#5239ca;border:1.6px solid #9277f5;border-radius:16px;font-weight:700; font-size:1.02rem;padding:10px 18px;box-shadow:0 7px 26px 0 rgba(126,91,255,.13),0 2px 7px 0 rgba(126,91,255,.09);backdrop-filter:blur(7px);margin:0 4px 6px 0;display:inline-flex;align-items:center;cursor:pointer;transition:color .2s,background .2s;}
     .btn-glass-violet.selected,.btn-glass-violet:active,.btn-glass-violet.primary {background: #8d6dff;color:#fff;border-color: #8769e6;}
-    .settings-bar{
-      display: flex; justify-content:center; align-items:stretch; margin:13px 0 10px 0; gap:18px;
-      flex-wrap:nowrap; width:100%;
-    }
-    .setbtn-main{
-      display:flex; align-items:center; flex:1 1 0px; gap:7px; min-width:0; min-height:54px;
-      justify-content:center; max-width:100%; text-align:center; box-sizing:border-box;
-    }
+    .settings-bar{display: flex; justify-content:center; align-items:stretch; margin:13px 0 10px 0; gap:18px;
+      flex-wrap:nowrap; width:100%;}
+    .setbtn-main{display:flex; align-items:center; flex:1 1 0px; gap:7px; min-width:0; min-height:54px;
+      justify-content:center; max-width:100%; text-align:center; box-sizing:border-box;}
     .setbtn-main input[type=checkbox]{margin-right:7px;transform:scale(1.15);}
     .btn-new {background:rgba(82,195,255,0.18);color:#233542;border-radius:14px;border:1.6px solid #43c6f6; font-weight:800;font-size:1.01rem; padding:10px 18px; margin:0 4px 0 0;transition:color .2s,background .2s;}
     .workspace{display:none;margin-top:20px;}
@@ -128,24 +142,24 @@
 </head>
 <body data-theme="light">
 <div class="container">
-  <header>
-    <div class="logo">Q↔A</div>
-    <div>
-      <h1 id="siteTitle">Albinyok Flashcards</h1>
-      <div class="sub">
-        <span id="siteSubtitle"></span>
-        <span class="sub-secondary" id="localProgress"></span>
+  <div class="main-header-centered">
+    <div class="header-row">
+      <div class="logo">Q↔A</div>
+      <div class="title-block">
+        <h1 id="siteTitle">Albinyok Flashcards</h1>
       </div>
     </div>
-    <div class="lang-select">
-      <select id="langSelect" class="lang-flags" aria-label="Language">
-        <option value="ru">🇷🇺 Русский</option>
-        <option value="en">🇬🇧 English</option>
-        <option value="fr">🇫🇷 Français</option>
-      </select>
-      <button class="theme-toggle" id="themeToggle" title="Theme">🌙</button>
-    </div>
-  </header>
+    <div class="sub" id="siteSubtitle"></div>
+    <div class="sub-secondary" id="localProgress"></div>
+  </div>
+  <div class="lang-select" style="position:absolute; top:24px; right:32px;">
+    <select id="langSelect" class="lang-flags" aria-label="Language">
+      <option value="ru">🇷🇺 Русский</option>
+      <option value="en">🇬🇧 English</option>
+      <option value="fr">🇫🇷 Français</option>
+    </select>
+    <button class="theme-toggle" id="themeToggle" title="Theme">🌙</button>
+  </div>
   <section class="uploader" id="uploader" aria-label="Загрузка CSV">
     <h2 id="fileOrLink"></h2>
     <div class="uploader-flex">
