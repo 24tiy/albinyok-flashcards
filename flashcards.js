@@ -36,6 +36,9 @@ const translations = {
     revealText: "Показать ответ",
     knowText: "Знаю",
     dontKnowText: "Не знаю",
+    hintText: "Подсказка",
+    hintLabel: "Подсказка:",
+    hintHotkey: "подсказка",
     hintReveal: "перевернуть",
     hintKnow: "знаю",
     hintDontKnow: "не знаю",
@@ -74,7 +77,24 @@ const translations = {
     allCategories: "Все",
     confirmDelete: "Удалить эту колоду?",
     confirmReset: "Сбросить весь прогресс?",
-    deckDefault: "Основная колода"
+    deckDefault: "Основная колода",
+    // AI Generator
+    aiGeneratorTitle: "AI Генератор карточек",
+    aiGeneratorDesc: "Вставьте текст и AI автоматически создаст карточки",
+    aiCountLabel: "Количество карточек:",
+    aiLangLabel: "Язык карточек:",
+    aiLangSame: "Как в тексте",
+    aiApiSummary: "🔑 API ключ (опционально - для лучших результатов)",
+    apiNote: "Без API ключа используется базовый парсинг текста",
+    generateText: "Сгенерировать",
+    aiLoadingText: "Генерация...",
+    previewTitle: "Предпросмотр",
+    acceptText: "Добавить в колоду",
+    discardText: "Отменить",
+    toastGenerated: "Сгенерировано карточек: ",
+    toastNoText: "Вставьте текст для генерации",
+    swipeLeftHint: "← Свайп влево = Не знаю",
+    swipeRightHint: "Свайп вправо = Знаю →"
   },
   en: {
     siteTitle: "Albinyok Flashcards",
@@ -94,6 +114,9 @@ const translations = {
     revealText: "Show Answer",
     knowText: "Know",
     dontKnowText: "Don't Know",
+    hintText: "Hint",
+    hintLabel: "Hint:",
+    hintHotkey: "hint",
     hintReveal: "flip card",
     hintKnow: "know",
     hintDontKnow: "don't know",
@@ -132,7 +155,24 @@ const translations = {
     allCategories: "All",
     confirmDelete: "Delete this deck?",
     confirmReset: "Reset all progress?",
-    deckDefault: "Main Deck"
+    deckDefault: "Main Deck",
+    // AI Generator
+    aiGeneratorTitle: "AI Card Generator",
+    aiGeneratorDesc: "Paste text and AI will create flashcards automatically",
+    aiCountLabel: "Number of cards:",
+    aiLangLabel: "Card language:",
+    aiLangSame: "Same as text",
+    aiApiSummary: "🔑 API Key (optional - for better results)",
+    apiNote: "Without API key, basic text parsing will be used",
+    generateText: "Generate Cards",
+    aiLoadingText: "Generating...",
+    previewTitle: "Preview",
+    acceptText: "Add to Deck",
+    discardText: "Discard",
+    toastGenerated: "Cards generated: ",
+    toastNoText: "Please paste text to generate cards",
+    swipeLeftHint: "← Swipe left = Don't know",
+    swipeRightHint: "Swipe right = Know →"
   },
   fr: {
     siteTitle: "Albinyok Flashcards",
@@ -152,6 +192,9 @@ const translations = {
     revealText: "Voir la réponse",
     knowText: "Je sais",
     dontKnowText: "Je ne sais pas",
+    hintText: "Indice",
+    hintLabel: "Indice:",
+    hintHotkey: "indice",
     hintReveal: "retourner",
     hintKnow: "je sais",
     hintDontKnow: "je ne sais pas",
@@ -190,7 +233,24 @@ const translations = {
     allCategories: "Toutes",
     confirmDelete: "Supprimer ce paquet?",
     confirmReset: "Réinitialiser toute la progression?",
-    deckDefault: "Paquet principal"
+    deckDefault: "Paquet principal",
+    // AI Generator
+    aiGeneratorTitle: "Générateur de cartes IA",
+    aiGeneratorDesc: "Collez du texte et l'IA créera des cartes automatiquement",
+    aiCountLabel: "Nombre de cartes:",
+    aiLangLabel: "Langue des cartes:",
+    aiLangSame: "Comme le texte",
+    aiApiSummary: "🔑 Clé API (optionnel - pour de meilleurs résultats)",
+    apiNote: "Sans clé API, l'analyse basique du texte sera utilisée",
+    generateText: "Générer",
+    aiLoadingText: "Génération...",
+    previewTitle: "Aperçu",
+    acceptText: "Ajouter au paquet",
+    discardText: "Annuler",
+    toastGenerated: "Cartes générées: ",
+    toastNoText: "Veuillez coller du texte pour générer des cartes",
+    swipeLeftHint: "← Glisser à gauche = Je ne sais pas",
+    swipeRightHint: "Glisser à droite = Je sais →"
   }
 };
 
@@ -216,7 +276,17 @@ const state = {
     weekActivity: [false, false, false, false, false, false, false]
   },
   filteredCards: [],
-  selectedCategory: null
+  selectedCategory: null,
+  // New state for hints
+  hintLevel: 0, // 0 = no hint, 1 = first letter, 2 = more letters, etc.
+  // New state for AI generator
+  aiApiKey: null,
+  aiProvider: 'anthropic',
+  generatedCards: [],
+  // Swipe state
+  swipeStartX: 0,
+  swipeStartY: 0,
+  isSwiping: false
 };
 
 // ==================== DOM ELEMENTS ====================
@@ -357,7 +427,9 @@ function saveState() {
     decks: state.decks,
     currentDeckId: state.currentDeckId,
     settings: state.settings,
-    statistics: state.statistics
+    statistics: state.statistics,
+    aiApiKey: state.aiApiKey,
+    aiProvider: state.aiProvider
   };
   localStorage.setItem(CONFIG.storageKey, JSON.stringify(data));
 }
@@ -373,6 +445,8 @@ function loadState() {
       state.currentDeckId = data.currentDeckId;
       state.settings = { ...state.settings, ...data.settings };
       state.statistics = { ...state.statistics, ...data.statistics };
+      state.aiApiKey = data.aiApiKey || null;
+      state.aiProvider = data.aiProvider || 'anthropic';
       
       // Update daily stats
       if (state.statistics.lastReviewDate && !isToday(state.statistics.lastReviewDate)) {
@@ -478,6 +552,9 @@ function markCard(quality) {
   
   playSound(quality >= 3 ? 'correct' : 'incorrect');
   
+  // Reset hint for next card
+  resetHint();
+  
   // Move to next card
   state.isFlipped = false;
   state.currentIndex++;
@@ -548,6 +625,9 @@ function updateLanguage() {
   $('#revealText').textContent = t('revealText');
   $('#knowText').textContent = t('knowText');
   $('#dontKnowText').textContent = t('dontKnowText');
+  $('#hintText').textContent = t('hintText');
+  $('#hintLabel').textContent = t('hintLabel');
+  if ($('#hintHotkey')) $('#hintHotkey').textContent = t('hintHotkey');
   $('#hintReveal').textContent = t('hintReveal');
   $('#hintKnow').textContent = t('hintKnow');
   $('#hintDontKnow').textContent = t('hintDontKnow');
@@ -578,6 +658,20 @@ function updateLanguage() {
   $('#saveCardsText').textContent = t('saveCardsText');
   $('#closeEditorText').textContent = t('closeEditorText');
   $('#footerText').textContent = t('footerText');
+  
+  // AI Generator translations
+  $('#aiGeneratorTitle').textContent = t('aiGeneratorTitle');
+  $('#aiGeneratorDesc').textContent = t('aiGeneratorDesc');
+  $('#aiCountLabel').textContent = t('aiCountLabel');
+  $('#aiLangLabel').textContent = t('aiLangLabel');
+  $('#aiLangSame').textContent = t('aiLangSame');
+  $('#aiApiSummary').textContent = t('aiApiSummary');
+  $('#apiNote').textContent = t('apiNote');
+  $('#generateText').textContent = t('generateText');
+  $('#aiLoadingText').textContent = t('aiLoadingText');
+  $('#previewTitle').textContent = t('previewTitle');
+  $('#acceptText').textContent = t('acceptText');
+  $('#discardText').textContent = t('discardText');
 }
 
 function updateTheme() {
@@ -744,11 +838,17 @@ function updateControls() {
   const hasCards = cards.length > 0;
   
   $('#revealBtn').disabled = !hasCards;
+  $('#hintBtn').disabled = !hasCards || state.isFlipped;
   $('#knowBtn').disabled = !hasCards || (!state.isFlipped && state.settings.testMode);
   $('#dontKnowBtn').disabled = !hasCards || (!state.isFlipped && state.settings.testMode);
   
   // Update reveal button text based on flip state
-  $('#revealText').textContent = state.isFlipped ? (state.lang === 'ru' ? 'Скрыть' : 'Hide') : t('revealText');
+  $('#revealText').textContent = state.isFlipped ? (state.lang === 'ru' ? 'Скрыть' : state.lang === 'fr' ? 'Cacher' : 'Hide') : t('revealText');
+  
+  // Reset hint display when card changes
+  if (!state.isFlipped) {
+    resetHint();
+  }
 }
 
 function updateSettings() {
@@ -956,6 +1056,446 @@ function exportData() {
   URL.revokeObjectURL(url);
 }
 
+// ==================== HINT SYSTEM ====================
+function getHint(answer, level) {
+  if (!answer || level === 0) return '';
+  
+  const words = answer.split(' ');
+  const totalChars = answer.length;
+  
+  // Progressive hint levels
+  if (level === 1) {
+    // First letter of first word + underscores
+    return answer[0] + '_'.repeat(Math.min(totalChars - 1, 10)) + '...';
+  } else if (level === 2) {
+    // First word partially revealed
+    const firstWord = words[0];
+    const revealed = Math.ceil(firstWord.length / 2);
+    return firstWord.substring(0, revealed) + '_'.repeat(firstWord.length - revealed) + 
+           (words.length > 1 ? ' ...' : '');
+  } else if (level === 3) {
+    // First word + first letter of second word
+    if (words.length === 1) {
+      return words[0].substring(0, Math.ceil(words[0].length * 0.75)) + '...';
+    }
+    return words[0] + ' ' + words[1][0] + '...';
+  } else {
+    // Almost full reveal
+    const revealPercent = Math.min(0.5 + (level * 0.1), 0.9);
+    const revealChars = Math.floor(totalChars * revealPercent);
+    return answer.substring(0, revealChars) + '...';
+  }
+}
+
+function showHint() {
+  const cards = getCurrentCards();
+  const card = cards[state.currentIndex];
+  if (!card) return;
+  
+  state.hintLevel++;
+  const hint = getHint(card.answer, state.hintLevel);
+  
+  $('#hintContent').textContent = hint;
+  $('#hintDisplay').classList.remove('hidden');
+  
+  // If max hint level reached, show message
+  if (state.hintLevel >= 4) {
+    $('#hintBtn').disabled = true;
+  }
+  
+  playSound('flip');
+}
+
+function resetHint() {
+  state.hintLevel = 0;
+  $('#hintDisplay').classList.add('hidden');
+  $('#hintBtn').disabled = false;
+}
+
+// ==================== SWIPE GESTURES ====================
+function initSwipeGestures() {
+  const container = $('.flashcard-container');
+  const flashcard = $('#flashcard');
+  const indicator = $('#swipeIndicator');
+  
+  let startX = 0;
+  let startY = 0;
+  let currentX = 0;
+  let isDragging = false;
+  
+  container.addEventListener('touchstart', (e) => {
+    if (e.touches.length !== 1) return;
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    isDragging = true;
+    flashcard.classList.add('swiping');
+  }, { passive: true });
+  
+  container.addEventListener('touchmove', (e) => {
+    if (!isDragging) return;
+    
+    currentX = e.touches[0].clientX;
+    const currentY = e.touches[0].clientY;
+    const diffX = currentX - startX;
+    const diffY = currentY - startY;
+    
+    // Only handle horizontal swipes
+    if (Math.abs(diffY) > Math.abs(diffX)) {
+      return;
+    }
+    
+    // Apply transform
+    const rotation = diffX * 0.05;
+    flashcard.style.transform = `translateX(${diffX}px) rotate(${rotation}deg)`;
+    
+    // Show swipe indicators
+    if (diffX < -50) {
+      indicator.classList.add('show-left');
+      indicator.classList.remove('show-right');
+    } else if (diffX > 50) {
+      indicator.classList.add('show-right');
+      indicator.classList.remove('show-left');
+    } else {
+      indicator.classList.remove('show-left', 'show-right');
+    }
+  }, { passive: true });
+  
+  container.addEventListener('touchend', (e) => {
+    if (!isDragging) return;
+    isDragging = false;
+    
+    const diffX = currentX - startX;
+    flashcard.classList.remove('swiping');
+    indicator.classList.remove('show-left', 'show-right');
+    
+    const threshold = 100;
+    
+    if (diffX < -threshold) {
+      // Swipe left - Don't know
+      flashcard.classList.add('swipe-left');
+      setTimeout(() => {
+        flashcard.classList.remove('swipe-left');
+        flashcard.style.transform = '';
+        markCard(1); // Don't know
+      }, 300);
+    } else if (diffX > threshold) {
+      // Swipe right - Know
+      flashcard.classList.add('swipe-right');
+      setTimeout(() => {
+        flashcard.classList.remove('swipe-right');
+        flashcard.style.transform = '';
+        markCard(4); // Know
+      }, 300);
+    } else {
+      // Reset position
+      flashcard.style.transform = '';
+    }
+    
+    currentX = 0;
+  }, { passive: true });
+  
+  // Cancel on touch cancel
+  container.addEventListener('touchcancel', () => {
+    isDragging = false;
+    flashcard.classList.remove('swiping');
+    flashcard.style.transform = '';
+    indicator.classList.remove('show-left', 'show-right');
+  }, { passive: true });
+}
+
+// ==================== AI CARD GENERATOR ====================
+async function generateCardsWithAI() {
+  const text = $('#aiTextInput').value.trim();
+  if (!text) {
+    showToast(t('toastNoText'), 'error');
+    return;
+  }
+  
+  const cardCount = parseInt($('#aiCardCount').value);
+  const cardLang = $('#aiCardLang').value;
+  const apiKey = state.aiApiKey;
+  const provider = state.aiProvider;
+  
+  // Show loading
+  $('#aiLoading').classList.remove('hidden');
+  $('#generateCardsBtn').disabled = true;
+  
+  try {
+    let cards;
+    
+    if (apiKey) {
+      // Use AI API
+      cards = await generateWithAPI(text, cardCount, cardLang, apiKey, provider);
+    } else {
+      // Fallback to basic text parsing
+      cards = generateWithBasicParsing(text, cardCount);
+    }
+    
+    if (cards.length === 0) {
+      showToast(t('toastError') + ': No cards generated', 'error');
+      return;
+    }
+    
+    state.generatedCards = cards;
+    showCardPreview(cards);
+    showToast(t('toastGenerated') + cards.length, 'success');
+    
+  } catch (error) {
+    console.error('AI generation error:', error);
+    showToast(t('toastError') + ': ' + error.message, 'error');
+  } finally {
+    $('#aiLoading').classList.add('hidden');
+    $('#generateCardsBtn').disabled = false;
+  }
+}
+
+async function generateWithAPI(text, count, lang, apiKey, provider) {
+  const langInstruction = lang === 'same' ? '' : `Generate the cards in ${lang === 'ru' ? 'Russian' : lang === 'fr' ? 'French' : 'English'}.`;
+  
+  const prompt = `Analyze the following text and create exactly ${count} flashcards for learning/memorization.
+${langInstruction}
+
+Return ONLY a JSON array with objects containing "question" and "answer" fields. No markdown, no explanation.
+Example: [{"question": "What is X?", "answer": "X is Y"}]
+
+Text to analyze:
+${text.substring(0, 8000)}`;
+
+  if (provider === 'anthropic') {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-3-haiku-20240307',
+        max_tokens: 4096,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error?.message || 'API request failed');
+    }
+    
+    const data = await response.json();
+    const content = data.content[0].text;
+    return parseAIResponse(content);
+    
+  } else if (provider === 'openai') {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: 'gpt-3.5-turbo',
+        messages: [{ role: 'user', content: prompt }],
+        max_tokens: 4096
+      })
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error?.message || 'API request failed');
+    }
+    
+    const data = await response.json();
+    const content = data.choices[0].message.content;
+    return parseAIResponse(content);
+  }
+  
+  throw new Error('Unknown provider');
+}
+
+function parseAIResponse(content) {
+  // Try to extract JSON from the response
+  let jsonStr = content.trim();
+  
+  // Remove markdown code blocks if present
+  jsonStr = jsonStr.replace(/```json\n?/g, '').replace(/```\n?/g, '');
+  
+  // Find JSON array
+  const match = jsonStr.match(/\[[\s\S]*\]/);
+  if (match) {
+    jsonStr = match[0];
+  }
+  
+  try {
+    const cards = JSON.parse(jsonStr);
+    return cards.filter(c => c.question && c.answer).map(c => ({
+      question: c.question.trim(),
+      answer: c.answer.trim(),
+      category: 'AI Generated'
+    }));
+  } catch (e) {
+    console.error('Failed to parse AI response:', e);
+    throw new Error('Failed to parse AI response');
+  }
+}
+
+function generateWithBasicParsing(text, count) {
+  const cards = [];
+  
+  // Split into sentences
+  const sentences = text
+    .replace(/([.!?])\s+/g, '$1|')
+    .split('|')
+    .filter(s => s.trim().length > 20);
+  
+  // Look for patterns
+  const patterns = [
+    // Definition patterns: "X is Y", "X - это Y"
+    /^([^.]{5,50})\s+(?:is|are|was|were|это|est|sont)\s+(.{10,200})/i,
+    // "X: Y" pattern
+    /^([^:]{5,50}):\s*(.{10,200})/,
+    // Year/date patterns
+    /(\d{4})[^.]*[.]/,
+  ];
+  
+  for (const sentence of sentences) {
+    if (cards.length >= count) break;
+    
+    const trimmed = sentence.trim();
+    
+    // Try definition pattern
+    for (const pattern of patterns) {
+      const match = trimmed.match(pattern);
+      if (match && match[1] && match[2]) {
+        cards.push({
+          question: `What is ${match[1].trim()}?`,
+          answer: match[2].trim(),
+          category: 'Auto-generated'
+        });
+        break;
+      }
+    }
+    
+    // Create fill-in-the-blank for longer sentences
+    if (cards.length < count && trimmed.length > 50) {
+      const words = trimmed.split(' ');
+      if (words.length > 8) {
+        // Find a key word (longer words are usually more important)
+        const keyWords = words.filter(w => w.length > 5 && /^[A-Za-zА-Яа-яÀ-ÿ]/.test(w));
+        if (keyWords.length > 0) {
+          const keyWord = keyWords[Math.floor(keyWords.length / 2)];
+          const question = trimmed.replace(keyWord, '_____');
+          cards.push({
+            question: question,
+            answer: keyWord,
+            category: 'Auto-generated'
+          });
+        }
+      }
+    }
+  }
+  
+  // If we still need more cards, create simple Q&A from sentences
+  for (const sentence of sentences) {
+    if (cards.length >= count) break;
+    
+    const trimmed = sentence.trim();
+    if (trimmed.length > 30 && trimmed.length < 200) {
+      // Check if we already used this sentence
+      const alreadyUsed = cards.some(c => 
+        c.answer.includes(trimmed.substring(0, 30)) || 
+        c.question.includes(trimmed.substring(0, 30))
+      );
+      
+      if (!alreadyUsed) {
+        cards.push({
+          question: `Complete: "${trimmed.substring(0, 40)}..."`,
+          answer: trimmed,
+          category: 'Auto-generated'
+        });
+      }
+    }
+  }
+  
+  return cards.slice(0, count);
+}
+
+function showCardPreview(cards) {
+  const list = $('#aiPreviewList');
+  list.innerHTML = '';
+  
+  cards.forEach((card, index) => {
+    const div = document.createElement('div');
+    div.className = 'preview-card';
+    div.innerHTML = `
+      <input type="text" value="${card.question.replace(/"/g, '&quot;')}" data-index="${index}" data-field="question">
+      <input type="text" value="${card.answer.replace(/"/g, '&quot;')}" data-index="${index}" data-field="answer">
+      <button class="remove-btn" onclick="removePreviewCard(${index})">✕</button>
+    `;
+    list.appendChild(div);
+  });
+  
+  $('#aiPreview').classList.remove('hidden');
+}
+
+function removePreviewCard(index) {
+  state.generatedCards.splice(index, 1);
+  showCardPreview(state.generatedCards);
+}
+
+function acceptGeneratedCards() {
+  if (state.generatedCards.length === 0) return;
+  
+  // Update cards from preview inputs
+  const inputs = $$('#aiPreviewList input');
+  inputs.forEach(input => {
+    const index = parseInt(input.dataset.index);
+    const field = input.dataset.field;
+    if (state.generatedCards[index]) {
+      state.generatedCards[index][field] = input.value.trim();
+    }
+  });
+  
+  // Filter out empty cards
+  const validCards = state.generatedCards.filter(c => c.question && c.answer);
+  
+  if (validCards.length === 0) {
+    showToast(t('toastError'), 'error');
+    return;
+  }
+  
+  // Add to current deck or create new one
+  if (state.currentDeckId && state.decks[state.currentDeckId]) {
+    const deck = state.decks[state.currentDeckId];
+    validCards.forEach(card => {
+      deck.cards.push({
+        id: generateId(),
+        question: card.question,
+        answer: card.answer,
+        category: card.category || 'AI Generated',
+        sm2: null,
+        created: new Date().toISOString()
+      });
+    });
+  } else {
+    createDeck('AI Generated', validCards);
+  }
+  
+  saveState();
+  discardGeneratedCards();
+  updateUI();
+  showToast(t('toastSaved'), 'success');
+}
+
+function discardGeneratedCards() {
+  state.generatedCards = [];
+  $('#aiPreview').classList.add('hidden');
+  $('#aiTextInput').value = '';
+}
+
+// Expose to global scope for onclick handlers
+window.removePreviewCard = removePreviewCard;
+
 // ==================== EVENT HANDLERS ====================
 function setupEventListeners() {
   // Language
@@ -1091,6 +1631,33 @@ function setupEventListeners() {
   $('#addCardBtn').addEventListener('click', addCard);
   $('#saveCardsBtn').addEventListener('click', saveCards);
   
+  // Hint button
+  $('#hintBtn').addEventListener('click', showHint);
+  
+  // AI Generator
+  $('#generateCardsBtn').addEventListener('click', generateCardsWithAI);
+  $('#acceptCardsBtn').addEventListener('click', acceptGeneratedCards);
+  $('#discardCardsBtn').addEventListener('click', discardGeneratedCards);
+  
+  // Save API key
+  $('#saveApiKey').addEventListener('click', () => {
+    state.aiApiKey = $('#aiApiKey').value.trim() || null;
+    state.aiProvider = $('#aiProvider').value;
+    saveState();
+    showToast(t('toastSaved'), 'success');
+  });
+  
+  // Load saved API key
+  if (state.aiApiKey) {
+    $('#aiApiKey').value = state.aiApiKey;
+  }
+  if (state.aiProvider) {
+    $('#aiProvider').value = state.aiProvider;
+  }
+  
+  // Initialize swipe gestures for mobile
+  initSwipeGestures();
+  
   // Keyboard shortcuts
   document.addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
@@ -1124,6 +1691,7 @@ function setupEventListeners() {
         e.preventDefault();
         state.currentIndex = Math.max(0, state.currentIndex - 1);
         state.isFlipped = false;
+        resetHint();
         updateFlashcard();
         updateStats();
         updateControls();
@@ -1132,9 +1700,17 @@ function setupEventListeners() {
         e.preventDefault();
         state.currentIndex = Math.min(cards.length - 1, state.currentIndex + 1);
         state.isFlipped = false;
+        resetHint();
         updateFlashcard();
         updateStats();
         updateControls();
+        break;
+      case 'KeyH':
+        // Hint shortcut
+        if (!state.isFlipped) {
+          e.preventDefault();
+          showHint();
+        }
         break;
     }
   });
