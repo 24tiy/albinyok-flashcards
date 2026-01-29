@@ -1,0 +1,35 @@
+{
+  "name": "Albinyok Flashcards",
+  "short_name": "Flashcards",
+  "description": "Smart spaced repetition flashcards app for efficient learning",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#7c3aed",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "productivity"],
+  "lang": "en",
+  "dir": "ltr",
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Start Learning",
+      "url": "/",
+      "description": "Open flashcards and start learning"
+    }
+  ]
+}
