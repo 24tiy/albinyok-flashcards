@@ -1,26 +1,43 @@
 /**
- * Albinyok Flashcards v2.2
- * Beautiful air.inc inspired design
- * Features: Swipe, Hints, AI Generation, SM-2 Algorithm
+ * Albinyok Flashcards v3.0 - Premium Edition
+ * Glassmorphism design with beautiful animations
+ * Features: Swipe gestures, Hints, AI Generation, SM-2 Algorithm
  */
 
 // ===== CONFIG =====
 const CONFIG = {
-  storageKey: 'albinyok-flashcards-v2',
+  storageKey: 'albinyok-flashcards-v3',
   sm2: { defaultEF: 2.5, minEF: 1.3, maxEF: 3.0 }
 };
 
 // ===== TRANSLATIONS =====
 const T = {
   ru: {
-    tapHint: 'Нажмите для ответа',
+    tagline: 'Учись умнее',
+    tapHint: 'Нажмите, чтобы увидеть ответ',
     flipShow: 'Показать ответ',
     flipHide: 'Скрыть ответ',
     know: 'Знаю',
     dontKnow: 'Не знаю',
+    back: 'Назад',
+    next: 'Далее',
     emptyTitle: 'Загрузите карточки',
-    emptyDesc: 'CSV файл или ссылка на Google Sheets',
-    toastLoaded: 'Загружено карточек: ',
+    emptyDesc: 'Перетащите CSV файл или вставьте ссылку на Google Sheets',
+    uploadTitle: 'Загрузить',
+    decksTitle: 'Колоды',
+    aiTitle: 'AI Генератор',
+    settingsTitle: 'Настройки',
+    editorTitle: 'Редактор карточек',
+    testMode: 'Режим теста',
+    testModeDesc: 'Ответить перед просмотром',
+    sr: 'Интервальное повторение',
+    srDesc: 'Алгоритм SM-2',
+    hard: 'Только сложные',
+    hardDesc: 'Фокус на трудных карточках',
+    shuffle: 'Перемешать',
+    shuffleDesc: 'Случайный порядок',
+    allCats: 'Все',
+    toastLoaded: 'Загружено: ',
     toastSaved: 'Сохранено!',
     toastError: 'Ошибка',
     toastReset: 'Прогресс сброшен',
@@ -29,33 +46,47 @@ const T = {
     toastGen: 'Сгенерировано: ',
     confirmReset: 'Сбросить весь прогресс?',
     confirmDelete: 'Удалить эту колоду?',
-    allCats: 'Все',
-    tagline: 'Учись <em>умнее</em>',
-    upload: 'Загрузить',
-    decks: 'Колоды',
-    settings: 'Настройки',
-    aiGen: 'AI Генератор',
-    editor: 'Редактор',
-    testMode: 'Режим теста',
-    testModeDesc: 'Ответить перед просмотром',
-    sr: 'Интервальное повторение',
-    srDesc: 'Алгоритм SM-2',
-    hard: 'Только сложные',
-    hardDesc: 'Фокус на трудных',
-    shuffle: 'Перемешать',
-    shuffleDesc: 'Случайный порядок',
-    back: 'Назад',
-    next: 'Далее'
+    browseFiles: 'Выбрать файл',
+    loadDemo: 'Загрузить демо',
+    loadUrl: 'Загрузить по ссылке',
+    dragDrop: 'Перетащите',
+    csvHere: 'CSV файл сюда',
+    newDeck: 'Новая',
+    deleteDeck: 'Удалить',
+    generate: 'Сгенерировать',
+    add: 'Добавить',
+    save: 'Сохранить',
+    cancel: 'Отмена',
+    reset: 'Сброс',
+    export: 'Экспорт',
+    editor: 'Редактор'
   },
   en: {
-    tapHint: 'Tap to flip',
+    tagline: 'Learn smarter',
+    tapHint: 'Tap to reveal answer',
     flipShow: 'Show answer',
     flipHide: 'Hide answer',
     know: 'Know',
     dontKnow: "Don't know",
+    back: 'Back',
+    next: 'Next',
     emptyTitle: 'Load your flashcards',
-    emptyDesc: 'Upload a CSV file or paste a link',
-    toastLoaded: 'Cards loaded: ',
+    emptyDesc: 'Drag & drop a CSV file or paste a Google Sheets link',
+    uploadTitle: 'Upload',
+    decksTitle: 'Decks',
+    aiTitle: 'AI Generator',
+    settingsTitle: 'Settings',
+    editorTitle: 'Card Editor',
+    testMode: 'Test mode',
+    testModeDesc: 'Answer before reveal',
+    sr: 'Spaced repetition',
+    srDesc: 'SM-2 algorithm',
+    hard: 'Hard cards only',
+    hardDesc: 'Focus on difficult cards',
+    shuffle: 'Shuffle',
+    shuffleDesc: 'Random order',
+    allCats: 'All',
+    toastLoaded: 'Loaded: ',
     toastSaved: 'Saved!',
     toastError: 'Error',
     toastReset: 'Progress reset',
@@ -64,65 +95,76 @@ const T = {
     toastGen: 'Generated: ',
     confirmReset: 'Reset all progress?',
     confirmDelete: 'Delete this deck?',
-    allCats: 'All',
-    tagline: 'Learn <em>smarter</em>',
-    upload: 'Upload',
-    decks: 'Decks',
-    settings: 'Settings',
-    aiGen: 'AI Generator',
-    editor: 'Card Editor',
-    testMode: 'Test mode',
-    testModeDesc: 'Answer before reveal',
-    sr: 'Spaced repetition',
-    srDesc: 'SM-2 algorithm',
-    hard: 'Hard cards only',
-    hardDesc: 'Focus on difficult',
-    shuffle: 'Shuffle',
-    shuffleDesc: 'Random order',
-    back: 'Back',
-    next: 'Next'
+    browseFiles: 'Browse files',
+    loadDemo: 'Load demo',
+    loadUrl: 'Load from URL',
+    dragDrop: 'Drag & drop',
+    csvHere: 'your CSV file here',
+    newDeck: 'New',
+    deleteDeck: 'Delete',
+    generate: 'Generate',
+    add: 'Add',
+    save: 'Save',
+    cancel: 'Cancel',
+    reset: 'Reset',
+    export: 'Export',
+    editor: 'Editor'
   },
   fr: {
-    tapHint: 'Appuyez pour retourner',
+    tagline: 'Apprenez intelligemment',
+    tapHint: 'Appuyez pour révéler',
     flipShow: 'Voir la réponse',
     flipHide: 'Cacher la réponse',
     know: 'Je sais',
     dontKnow: 'Je ne sais pas',
+    back: 'Retour',
+    next: 'Suivant',
     emptyTitle: 'Chargez vos cartes',
-    emptyDesc: 'Fichier CSV ou lien Google Sheets',
-    toastLoaded: 'Cartes chargées: ',
-    toastSaved: 'Enregistré!',
-    toastError: 'Erreur',
-    toastReset: 'Progression réinitialisée',
-    toastNoHard: 'Pas de cartes difficiles',
-    toastNoText: 'Collez du texte',
-    toastGen: 'Générées: ',
-    confirmReset: 'Réinitialiser?',
-    confirmDelete: 'Supprimer ce paquet?',
-    allCats: 'Toutes',
-    tagline: 'Apprenez <em>intelligemment</em>',
-    upload: 'Charger',
-    decks: 'Paquets',
-    settings: 'Paramètres',
-    aiGen: 'Générateur IA',
-    editor: 'Éditeur',
+    emptyDesc: 'Glissez un fichier CSV ou collez un lien Google Sheets',
+    uploadTitle: 'Charger',
+    decksTitle: 'Paquets',
+    aiTitle: 'Générateur IA',
+    settingsTitle: 'Paramètres',
+    editorTitle: 'Éditeur de cartes',
     testMode: 'Mode test',
     testModeDesc: 'Répondre avant de voir',
     sr: 'Répétition espacée',
     srDesc: 'Algorithme SM-2',
     hard: 'Cartes difficiles',
-    hardDesc: 'Concentrer sur les difficiles',
+    hardDesc: 'Focus sur les difficiles',
     shuffle: 'Mélanger',
     shuffleDesc: 'Ordre aléatoire',
-    back: 'Retour',
-    next: 'Suivant'
+    allCats: 'Toutes',
+    toastLoaded: 'Chargé: ',
+    toastSaved: 'Enregistré!',
+    toastError: 'Erreur',
+    toastReset: 'Progression réinitialisée',
+    toastNoHard: 'Pas de cartes difficiles',
+    toastNoText: 'Collez du texte',
+    toastGen: 'Généré: ',
+    confirmReset: 'Réinitialiser tout?',
+    confirmDelete: 'Supprimer ce paquet?',
+    browseFiles: 'Parcourir',
+    loadDemo: 'Charger démo',
+    loadUrl: 'Charger depuis URL',
+    dragDrop: 'Glissez-déposez',
+    csvHere: 'votre fichier CSV ici',
+    newDeck: 'Nouveau',
+    deleteDeck: 'Supprimer',
+    generate: 'Générer',
+    add: 'Ajouter',
+    save: 'Enregistrer',
+    cancel: 'Annuler',
+    reset: 'Réinit.',
+    export: 'Exporter',
+    editor: 'Éditeur'
   }
 };
 
 // ===== STATE =====
 const state = {
   lang: 'ru',
-  theme: 'light',
+  theme: 'dark',
   decks: {},
   deckId: null,
   idx: 0,
@@ -176,7 +218,7 @@ function load() {
     if (d) {
       Object.assign(state, {
         lang: d.lang || 'ru',
-        theme: d.theme || 'light',
+        theme: d.theme || 'dark',
         decks: d.decks || {},
         deckId: d.deckId,
         settings: { ...state.settings, ...d.settings },
@@ -267,6 +309,7 @@ function createDeck(name, cards = []) {
   };
   state.deckId = id;
   state.idx = 0;
+  state.category = null;
   save();
   return id;
 }
@@ -276,6 +319,7 @@ function deleteDeck(id) {
   const ids = Object.keys(state.decks);
   state.deckId = ids.length ? ids[0] : null;
   state.idx = 0;
+  state.category = null;
   save();
 }
 
@@ -295,26 +339,56 @@ function mark(quality) {
   }
   
   // Visual feedback
-  const el = $('#card');
+  const el = $('#flashcard');
   el.classList.add(quality >= 3 ? 'correct' : 'incorrect');
-  setTimeout(() => el.classList.remove('correct', 'incorrect'), 500);
   
-  // Next card
-  state.flipped = false;
-  state.hintLvl = 0;
-  state.idx = (state.idx + 1) % (getCards().length || 1);
+  // Haptic feedback
+  if (navigator.vibrate) {
+    navigator.vibrate(quality >= 3 ? [10] : [20, 50, 20]);
+  }
   
-  render();
+  setTimeout(() => {
+    el.classList.remove('correct', 'incorrect');
+    
+    // Next card
+    state.flipped = false;
+    state.hintLvl = 0;
+    
+    const newCards = getCards();
+    if (newCards.length === 0) {
+      state.idx = 0;
+    } else {
+      state.idx = state.idx >= newCards.length ? 0 : state.idx;
+      // Don't increment if we just removed a card from the filtered list
+      if (newCards.length > 0 && state.idx < newCards.length - 1) {
+        state.idx++;
+      } else if (state.idx >= newCards.length) {
+        state.idx = 0;
+      }
+    }
+    
+    render();
+  }, 300);
 }
 
 // ===== HINT SYSTEM =====
 function getHint(answer, lvl) {
   if (!answer || lvl === 0) return '';
   const len = answer.length;
+  const words = answer.split(' ');
   
-  if (lvl === 1) return answer[0] + '•'.repeat(Math.min(len - 1, 8)) + '...';
-  if (lvl === 2) return answer.slice(0, Math.ceil(len * 0.3)) + '...';
-  if (lvl === 3) return answer.slice(0, Math.ceil(len * 0.5)) + '...';
+  if (lvl === 1) {
+    return answer[0] + ' •••';
+  }
+  if (lvl === 2) {
+    return answer.slice(0, Math.ceil(len * 0.25)) + '...';
+  }
+  if (lvl === 3) {
+    if (words.length > 1) {
+      return words[0] + ' ' + words[1][0] + '...';
+    }
+    return answer.slice(0, Math.ceil(len * 0.5)) + '...';
+  }
   return answer.slice(0, Math.ceil(len * 0.75)) + '...';
 }
 
@@ -327,7 +401,9 @@ function showHint() {
   $('#hintText').textContent = getHint(card.a, state.hintLvl);
   $('#hintBox').classList.remove('hidden');
   
-  if (state.hintLvl >= 4) $('#hintBtn').disabled = true;
+  if (state.hintLvl >= 4) {
+    $('#hintBtn').disabled = true;
+  }
 }
 
 function hideHint() {
@@ -338,50 +414,114 @@ function hideHint() {
 
 // ===== SWIPE GESTURES =====
 function initSwipe() {
-  const wrapper = $('#cardWrapper');
-  const card = $('#card');
+  const container = $('#cardContainer');
+  const card = $('#flashcard');
   const swL = $('#swipeL');
   const swR = $('#swipeR');
   
-  let startX = 0, curX = 0, dragging = false;
+  let startX = 0, startY = 0, curX = 0, curY = 0;
+  let isDragging = false;
+  let startTime = 0;
   
-  wrapper.addEventListener('touchstart', e => {
-    if (e.touches.length !== 1) return;
-    startX = curX = e.touches[0].clientX;
-    dragging = true;
-    card.style.transition = 'none';
-  }, { passive: true });
+  const onStart = (x, y) => {
+    startX = curX = x;
+    startY = curY = y;
+    startTime = Date.now();
+    isDragging = true;
+    card.classList.add('swiping');
+  };
   
-  wrapper.addEventListener('touchmove', e => {
-    if (!dragging) return;
-    curX = e.touches[0].clientX;
-    const diff = curX - startX;
+  const onMove = (x, y) => {
+    if (!isDragging) return;
     
-    card.style.transform = state.flipped
-      ? `rotateY(180deg) translateX(${-diff}px) rotate(${-diff * 0.03}deg)`
-      : `translateX(${diff}px) rotate(${diff * 0.03}deg)`;
+    curX = x;
+    curY = y;
+    const diffX = curX - startX;
+    const diffY = curY - startY;
     
-    swL.classList.toggle('show', diff < -50);
-    swR.classList.toggle('show', diff > 50);
-  }, { passive: true });
+    // Only horizontal swipes
+    if (Math.abs(diffY) > Math.abs(diffX) * 1.5) return;
+    
+    const rotation = diffX * 0.08;
+    const baseTransform = state.flipped ? 'rotateY(180deg) ' : '';
+    const moveX = state.flipped ? -diffX : diffX;
+    
+    card.style.transform = `${baseTransform}translateX(${moveX}px) rotate(${rotation}deg)`;
+    
+    // Show indicators
+    if (diffX < -60) {
+      swL.classList.add('show');
+      swR.classList.remove('show');
+    } else if (diffX > 60) {
+      swR.classList.add('show');
+      swL.classList.remove('show');
+    } else {
+      swL.classList.remove('show');
+      swR.classList.remove('show');
+    }
+  };
   
-  wrapper.addEventListener('touchend', () => {
-    if (!dragging) return;
-    dragging = false;
+  const onEnd = () => {
+    if (!isDragging) return;
+    isDragging = false;
     
-    const diff = curX - startX;
-    card.style.transition = '';
+    const diffX = curX - startX;
+    const velocity = Math.abs(diffX) / (Date.now() - startTime);
+    const threshold = velocity > 0.5 ? 50 : 100;
+    
+    card.classList.remove('swiping');
     card.style.transform = '';
     swL.classList.remove('show');
     swR.classList.remove('show');
     
-    if (diff < -100) mark(1);
-    else if (diff > 100) mark(4);
+    if (diffX < -threshold) {
+      // Swipe left - Don't know
+      card.classList.add('swipe-left');
+      setTimeout(() => {
+        card.classList.remove('swipe-left');
+        mark(1);
+      }, 300);
+    } else if (diffX > threshold) {
+      // Swipe right - Know
+      card.classList.add('swipe-right');
+      setTimeout(() => {
+        card.classList.remove('swipe-right');
+        mark(4);
+      }, 300);
+    }
+  };
+  
+  // Touch events
+  container.addEventListener('touchstart', e => {
+    if (e.touches.length === 1) {
+      onStart(e.touches[0].clientX, e.touches[0].clientY);
+    }
   }, { passive: true });
   
-  // Tap to flip
-  wrapper.addEventListener('click', e => {
-    if (Math.abs(curX - startX) < 10) {
+  container.addEventListener('touchmove', e => {
+    if (e.touches.length === 1) {
+      onMove(e.touches[0].clientX, e.touches[0].clientY);
+    }
+  }, { passive: true });
+  
+  container.addEventListener('touchend', onEnd, { passive: true });
+  container.addEventListener('touchcancel', onEnd, { passive: true });
+  
+  // Mouse events for desktop
+  container.addEventListener('mousedown', e => {
+    onStart(e.clientX, e.clientY);
+  });
+  
+  document.addEventListener('mousemove', e => {
+    onMove(e.clientX, e.clientY);
+  });
+  
+  document.addEventListener('mouseup', onEnd);
+  
+  // Click to flip
+  container.addEventListener('click', e => {
+    const moved = Math.abs(curX - startX) > 10;
+    if (!moved) {
       toggleFlip();
     }
   });
@@ -393,14 +533,19 @@ function parseCSV(text, name) {
   const rows = parsed.data;
   if (rows.length < 2) throw new Error('Not enough data');
   
-  const hasHeader = ['q', 'question', 'вопрос'].includes(rows[0][0]?.toLowerCase());
+  const first = rows[0][0]?.toLowerCase() || '';
+  const hasHeader = ['q', 'question', 'вопрос', 'front'].includes(first);
   const start = hasHeader ? 1 : 0;
   
   const cards = [];
   for (let i = start; i < rows.length; i++) {
     const r = rows[i];
     if (r[0] || r[1]) {
-      cards.push({ q: r[0]?.trim() || '', a: r[1]?.trim() || '', cat: r[2]?.trim() || '' });
+      cards.push({
+        q: r[0]?.trim() || '',
+        a: r[1]?.trim() || '',
+        cat: r[2]?.trim() || ''
+      });
     }
   }
   
@@ -411,7 +556,10 @@ function parseCSV(text, name) {
 // ===== AI GENERATOR =====
 async function generateAI() {
   const text = $('#aiText').value.trim();
-  if (!text) { toast(t('toastNoText'), 'error'); return; }
+  if (!text) {
+    toast(t('toastNoText'), 'error');
+    return;
+  }
   
   const count = +$('#aiCount').value;
   const lang = $('#aiLang').value;
@@ -442,7 +590,13 @@ async function generateAI() {
 
 async function callAI(text, count, lang) {
   const langInstr = lang === 'same' ? '' : `Generate in ${lang === 'ru' ? 'Russian' : lang === 'fr' ? 'French' : 'English'}.`;
-  const prompt = `Create ${count} flashcards from this text. ${langInstr}\nReturn ONLY JSON array: [{"question":"...","answer":"..."}]\n\nText:\n${text.slice(0, 8000)}`;
+  const prompt = `Create exactly ${count} flashcards from this text. ${langInstr}
+Return ONLY a JSON array with objects containing "question" and "answer" fields.
+No markdown, no explanation, just the JSON array.
+Example format: [{"question":"What is X?","answer":"X is Y"}]
+
+Text to analyze:
+${text.slice(0, 8000)}`;
   
   let content;
   if (state.apiProv === 'anthropic') {
@@ -481,8 +635,10 @@ async function callAI(text, count, lang) {
     content = data.choices[0].message.content;
   }
   
+  // Extract JSON
   const match = content.match(/\[[\s\S]*\]/);
   if (!match) throw new Error('Parse error');
+  
   const arr = JSON.parse(match[0]);
   return arr.filter(c => c.question && c.answer).map(c => ({
     q: c.question.trim(),
@@ -500,17 +656,25 @@ function basicParse(text, count) {
     const trimmed = s.trim();
     
     // Definition pattern
-    const def = trimmed.match(/^(.{5,40})\s+(?:is|are|это|est|sont)\s+(.{10,})/i);
+    const def = trimmed.match(/^(.{5,40})\s+(?:is|are|это|est|sont|—|–|-)\s+(.{10,})/i);
     if (def) {
-      cards.push({ q: `What is ${def[1].trim()}?`, a: def[2].trim(), cat: 'Auto' });
+      cards.push({
+        q: `What is ${def[1].trim()}?`,
+        a: def[2].trim(),
+        cat: 'Auto'
+      });
       continue;
     }
     
     // Fill blank
-    const words = trimmed.split(' ').filter(w => w.length > 5);
+    const words = trimmed.split(' ').filter(w => w.length > 5 && /^[a-zA-Zа-яА-ЯёЁ]/.test(w));
     if (words.length > 3) {
       const key = words[Math.floor(words.length / 2)];
-      cards.push({ q: trimmed.replace(key, '_____'), a: key, cat: 'Auto' });
+      cards.push({
+        q: trimmed.replace(new RegExp(key, 'i'), '_____'),
+        a: key,
+        cat: 'Auto'
+      });
     }
   }
   
@@ -521,8 +685,8 @@ function showPreview(cards) {
   const list = $('#aiPreviewList');
   list.innerHTML = cards.map((c, i) => `
     <div class="preview-item">
-      <input value="${c.q.replace(/"/g, '&quot;')}" data-i="${i}" data-f="q">
-      <input value="${c.a.replace(/"/g, '&quot;')}" data-i="${i}" data-f="a">
+      <input value="${c.q.replace(/"/g, '&quot;')}" data-i="${i}" data-f="q" placeholder="Question">
+      <input value="${c.a.replace(/"/g, '&quot;')}" data-i="${i}" data-f="a" placeholder="Answer">
       <button onclick="removePreview(${i})">✕</button>
     </div>
   `).join('');
@@ -531,7 +695,11 @@ function showPreview(cards) {
 
 window.removePreview = i => {
   state.genCards.splice(i, 1);
-  showPreview(state.genCards);
+  if (state.genCards.length === 0) {
+    discardCards();
+  } else {
+    showPreview(state.genCards);
+  }
 };
 
 function acceptCards() {
@@ -544,7 +712,15 @@ function acceptCards() {
   if (!valid.length) return;
   
   if (state.deckId && state.decks[state.deckId]) {
-    valid.forEach(c => state.decks[state.deckId].cards.push({ id: genId(), ...c, sm2: null }));
+    valid.forEach(c => {
+      state.decks[state.deckId].cards.push({
+        id: genId(),
+        q: c.q,
+        a: c.a,
+        cat: c.cat || 'AI',
+        sm2: null
+      });
+    });
   } else {
     createDeck('AI Cards', valid);
   }
@@ -571,12 +747,19 @@ function openEditor() {
       <input value="${c.q.replace(/"/g, '&quot;')}" placeholder="Question" data-i="${i}" data-f="q">
       <input value="${c.a.replace(/"/g, '&quot;')}" placeholder="Answer" data-i="${i}" data-f="a">
       <input value="${(c.cat || '').replace(/"/g, '&quot;')}" placeholder="Category" data-i="${i}" data-f="cat">
-      <div class="editor-item-del"><button onclick="delCard(${i})">Delete</button></div>
+      <div class="editor-item-actions">
+        <button onclick="delCard(${i})">Delete</button>
+      </div>
     </div>
   `).join('');
   
   $('#secEditor').classList.remove('hidden');
   $('#secEditor').classList.add('open');
+  
+  // Scroll to editor
+  setTimeout(() => {
+    $('#secEditor').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
 }
 
 window.delCard = i => {
@@ -587,8 +770,11 @@ window.delCard = i => {
 
 function addCard() {
   const deck = getDeck();
-  if (!deck) return;
-  deck.cards.push({ id: genId(), q: '', a: '', cat: '', sm2: null });
+  if (!deck) {
+    createDeck('New Deck', []);
+  }
+  getDeck().cards.push({ id: genId(), q: '', a: '', cat: '', sm2: null });
+  save();
   openEditor();
 }
 
@@ -605,6 +791,7 @@ function saveCards() {
   save();
   
   $('#secEditor').classList.add('hidden');
+  $('#secEditor').classList.remove('open');
   render();
   toast(t('toastSaved'), 'success');
 }
@@ -615,7 +802,12 @@ function toast(msg, type = 'info') {
   el.className = `toast ${type}`;
   el.innerHTML = `${type === 'success' ? '✓' : type === 'error' ? '✗' : 'ℹ'} ${msg}`;
   $('#toastContainer').appendChild(el);
-  setTimeout(() => el.remove(), 3000);
+  
+  setTimeout(() => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(-20px) scale(0.9)';
+    setTimeout(() => el.remove(), 300);
+  }, 3000);
 }
 
 // ===== UI RENDERING =====
@@ -624,9 +816,7 @@ function render() {
   const cards = getCards();
   const hasCards = cards.length > 0;
   
-  // Theme
-  document.documentElement.setAttribute('data-theme', state.theme);
-  $('#themeBtn').textContent = state.theme === 'dark' ? '☀️' : '🌙';
+  // Language
   $('#langSelect').value = state.lang;
   
   // Views
@@ -639,18 +829,20 @@ function render() {
   if (hasDecks) {
     $('#deckList').innerHTML = Object.values(state.decks).map(d => `
       <div class="deck-chip ${d.id === state.deckId ? 'active' : ''}" data-id="${d.id}">
-        ${d.name} (${d.cards.length})
+        ${d.name} <span style="opacity:0.6">(${d.cards.length})</span>
       </div>
     `).join('');
   }
   
   // Categories
   const cats = getCategories();
-  if (cats.length) {
+  if (cats.length > 0) {
     $('#catContainer').classList.remove('hidden');
     $('#catContainer').innerHTML = `
-      <button class="cat-btn ${!state.category ? 'active' : ''}" data-cat="">${t('allCats')}</button>
-      ${cats.map(c => `<button class="cat-btn ${state.category === c ? 'active' : ''}" data-cat="${c}">${c}</button>`).join('')}
+      <button class="cat-pill ${!state.category ? 'active' : ''}" data-cat="">${t('allCats')}</button>
+      ${cats.map(c => `
+        <button class="cat-pill ${state.category === c ? 'active' : ''}" data-cat="${c}">${c}</button>
+      `).join('')}
     `;
   } else {
     $('#catContainer').classList.add('hidden');
@@ -659,6 +851,8 @@ function render() {
   // Card
   if (hasCards) {
     const card = cards[state.idx] || cards[0];
+    if (!card) return;
+    
     const total = cards.length;
     const deck = getDeck();
     const known = deck?.cards.filter(c => c.sm2?.reps >= 3).length || 0;
@@ -668,27 +862,35 @@ function render() {
     $('#answerText').textContent = card.a;
     $('#cardNum').textContent = `#${state.idx + 1}`;
     $('#cardNum2').textContent = `#${state.idx + 1}`;
-    $('#cardCat').textContent = card.cat || '';
     
-    $('#progressBar').style.width = `${(known / (deck?.cards.length || 1)) * 100}%`;
+    const catEl = $('#cardCat');
+    if (card.cat) {
+      catEl.textContent = card.cat;
+      catEl.style.display = '';
+    } else {
+      catEl.style.display = 'none';
+    }
+    
+    const progress = deck?.cards.length ? (known / deck.cards.length) * 100 : 0;
+    $('#progressFill').style.width = `${progress}%`;
     $('#progressLabel').textContent = `${state.idx + 1}/${total}`;
     $('#knownCount').textContent = known;
     $('#unknownCount').textContent = learning;
     
-    $('#tapHint').textContent = t('tapHint');
-    
     // Flip state
-    const cardEl = $('#card');
+    const cardEl = $('#flashcard');
     cardEl.classList.toggle('flipped', state.flipped);
     $('#flipText').textContent = state.flipped ? t('flipHide') : t('flipShow');
     
-    // Buttons
+    // Buttons state
     const testBlock = state.settings.testMode && !state.flipped;
     $('#yesBtn').disabled = testBlock;
     $('#noBtn').disabled = testBlock;
     
     // Hint
-    if (!state.flipped) hideHint();
+    if (!state.flipped) {
+      hideHint();
+    }
   }
   
   // Settings toggles
@@ -701,20 +903,26 @@ function render() {
   if (state.apiKey) $('#aiKey').value = state.apiKey;
   $('#aiProvider').value = state.apiProv;
   
-  // Translations
+  // Update translations
   updateTranslations();
 }
 
 function updateTranslations() {
+  $('#brandTagline').textContent = t('tagline');
+  $('#tapHintText').textContent = t('tapHint');
   $('#emptyTitle').textContent = t('emptyTitle');
   $('#emptyDesc').textContent = t('emptyDesc');
+  $('#uploadTitle').textContent = t('uploadTitle');
+  $('#decksTitle').textContent = t('decksTitle');
+  $('#aiTitle').textContent = t('aiTitle');
+  $('#settingsTitle').textContent = t('settingsTitle');
+  $('#editorTitle').textContent = t('editorTitle');
+  
   $('#yesText').textContent = t('know');
   $('#noText').textContent = t('dontKnow');
-  $('#uploadTitle').textContent = t('upload');
-  $('#decksTitle').textContent = t('decks');
-  $('#settingsTitle').textContent = t('settings');
-  $('#aiTitle').textContent = t('aiGen');
-  $('#editorTitle').textContent = t('editor');
+  $('#prevText').textContent = t('back');
+  $('#nextText').textContent = t('next');
+  
   $('#testModeLabel').textContent = t('testMode');
   $('#testModeDesc').textContent = t('testModeDesc');
   $('#srLabel').textContent = t('sr');
@@ -723,11 +931,26 @@ function updateTranslations() {
   $('#hardDesc').textContent = t('hardDesc');
   $('#shuffleLabel').textContent = t('shuffle');
   $('#shuffleDesc').textContent = t('shuffleDesc');
-  $('#prevBtn').innerHTML = `← ${t('back')}`;
-  $('#nextBtn').innerHTML = `${t('next')} →`;
   
-  // Tagline
-  document.querySelector('.brand-tagline').innerHTML = t('tagline');
+  $('#browseBtn').innerHTML = t('browseFiles');
+  $('#demoBtn').innerHTML = t('loadDemo');
+  $('#urlBtn').innerHTML = t('loadUrl');
+  $('#newDeckBtn').innerHTML = `➕ ${t('newDeck')}`;
+  $('#delDeckBtn').innerHTML = `🗑 ${t('deleteDeck')}`;
+  $('#generateBtn').innerHTML = `✨ ${t('generate')}`;
+  $('#acceptBtn').innerHTML = `✓ ${t('add')}`;
+  $('#discardBtn').innerHTML = t('cancel');
+  $('#resetBtn').innerHTML = `🔄 ${t('reset')}`;
+  $('#exportBtn').innerHTML = `📤 ${t('export')}`;
+  $('#editorBtn').innerHTML = `✏️ ${t('editor')}`;
+  $('#addCardBtn').innerHTML = `➕ ${t('add')}`;
+  $('#saveCardsBtn').innerHTML = `💾 ${t('save')}`;
+  
+  // Upload zone
+  const uploadText = $('.upload-text');
+  if (uploadText) {
+    uploadText.innerHTML = `<strong>${t('dragDrop')}</strong> ${t('csvHere')}`;
+  }
 }
 
 function toggleFlip() {
@@ -756,12 +979,14 @@ function handleFile(file) {
   const reader = new FileReader();
   reader.onload = e => {
     try {
-      const res = parseCSV(e.target.result, file.name.replace(/\.[^.]+$/, ''));
+      const name = file.name.replace(/\.[^.]+$/, '');
+      const res = parseCSV(e.target.result, name);
       createDeck(res.name, res.cards);
       render();
       toast(t('toastLoaded') + res.cards.length, 'success');
     } catch (err) {
       toast(t('toastError'), 'error');
+      console.error(err);
     }
   };
   reader.readAsText(file);
@@ -782,7 +1007,7 @@ function handleURL(url) {
   fetch(url, { cache: 'no-store' })
     .then(r => r.ok ? r.text() : Promise.reject())
     .then(text => {
-      const name = decodeURIComponent(url.split('/').pop() || 'Remote');
+      const name = decodeURIComponent(url.split('/').pop()?.split('?')[0] || 'Remote');
       const res = parseCSV(text, name);
       createDeck(res.name, res.cards);
       render();
@@ -797,10 +1022,12 @@ function loadDemo() {
     { q: "2 + 2 = ?", a: "4", cat: "Математика" },
     { q: "Кто написал 'Война и мир'?", a: "Лев Толстой", cat: "Литература" },
     { q: "Формула воды?", a: "H₂O", cat: "Химия" },
-    { q: "Год окончания ВОВ?", a: "1945", cat: "История" },
-    { q: "Самая большая планета?", a: "Юпитер", cat: "Астрономия" },
+    { q: "Год окончания Второй мировой войны?", a: "1945", cat: "История" },
+    { q: "Самая большая планета Солнечной системы?", a: "Юпитер", cat: "Астрономия" },
     { q: "Кто нарисовал Мону Лизу?", a: "Леонардо да Винчи", cat: "Искусство" },
     { q: "Сколько континентов на Земле?", a: "7", cat: "География" },
+    { q: "Химический символ золота?", a: "Au", cat: "Химия" },
+    { q: "Автор 'Преступления и наказания'?", a: "Фёдор Достоевский", cat: "Литература" },
   ];
   createDeck('Демо', demo);
   render();
@@ -808,7 +1035,13 @@ function loadDemo() {
 }
 
 function exportData() {
-  const blob = new Blob([JSON.stringify({ decks: state.decks, stats: state.stats }, null, 2)], { type: 'application/json' });
+  const data = {
+    version: '3.0',
+    exported: new Date().toISOString(),
+    decks: state.decks,
+    stats: state.stats
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = `albinyok-flashcards_${new Date().toISOString().slice(0, 10)}.json`;
@@ -821,18 +1054,17 @@ function init() {
   render();
   initSwipe();
   
-  // Theme toggle
-  $('#themeBtn').onclick = () => {
-    state.theme = state.theme === 'dark' ? 'light' : 'dark';
-    save();
-    render();
-  };
-  
   // Language
   $('#langSelect').onchange = e => {
     state.lang = e.target.value;
     save();
     render();
+  };
+  
+  // Theme (always dark for this design)
+  $('#themeBtn').onclick = () => {
+    // This design is optimized for dark mode
+    toast('This design is optimized for dark mode ✨', 'info');
   };
   
   // Section headers
@@ -842,31 +1074,46 @@ function init() {
   
   // File upload
   $('#browseBtn').onclick = () => $('#fileInput').click();
-  $('#fileInput').onchange = e => e.target.files[0] && handleFile(e.target.files[0]);
+  $('#fileInput').onchange = e => {
+    if (e.target.files[0]) handleFile(e.target.files[0]);
+  };
   
   // Drag & drop
-  const drop = $('#dropZone');
-  drop.ondragover = e => { e.preventDefault(); drop.classList.add('dragover'); };
-  drop.ondragleave = () => drop.classList.remove('dragover');
-  drop.ondrop = e => {
+  const dropZone = $('#dropZone');
+  
+  dropZone.ondragover = e => {
     e.preventDefault();
-    drop.classList.remove('dragover');
-    e.dataTransfer.files[0] && handleFile(e.dataTransfer.files[0]);
+    dropZone.classList.add('dragover');
+  };
+  
+  dropZone.ondragleave = e => {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+  };
+  
+  dropZone.ondrop = e => {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+    if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
   };
   
   // URL load
   $('#urlBtn').onclick = () => handleURL($('#urlInput').value.trim());
+  $('#urlInput').onkeydown = e => {
+    if (e.key === 'Enter') handleURL($('#urlInput').value.trim());
+  };
   
   // Demo
   $('#demoBtn').onclick = loadDemo;
   
   // Deck selection
   $('#deckList').onclick = e => {
-    const id = e.target.dataset.id;
-    if (id) {
-      state.deckId = id;
+    const chip = e.target.closest('.deck-chip');
+    if (chip?.dataset.id) {
+      state.deckId = chip.dataset.id;
       state.idx = 0;
       state.category = null;
+      state.flipped = false;
       save();
       render();
     }
@@ -874,8 +1121,11 @@ function init() {
   
   // New/delete deck
   $('#newDeckBtn').onclick = () => {
-    const name = prompt('Deck name:');
-    if (name) { createDeck(name); render(); }
+    const name = prompt('Deck name / Название колоды:');
+    if (name) {
+      createDeck(name);
+      render();
+    }
   };
   
   $('#delDeckBtn').onclick = () => {
@@ -887,10 +1137,12 @@ function init() {
   
   // Category filter
   $('#catContainer').onclick = e => {
-    const cat = e.target.dataset.cat;
-    if (cat !== undefined) {
+    const pill = e.target.closest('.cat-pill');
+    if (pill) {
+      const cat = pill.dataset.cat;
       state.category = cat || null;
       state.idx = 0;
+      state.flipped = false;
       render();
     }
   };
@@ -903,44 +1155,54 @@ function init() {
   
   // Navigation
   $('#prevBtn').onclick = () => {
-    state.idx = Math.max(0, state.idx - 1);
-    state.flipped = false;
-    hideHint();
-    render();
+    if (state.idx > 0) {
+      state.idx--;
+      state.flipped = false;
+      hideHint();
+      render();
+    }
   };
   
   $('#nextBtn').onclick = () => {
     const cards = getCards();
-    state.idx = Math.min(cards.length - 1, state.idx + 1);
-    state.flipped = false;
-    hideHint();
-    render();
+    if (state.idx < cards.length - 1) {
+      state.idx++;
+      state.flipped = false;
+      hideHint();
+      render();
+    }
   };
   
-  $('#shuffleBtn').onclick = () => {
-    state.settings.shuffle = true;
+  $('#shuffleNavBtn').onclick = () => {
+    state.settings.shuffle = !state.settings.shuffle;
     state.idx = 0;
+    state.flipped = false;
     save();
     render();
+    toast(state.settings.shuffle ? '🔀 Shuffled!' : '📋 In order', 'success');
   };
   
   // Settings toggles
-  $$('.toggle').forEach(t => {
-    t.onclick = () => toggleSetting(t.dataset.key);
+  $$('.toggle').forEach(toggle => {
+    toggle.onclick = () => toggleSetting(toggle.dataset.key);
   });
   
-  // Reset/Export
+  // Reset
   $('#resetBtn').onclick = () => {
     if (confirm(t('confirmReset'))) {
       const deck = getDeck();
-      if (deck) deck.cards.forEach(c => c.sm2 = null);
+      if (deck) {
+        deck.cards.forEach(c => c.sm2 = null);
+      }
       state.stats = { today: 0, streak: 0 };
+      state.idx = 0;
       save();
       render();
       toast(t('toastReset'), 'success');
     }
   };
   
+  // Export
   $('#exportBtn').onclick = exportData;
   
   // Editor
@@ -953,11 +1215,11 @@ function init() {
   $('#acceptBtn').onclick = acceptCards;
   $('#discardBtn').onclick = discardCards;
   
-  // Save API key
   $('#aiKey').onchange = () => {
     state.apiKey = $('#aiKey').value.trim() || null;
     save();
   };
+  
   $('#aiProvider').onchange = () => {
     state.apiProv = $('#aiProvider').value;
     save();
@@ -965,6 +1227,7 @@ function init() {
   
   // Keyboard shortcuts
   document.onkeydown = e => {
+    // Ignore if typing in input
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
     
     const cards = getCards();
@@ -979,29 +1242,33 @@ function init() {
       case 'Numpad1':
         if (!state.settings.testMode || state.flipped) {
           e.preventDefault();
-          mark(4);
+          mark(4); // Know
         }
         break;
       case 'Digit2':
       case 'Numpad2':
         if (!state.settings.testMode || state.flipped) {
           e.preventDefault();
-          mark(1);
+          mark(1); // Don't know
         }
         break;
       case 'ArrowLeft':
         e.preventDefault();
-        state.idx = Math.max(0, state.idx - 1);
-        state.flipped = false;
-        hideHint();
-        render();
+        if (state.idx > 0) {
+          state.idx--;
+          state.flipped = false;
+          hideHint();
+          render();
+        }
         break;
       case 'ArrowRight':
         e.preventDefault();
-        state.idx = Math.min(cards.length - 1, state.idx + 1);
-        state.flipped = false;
-        hideHint();
-        render();
+        if (state.idx < cards.length - 1) {
+          state.idx++;
+          state.flipped = false;
+          hideHint();
+          render();
+        }
         break;
       case 'KeyH':
         e.preventDefault();
@@ -1016,4 +1283,5 @@ function init() {
   }
 }
 
+// Start the app
 document.addEventListener('DOMContentLoaded', init);
