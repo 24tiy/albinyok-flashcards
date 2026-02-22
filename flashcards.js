@@ -1,7 +1,7 @@
 /**
- * Albinyok Flashcards v3.0 - Premium Edition
+ * Albinyok Flashcards v3.1 - Premium Edition
  * Glassmorphism design with beautiful animations
- * Features: Swipe gestures, Hints, AI Generation, SM-2 Algorithm
+ * Features: Swipe gestures, Hints, AI Generation, SM-2 Algorithm, Light/Dark Theme
  */
 
 // ===== CONFIG =====
@@ -198,6 +198,28 @@ function shuffleArray(arr) {
   return a;
 }
 
+// ===== THEME =====
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  const btn = $('#themeBtn');
+  if (btn) {
+    btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+    btn.title = theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme';
+  }
+  // Update meta theme-color
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) {
+    meta.setAttribute('content', theme === 'dark' ? '#0f0f23' : '#f0f2ff');
+  }
+}
+
+function toggleTheme() {
+  state.theme = state.theme === 'dark' ? 'light' : 'dark';
+  applyTheme(state.theme);
+  save();
+  toast(state.theme === 'light' ? '☀️ Светлая тема' : '🌙 Тёмная тема', 'success');
+}
+
 // ===== STORAGE =====
 function save() {
   localStorage.setItem(CONFIG.storageKey, JSON.stringify({
@@ -235,7 +257,7 @@ function load() {
 // ===== SM-2 ALGORITHM =====
 function sm2(card, quality) {
   let { ef = CONFIG.sm2.defaultEF, interval = 0, reps = 0 } = card.sm2 || {};
-  
+
   if (quality < 3) {
     reps = 0;
     interval = 1;
@@ -245,10 +267,10 @@ function sm2(card, quality) {
     ef = Math.max(CONFIG.sm2.minEF, Math.min(CONFIG.sm2.maxEF,
       ef + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02))));
   }
-  
+
   const next = new Date();
   next.setDate(next.getDate() + interval);
-  
+
   return { ef, interval, reps, next: next.toISOString(), last: new Date().toISOString() };
 }
 
@@ -266,25 +288,25 @@ function getDeck() {
 function getCards() {
   const deck = getDeck();
   if (!deck) return [];
-  
+
   let cards = [...deck.cards];
-  
+
   if (state.category) {
     cards = cards.filter(c => c.cat === state.category);
   }
-  
+
   if (state.settings.hardOnly) {
     cards = cards.filter(c => !c.sm2 || c.sm2.reps < 2);
   }
-  
+
   if (state.settings.spacedRepetition) {
     cards = cards.filter(isDue);
   }
-  
+
   if (state.settings.shuffle) {
     cards = shuffleArray(cards);
   }
-  
+
   return cards;
 }
 
@@ -328,45 +350,41 @@ function mark(quality) {
   const cards = getCards();
   const card = cards[state.idx];
   if (!card) return;
-  
+
   const deck = getDeck();
   const i = deck.cards.findIndex(c => c.id === card.id);
-  
+
   if (i !== -1) {
     deck.cards[i].sm2 = sm2(card, quality);
     state.stats.today++;
     save();
   }
-  
-  // Visual feedback
+
   const el = $('#flashcard');
   el.classList.add(quality >= 3 ? 'correct' : 'incorrect');
-  
-  // Haptic feedback
+
   if (navigator.vibrate) {
     navigator.vibrate(quality >= 3 ? [10] : [20, 50, 20]);
   }
-  
+
   setTimeout(() => {
     el.classList.remove('correct', 'incorrect');
-    
-    // Next card
+
     state.flipped = false;
     state.hintLvl = 0;
-    
+
     const newCards = getCards();
     if (newCards.length === 0) {
       state.idx = 0;
     } else {
       state.idx = state.idx >= newCards.length ? 0 : state.idx;
-      // Don't increment if we just removed a card from the filtered list
       if (newCards.length > 0 && state.idx < newCards.length - 1) {
         state.idx++;
       } else if (state.idx >= newCards.length) {
         state.idx = 0;
       }
     }
-    
+
     render();
   }, 300);
 }
@@ -376,17 +394,11 @@ function getHint(answer, lvl) {
   if (!answer || lvl === 0) return '';
   const len = answer.length;
   const words = answer.split(' ');
-  
-  if (lvl === 1) {
-    return answer[0] + ' •••';
-  }
-  if (lvl === 2) {
-    return answer.slice(0, Math.ceil(len * 0.25)) + '...';
-  }
+
+  if (lvl === 1) return answer[0] + ' •••';
+  if (lvl === 2) return answer.slice(0, Math.ceil(len * 0.25)) + '...';
   if (lvl === 3) {
-    if (words.length > 1) {
-      return words[0] + ' ' + words[1][0] + '...';
-    }
+    if (words.length > 1) return words[0] + ' ' + words[1][0] + '...';
     return answer.slice(0, Math.ceil(len * 0.5)) + '...';
   }
   return answer.slice(0, Math.ceil(len * 0.75)) + '...';
@@ -396,14 +408,12 @@ function showHint() {
   const cards = getCards();
   const card = cards[state.idx];
   if (!card) return;
-  
+
   state.hintLvl = Math.min(state.hintLvl + 1, 4);
   $('#hintText').textContent = getHint(card.a, state.hintLvl);
   $('#hintBox').classList.remove('hidden');
-  
-  if (state.hintLvl >= 4) {
-    $('#hintBtn').disabled = true;
-  }
+
+  if (state.hintLvl >= 4) $('#hintBtn').disabled = true;
 }
 
 function hideHint() {
@@ -418,11 +428,11 @@ function initSwipe() {
   const card = $('#flashcard');
   const swL = $('#swipeL');
   const swR = $('#swipeR');
-  
+
   let startX = 0, startY = 0, curX = 0, curY = 0;
   let isDragging = false;
   let startTime = 0;
-  
+
   const onStart = (x, y) => {
     startX = curX = x;
     startY = curY = y;
@@ -430,25 +440,22 @@ function initSwipe() {
     isDragging = true;
     card.classList.add('swiping');
   };
-  
+
   const onMove = (x, y) => {
     if (!isDragging) return;
-    
     curX = x;
     curY = y;
     const diffX = curX - startX;
     const diffY = curY - startY;
-    
-    // Only horizontal swipes
+
     if (Math.abs(diffY) > Math.abs(diffX) * 1.5) return;
-    
+
     const rotation = diffX * 0.08;
     const baseTransform = state.flipped ? 'rotateY(180deg) ' : '';
     const moveX = state.flipped ? -diffX : diffX;
-    
+
     card.style.transform = `${baseTransform}translateX(${moveX}px) rotate(${rotation}deg)`;
-    
-    // Show indicators
+
     if (diffX < -60) {
       swL.classList.add('show');
       swR.classList.remove('show');
@@ -460,70 +467,47 @@ function initSwipe() {
       swR.classList.remove('show');
     }
   };
-  
+
   const onEnd = () => {
     if (!isDragging) return;
     isDragging = false;
-    
+
     const diffX = curX - startX;
     const velocity = Math.abs(diffX) / (Date.now() - startTime);
     const threshold = velocity > 0.5 ? 50 : 100;
-    
+
     card.classList.remove('swiping');
     card.style.transform = '';
     swL.classList.remove('show');
     swR.classList.remove('show');
-    
+
     if (diffX < -threshold) {
-      // Swipe left - Don't know
       card.classList.add('swipe-left');
-      setTimeout(() => {
-        card.classList.remove('swipe-left');
-        mark(1);
-      }, 300);
+      setTimeout(() => { card.classList.remove('swipe-left'); mark(1); }, 300);
     } else if (diffX > threshold) {
-      // Swipe right - Know
       card.classList.add('swipe-right');
-      setTimeout(() => {
-        card.classList.remove('swipe-right');
-        mark(4);
-      }, 300);
+      setTimeout(() => { card.classList.remove('swipe-right'); mark(4); }, 300);
     }
   };
-  
-  // Touch events
+
   container.addEventListener('touchstart', e => {
-    if (e.touches.length === 1) {
-      onStart(e.touches[0].clientX, e.touches[0].clientY);
-    }
+    if (e.touches.length === 1) onStart(e.touches[0].clientX, e.touches[0].clientY);
   }, { passive: true });
-  
+
   container.addEventListener('touchmove', e => {
-    if (e.touches.length === 1) {
-      onMove(e.touches[0].clientX, e.touches[0].clientY);
-    }
+    if (e.touches.length === 1) onMove(e.touches[0].clientX, e.touches[0].clientY);
   }, { passive: true });
-  
+
   container.addEventListener('touchend', onEnd, { passive: true });
   container.addEventListener('touchcancel', onEnd, { passive: true });
-  
-  // Mouse events for desktop
-  container.addEventListener('mousedown', e => {
-    onStart(e.clientX, e.clientY);
-  });
-  
-  document.addEventListener('mousemove', e => {
-    onMove(e.clientX, e.clientY);
-  });
-  
+
+  container.addEventListener('mousedown', e => onStart(e.clientX, e.clientY));
+  document.addEventListener('mousemove', e => onMove(e.clientX, e.clientY));
   document.addEventListener('mouseup', onEnd);
-  
-  // Click to flip
+
   container.addEventListener('click', e => {
     const moved = Math.abs(curX - startX) > 10;
-    if (!moved) {
-      toggleFlip();
-    }
+    if (!moved) toggleFlip();
   });
 }
 
@@ -532,11 +516,11 @@ function parseCSV(text, name) {
   const parsed = Papa.parse(text.trim(), { skipEmptyLines: true });
   const rows = parsed.data;
   if (rows.length < 2) throw new Error('Not enough data');
-  
+
   const first = rows[0][0]?.toLowerCase() || '';
   const hasHeader = ['q', 'question', 'вопрос', 'front'].includes(first);
   const start = hasHeader ? 1 : 0;
-  
+
   const cards = [];
   for (let i = start; i < rows.length; i++) {
     const r = rows[i];
@@ -548,7 +532,7 @@ function parseCSV(text, name) {
       });
     }
   }
-  
+
   if (!cards.length) throw new Error('No cards');
   return { name, cards };
 }
@@ -560,13 +544,13 @@ async function generateAI() {
     toast(t('toastNoText'), 'error');
     return;
   }
-  
+
   const count = +$('#aiCount').value;
   const lang = $('#aiLang').value;
-  
+
   $('#aiLoading').classList.remove('hidden');
   $('#generateBtn').disabled = true;
-  
+
   try {
     let cards;
     if (state.apiKey) {
@@ -574,9 +558,9 @@ async function generateAI() {
     } else {
       cards = basicParse(text, count);
     }
-    
+
     if (!cards.length) throw new Error('No cards generated');
-    
+
     state.genCards = cards;
     showPreview(cards);
     toast(t('toastGen') + cards.length, 'success');
@@ -597,7 +581,7 @@ Example format: [{"question":"What is X?","answer":"X is Y"}]
 
 Text to analyze:
 ${text.slice(0, 8000)}`;
-  
+
   let content;
   if (state.apiProv === 'anthropic') {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
@@ -634,11 +618,10 @@ ${text.slice(0, 8000)}`;
     const data = await res.json();
     content = data.choices[0].message.content;
   }
-  
-  // Extract JSON
+
   const match = content.match(/\[[\s\S]*\]/);
   if (!match) throw new Error('Parse error');
-  
+
   const arr = JSON.parse(match[0]);
   return arr.filter(c => c.question && c.answer).map(c => ({
     q: c.question.trim(),
@@ -650,23 +633,17 @@ ${text.slice(0, 8000)}`;
 function basicParse(text, count) {
   const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 20);
   const cards = [];
-  
+
   for (const s of sentences) {
     if (cards.length >= count) break;
     const trimmed = s.trim();
-    
-    // Definition pattern
+
     const def = trimmed.match(/^(.{5,40})\s+(?:is|are|это|est|sont|—|–|-)\s+(.{10,})/i);
     if (def) {
-      cards.push({
-        q: `What is ${def[1].trim()}?`,
-        a: def[2].trim(),
-        cat: 'Auto'
-      });
+      cards.push({ q: `What is ${def[1].trim()}?`, a: def[2].trim(), cat: 'Auto' });
       continue;
     }
-    
-    // Fill blank
+
     const words = trimmed.split(' ').filter(w => w.length > 5 && /^[a-zA-Zа-яА-ЯёЁ]/.test(w));
     if (words.length > 3) {
       const key = words[Math.floor(words.length / 2)];
@@ -677,7 +654,7 @@ function basicParse(text, count) {
       });
     }
   }
-  
+
   return cards.slice(0, count);
 }
 
@@ -707,24 +684,20 @@ function acceptCards() {
     const i = +inp.dataset.i, f = inp.dataset.f;
     if (state.genCards[i]) state.genCards[i][f] = inp.value.trim();
   });
-  
+
   const valid = state.genCards.filter(c => c.q && c.a);
   if (!valid.length) return;
-  
+
   if (state.deckId && state.decks[state.deckId]) {
     valid.forEach(c => {
       state.decks[state.deckId].cards.push({
-        id: genId(),
-        q: c.q,
-        a: c.a,
-        cat: c.cat || 'AI',
-        sm2: null
+        id: genId(), q: c.q, a: c.a, cat: c.cat || 'AI', sm2: null
       });
     });
   } else {
     createDeck('AI Cards', valid);
   }
-  
+
   save();
   discardCards();
   render();
@@ -741,7 +714,7 @@ function discardCards() {
 function openEditor() {
   const deck = getDeck();
   if (!deck) return;
-  
+
   $('#editorList').innerHTML = deck.cards.map((c, i) => `
     <div class="editor-item">
       <input value="${c.q.replace(/"/g, '&quot;')}" placeholder="Question" data-i="${i}" data-f="q">
@@ -752,11 +725,10 @@ function openEditor() {
       </div>
     </div>
   `).join('');
-  
+
   $('#secEditor').classList.remove('hidden');
   $('#secEditor').classList.add('open');
-  
-  // Scroll to editor
+
   setTimeout(() => {
     $('#secEditor').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, 100);
@@ -770,9 +742,7 @@ window.delCard = i => {
 
 function addCard() {
   const deck = getDeck();
-  if (!deck) {
-    createDeck('New Deck', []);
-  }
+  if (!deck) createDeck('New Deck', []);
   getDeck().cards.push({ id: genId(), q: '', a: '', cat: '', sm2: null });
   save();
   openEditor();
@@ -781,15 +751,15 @@ function addCard() {
 function saveCards() {
   const deck = getDeck();
   if (!deck) return;
-  
+
   $$('#editorList input').forEach(inp => {
     const i = +inp.dataset.i, f = inp.dataset.f;
     if (deck.cards[i]) deck.cards[i][f] = inp.value.trim();
   });
-  
+
   deck.cards = deck.cards.filter(c => c.q || c.a);
   save();
-  
+
   $('#secEditor').classList.add('hidden');
   $('#secEditor').classList.remove('open');
   render();
@@ -802,7 +772,7 @@ function toast(msg, type = 'info') {
   el.className = `toast ${type}`;
   el.innerHTML = `${type === 'success' ? '✓' : type === 'error' ? '✗' : 'ℹ'} ${msg}`;
   $('#toastContainer').appendChild(el);
-  
+
   setTimeout(() => {
     el.style.opacity = '0';
     el.style.transform = 'translateY(-20px) scale(0.9)';
@@ -815,16 +785,19 @@ function render() {
   const hasDecks = Object.keys(state.decks).length > 0;
   const cards = getCards();
   const hasCards = cards.length > 0;
-  
+
   // Language
   $('#langSelect').value = state.lang;
-  
+
+  // Theme button
+  applyTheme(state.theme);
+
   // Views
   $('#emptyView').classList.toggle('hidden', hasDecks);
   $('#studyView').classList.toggle('hidden', !hasCards);
   $('#bottomBar').classList.toggle('hidden', !hasCards);
   $('#secDecks').classList.toggle('hidden', !hasDecks);
-  
+
   // Deck list
   if (hasDecks) {
     $('#deckList').innerHTML = Object.values(state.decks).map(d => `
@@ -833,7 +806,7 @@ function render() {
       </div>
     `).join('');
   }
-  
+
   // Categories
   const cats = getCategories();
   if (cats.length > 0) {
@@ -847,22 +820,22 @@ function render() {
   } else {
     $('#catContainer').classList.add('hidden');
   }
-  
+
   // Card
   if (hasCards) {
     const card = cards[state.idx] || cards[0];
     if (!card) return;
-    
+
     const total = cards.length;
     const deck = getDeck();
     const known = deck?.cards.filter(c => c.sm2?.reps >= 3).length || 0;
     const learning = deck?.cards.filter(c => c.sm2 && c.sm2.reps < 3).length || 0;
-    
+
     $('#questionText').textContent = card.q;
     $('#answerText').textContent = card.a;
     $('#cardNum').textContent = `#${state.idx + 1}`;
     $('#cardNum2').textContent = `#${state.idx + 1}`;
-    
+
     const catEl = $('#cardCat');
     if (card.cat) {
       catEl.textContent = card.cat;
@@ -870,40 +843,34 @@ function render() {
     } else {
       catEl.style.display = 'none';
     }
-    
+
     const progress = deck?.cards.length ? (known / deck.cards.length) * 100 : 0;
     $('#progressFill').style.width = `${progress}%`;
     $('#progressLabel').textContent = `${state.idx + 1}/${total}`;
     $('#knownCount').textContent = known;
     $('#unknownCount').textContent = learning;
-    
-    // Flip state
+
     const cardEl = $('#flashcard');
     cardEl.classList.toggle('flipped', state.flipped);
     $('#flipText').textContent = state.flipped ? t('flipHide') : t('flipShow');
-    
-    // Buttons state
+
     const testBlock = state.settings.testMode && !state.flipped;
     $('#yesBtn').disabled = testBlock;
     $('#noBtn').disabled = testBlock;
-    
-    // Hint
-    if (!state.flipped) {
-      hideHint();
-    }
+
+    if (!state.flipped) hideHint();
   }
-  
+
   // Settings toggles
   $('#toggleTest').classList.toggle('on', state.settings.testMode);
   $('#toggleSR').classList.toggle('on', state.settings.spacedRepetition);
   $('#toggleHard').classList.toggle('on', state.settings.hardOnly);
   $('#toggleShuffle').classList.toggle('on', state.settings.shuffle);
-  
+
   // API key
   if (state.apiKey) $('#aiKey').value = state.apiKey;
   $('#aiProvider').value = state.apiProv;
-  
-  // Update translations
+
   updateTranslations();
 }
 
@@ -917,12 +884,12 @@ function updateTranslations() {
   $('#aiTitle').textContent = t('aiTitle');
   $('#settingsTitle').textContent = t('settingsTitle');
   $('#editorTitle').textContent = t('editorTitle');
-  
+
   $('#yesText').textContent = t('know');
   $('#noText').textContent = t('dontKnow');
   $('#prevText').textContent = t('back');
   $('#nextText').textContent = t('next');
-  
+
   $('#testModeLabel').textContent = t('testMode');
   $('#testModeDesc').textContent = t('testModeDesc');
   $('#srLabel').textContent = t('sr');
@@ -931,7 +898,7 @@ function updateTranslations() {
   $('#hardDesc').textContent = t('hardDesc');
   $('#shuffleLabel').textContent = t('shuffle');
   $('#shuffleDesc').textContent = t('shuffleDesc');
-  
+
   $('#browseBtn').innerHTML = t('browseFiles');
   $('#demoBtn').innerHTML = t('loadDemo');
   $('#urlBtn').innerHTML = t('loadUrl');
@@ -945,8 +912,7 @@ function updateTranslations() {
   $('#editorBtn').innerHTML = `✏️ ${t('editor')}`;
   $('#addCardBtn').innerHTML = `➕ ${t('add')}`;
   $('#saveCardsBtn').innerHTML = `💾 ${t('save')}`;
-  
-  // Upload zone
+
   const uploadText = $('.upload-text');
   if (uploadText) {
     uploadText.innerHTML = `<strong>${t('dragDrop')}</strong> ${t('csvHere')}`;
@@ -968,7 +934,7 @@ function toggleSetting(key) {
   state.idx = 0;
   save();
   render();
-  
+
   if (key === 'hardOnly' && state.settings.hardOnly && !getCards().length) {
     toast(t('toastNoHard'), 'error');
   }
@@ -994,16 +960,14 @@ function handleFile(file) {
 
 function handleURL(url) {
   if (!url) return;
-  
-  // Convert GitHub URLs
+
   if (/github\.com\/.+\/blob\//.test(url)) {
     url = url.replace('github.com/', 'raw.githubusercontent.com/').replace('/blob/', '/');
   }
-  // Convert Google Sheets URLs
   if (url.includes('docs.google.com/spreadsheets/') && !/export\?format=csv/.test(url)) {
     url = url.replace(/\/edit.*$/, '/export?format=csv');
   }
-  
+
   fetch(url, { cache: 'no-store' })
     .then(r => r.ok ? r.text() : Promise.reject())
     .then(text => {
@@ -1036,7 +1000,7 @@ function loadDemo() {
 
 function exportData() {
   const data = {
-    version: '3.0',
+    version: '3.1',
     exported: new Date().toISOString(),
     decks: state.decks,
     stats: state.stats
@@ -1051,61 +1015,50 @@ function exportData() {
 // ===== INIT =====
 function init() {
   load();
+  applyTheme(state.theme);
   render();
   initSwipe();
-  
+
   // Language
   $('#langSelect').onchange = e => {
     state.lang = e.target.value;
     save();
     render();
   };
-  
-  // Theme (always dark for this design)
-  $('#themeBtn').onclick = () => {
-    // This design is optimized for dark mode
-    toast('This design is optimized for dark mode ✨', 'info');
-  };
-  
+
+  // Theme toggle
+  $('#themeBtn').onclick = toggleTheme;
+
   // Section headers
   $$('.section-header').forEach(h => {
     h.onclick = () => toggleSection(h.dataset.section);
   });
-  
+
   // File upload
   $('#browseBtn').onclick = () => $('#fileInput').click();
   $('#fileInput').onchange = e => {
     if (e.target.files[0]) handleFile(e.target.files[0]);
   };
-  
+
   // Drag & drop
   const dropZone = $('#dropZone');
-  
-  dropZone.ondragover = e => {
-    e.preventDefault();
-    dropZone.classList.add('dragover');
-  };
-  
-  dropZone.ondragleave = e => {
-    e.preventDefault();
-    dropZone.classList.remove('dragover');
-  };
-  
+  dropZone.ondragover = e => { e.preventDefault(); dropZone.classList.add('dragover'); };
+  dropZone.ondragleave = e => { e.preventDefault(); dropZone.classList.remove('dragover'); };
   dropZone.ondrop = e => {
     e.preventDefault();
     dropZone.classList.remove('dragover');
     if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
   };
-  
+
   // URL load
   $('#urlBtn').onclick = () => handleURL($('#urlInput').value.trim());
   $('#urlInput').onkeydown = e => {
     if (e.key === 'Enter') handleURL($('#urlInput').value.trim());
   };
-  
+
   // Demo
   $('#demoBtn').onclick = loadDemo;
-  
+
   // Deck selection
   $('#deckList').onclick = e => {
     const chip = e.target.closest('.deck-chip');
@@ -1118,41 +1071,37 @@ function init() {
       render();
     }
   };
-  
+
   // New/delete deck
   $('#newDeckBtn').onclick = () => {
     const name = prompt('Deck name / Название колоды:');
-    if (name) {
-      createDeck(name);
-      render();
-    }
+    if (name) { createDeck(name); render(); }
   };
-  
+
   $('#delDeckBtn').onclick = () => {
     if (state.deckId && confirm(t('confirmDelete'))) {
       deleteDeck(state.deckId);
       render();
     }
   };
-  
+
   // Category filter
   $('#catContainer').onclick = e => {
     const pill = e.target.closest('.cat-pill');
     if (pill) {
-      const cat = pill.dataset.cat;
-      state.category = cat || null;
+      state.category = pill.dataset.cat || null;
       state.idx = 0;
       state.flipped = false;
       render();
     }
   };
-  
+
   // Card controls
   $('#flipBtn').onclick = toggleFlip;
   $('#hintBtn').onclick = showHint;
   $('#yesBtn').onclick = () => mark(4);
   $('#noBtn').onclick = () => mark(1);
-  
+
   // Navigation
   $('#prevBtn').onclick = () => {
     if (state.idx > 0) {
@@ -1162,7 +1111,7 @@ function init() {
       render();
     }
   };
-  
+
   $('#nextBtn').onclick = () => {
     const cards = getCards();
     if (state.idx < cards.length - 1) {
@@ -1172,7 +1121,7 @@ function init() {
       render();
     }
   };
-  
+
   $('#shuffleNavBtn').onclick = () => {
     state.settings.shuffle = !state.settings.shuffle;
     state.idx = 0;
@@ -1181,19 +1130,17 @@ function init() {
     render();
     toast(state.settings.shuffle ? '🔀 Shuffled!' : '📋 In order', 'success');
   };
-  
+
   // Settings toggles
   $$('.toggle').forEach(toggle => {
     toggle.onclick = () => toggleSetting(toggle.dataset.key);
   });
-  
+
   // Reset
   $('#resetBtn').onclick = () => {
     if (confirm(t('confirmReset'))) {
       const deck = getDeck();
-      if (deck) {
-        deck.cards.forEach(c => c.sm2 = null);
-      }
+      if (deck) deck.cards.forEach(c => c.sm2 = null);
       state.stats = { today: 0, streak: 0 };
       state.idx = 0;
       save();
@@ -1201,38 +1148,37 @@ function init() {
       toast(t('toastReset'), 'success');
     }
   };
-  
+
   // Export
   $('#exportBtn').onclick = exportData;
-  
+
   // Editor
   $('#editorBtn').onclick = openEditor;
   $('#addCardBtn').onclick = addCard;
   $('#saveCardsBtn').onclick = saveCards;
-  
+
   // AI Generator
   $('#generateBtn').onclick = generateAI;
   $('#acceptBtn').onclick = acceptCards;
   $('#discardBtn').onclick = discardCards;
-  
+
   $('#aiKey').onchange = () => {
     state.apiKey = $('#aiKey').value.trim() || null;
     save();
   };
-  
+
   $('#aiProvider').onchange = () => {
     state.apiProv = $('#aiProvider').value;
     save();
   };
-  
+
   // Keyboard shortcuts
   document.onkeydown = e => {
-    // Ignore if typing in input
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-    
+
     const cards = getCards();
     if (!cards.length) return;
-    
+
     switch (e.code) {
       case 'Space':
         e.preventDefault();
@@ -1240,48 +1186,35 @@ function init() {
         break;
       case 'Digit1':
       case 'Numpad1':
-        if (!state.settings.testMode || state.flipped) {
-          e.preventDefault();
-          mark(4); // Know
-        }
+        if (!state.settings.testMode || state.flipped) { e.preventDefault(); mark(4); }
         break;
       case 'Digit2':
       case 'Numpad2':
-        if (!state.settings.testMode || state.flipped) {
-          e.preventDefault();
-          mark(1); // Don't know
-        }
+        if (!state.settings.testMode || state.flipped) { e.preventDefault(); mark(1); }
         break;
       case 'ArrowLeft':
         e.preventDefault();
-        if (state.idx > 0) {
-          state.idx--;
-          state.flipped = false;
-          hideHint();
-          render();
-        }
+        if (state.idx > 0) { state.idx--; state.flipped = false; hideHint(); render(); }
         break;
       case 'ArrowRight':
         e.preventDefault();
-        if (state.idx < cards.length - 1) {
-          state.idx++;
-          state.flipped = false;
-          hideHint();
-          render();
-        }
+        if (state.idx < cards.length - 1) { state.idx++; state.flipped = false; hideHint(); render(); }
         break;
       case 'KeyH':
         e.preventDefault();
         if (!state.flipped) showHint();
         break;
+      case 'KeyT':
+        e.preventDefault();
+        toggleTheme();
+        break;
     }
   };
-  
+
   // Service Worker
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch(() => {});
   }
 }
 
-// Start the app
 document.addEventListener('DOMContentLoaded', init);
